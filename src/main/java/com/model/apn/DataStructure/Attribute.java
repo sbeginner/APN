@@ -3,6 +3,7 @@ package com.model.apn.DataStructure;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static com.model.apn.Config.ATTRIBUTEVALUE_NUM;
 import static com.model.apn.Config.UNKNOWNVALUE;
 
 /**
@@ -10,96 +11,140 @@ import static com.model.apn.Config.UNKNOWNVALUE;
  */
 public class Attribute {
 
-    private int index;
-    StringBuilder attributeName;
-    Boolean attributeTypeisStr;
-    ArrayList<StringBuilder> attrvalueList;
+    private int index;                                       //Attribute index
+    private Boolean attributeTypeisStr;                      //Attribute type, string as true, digital as false
+    private StringBuilder attributeName;                     //Attribute name
+    private ArrayList<StringBuilder> attrvalueList;          //Attribute value list
+    private HashMap<String, Integer> attrvalueMap;           //Attribute value set in train or k-fold validation mode
+    private HashMap<String, Integer> attrvalueMapforTest;    //Attribute value set in test mode
 
-    HashMap<String, Integer> attrvalueMap;
+    private double formissingNum;              //For replacing The missing number in train or k-fold validation mode
+    private String formissingStr;              //For replacing The missing string in train or k-fold validation mode
+    private double formissingNumForTest;       //For replacing The missing number in test mode
+    private String formissingStrForTest;       //For replacing The missing string in test mode
+
 
     public Attribute(StringBuilder attributeName){
-        //set attribute index and name
+        //Set attribute index and name
         this.attributeName = attributeName;
-        attrvalueMap = new HashMap();
-        attrvalueList = new  ArrayList();
+        attrvalueList = new  ArrayList(ATTRIBUTEVALUE_NUM);
+        attrvalueMap = new HashMap(ATTRIBUTEVALUE_NUM);
+        attrvalueMapforTest = new HashMap(ATTRIBUTEVALUE_NUM);
     }
 
     public void setIndex(int index){
-        //set attribute index
+        //Set attribute index
         this.index = index;
     }
 
     public void setAttributeType(boolean attributeTypeisStr){
-        //set attribute index
+        //Set attribute index
         this.attributeTypeisStr = attributeTypeisStr;
     }
 
-    public void setValue(ArrayList<StringBuilder> attrvalueList){
-        //set 'attribute value' list
-        this.attrvalueList = attrvalueList;
+    public void setformissingValue(double formissingNum, boolean checkIsTest){
+        //Set missing digital value
+        if(checkIsTest){
+            this.formissingNumForTest = formissingNum;
+            return;
+        }
+        this.formissingNum = formissingNum;
     }
 
-    public void setHashMapValue(String attrvalue){
-        //set 'attribute value' list
+    public void setformissingValue(String formissingStr, boolean checkIsTest){
+        //Set missing string value
+        if(checkIsTest){
+            this.formissingStrForTest = formissingStr;
+            return;
+        }
+        this.formissingStr = formissingStr;
+    }
+
+    public void setHashMapValue(String attrvalue,boolean checkIsTest){
+        //Set attribute value list
         if(UNKNOWNVALUE.equals(attrvalue)){
             return;
         }
 
+        if(checkIsTest){
+            this.attrvalueMapforTest.put(attrvalue, autoItemFrequencyCounter(this.attrvalueMapforTest.get(attrvalue)));
+            return;
+        }
+
         this.attrvalueMap.put(attrvalue, autoItemFrequencyCounter(this.attrvalueMap.get(attrvalue)));
-        //System.out.println(attrvalueSet.size());
     }
 
+
     public StringBuilder getAttributeName(){
-        //get attribute name
+        //Get attribute name
         return attributeName;
     }
 
-    public int getIndex(){
-        //set attribute index
-        return index;
-    }
-
     public StringBuilder getValue(int index){
-        //get 'attribute value'
+        //Get 'attribute value' by index
         return attrvalueList.get(index);
     }
 
-    public ArrayList<StringBuilder> getAllValue(){
-        //get 'attribute value'
-        return attrvalueList;
+    public int getIndex(){
+        //Get attribute index
+        return index;
     }
 
-    public boolean getAttributeType(){
-        //set attribute index
-        return attributeTypeisStr;
-    }
-
-    public int getAllValuesize(){
-        //set attribute size
+    public int getAllValueSize(){
+        //Get attribute size
         return attrvalueList.size();
     }
 
-    public OptionalInt getIndexOfValue(String value){
-        //get 'attribute value' index
-        return IntStream.range(0, attrvalueList.size()).filter(i -> value.equals(attrvalueList.get(i))).findFirst();
+    public int getIndexOfValue(String value){
+        //get 'attribute value' index, error return -1
+        return IntStream.range(0, attrvalueList.size()).filter(i -> value.equals(attrvalueList.get(i))).findFirst().orElse(-1);
     }
 
-    public HashMap<String, Integer>  getAttrValueMap(){
+    public boolean getAttributeType(){
+        //Get attribute type
+        return attributeTypeisStr;
+    }
+
+    public String getMissingValue(){
+        //Get value to replace the original missing value
+        if(attributeTypeisStr){
+            return this.formissingStr;
+        }
+        return String.valueOf(this.formissingNum);
+    }
+
+    public String getMissingValueTest(){
+        //Get value to replace the original missing value
+        if(attributeTypeisStr){
+            return this.formissingStrForTest;
+        }
+        return String.valueOf(this.formissingNumForTest);
+    }
+
+    public ArrayList<StringBuilder> getAllValue(){
+        //Get 'attribute value' list
+        return attrvalueList;
+    }
+
+    public HashMap<String, Integer>  getAttrValueMap(boolean checkIsTest){
+        //Get attribute value map
+        if(checkIsTest){
+            return attrvalueMapforTest;
+        }
         return attrvalueMap;
     }
 
+
     public void  transAttrValueSet2AttrValueList(){
+        //transfer the hash set to arraylist
         attrvalueMap.forEach((attrValue, attrValuefrequency)->{
             attrvalueList.add(new StringBuilder(attrValue));
         });
-        /*
-        attrvalueMap.forEach((attrValue, attrValuefrequency)->{
-            System.out.println(attrValue+" "+attrValuefrequency);
-        });
-        */
     }
 
+
     private int autoItemFrequencyCounter(Integer itemfrequency){
+        //Auto calculate the attribute value frequency
         itemfrequency = Optional.ofNullable(itemfrequency).orElse(new Integer(0)) + 1;
         return itemfrequency;
     }
