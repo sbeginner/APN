@@ -1,5 +1,7 @@
 package com.model.apn.DataStructure;
 
+import com.model.apn.Math.Arithmetic;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.IntStream;
@@ -75,14 +77,19 @@ public class Instance {
     }
 
     public StringBuilder getInstanceValue(int attrIndex){
-        return new StringBuilder((String) item.get(instances.getAttribute(attrIndex)));
+        return new StringBuilder(item.get(instances.getAttribute(attrIndex)));
+    }
+
+    public double getInstanceDigitalValue(int attrIndex){
+        //Get digital type, only use in digital type
+        return Arithmetic.createDouble(item.get(instances.getAttribute(attrIndex)));
     }
 
     public StringBuilder getInstanceValue(Attribute attr){
         return new StringBuilder((String)item.get(attr));
     }
 
-    public HashMap getInstanceMap(){
+    public HashMap getInstanceItemMap(){
         return item;
     }
 

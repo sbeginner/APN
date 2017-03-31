@@ -48,6 +48,11 @@ public class Arithmetic {
         return div(v1, v2, DEF_DIV_SCALE);
     }
 
+    //May consider this way is safe enough?
+    public static double ln(double v1){
+        return round(div(Math.log(v1), Math.log(2)));
+    }
+
     public static double round(double v, int scale) {
         if (scale < 0) {
             throw new IllegalArgumentException("scale must not be negetive");

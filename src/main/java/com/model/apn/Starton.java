@@ -1,9 +1,15 @@
 package com.model.apn;
 
+import com.model.apn.DataStructure.Instances;
+import com.model.apn.Eval.Evaluation;
 import com.model.apn.FileIO.DataInput;
+import com.model.apn.Model.APN;
+import com.model.apn.Preprocess.Filter;
+import com.model.apn.Preprocess.MEPA;
 
 import java.io.IOException;
-import java.util.stream.IntStream;
+
+import static com.model.apn.Config.RANDOM_SEED;
 
 /**
  * Created by jack on 2017/3/20.
@@ -12,47 +18,26 @@ public class Starton {
 
     public static void main(String str[]) throws IOException {
         DataInput dt =new DataInput();
-
-        dt.forKfoldValidationInstance();
-        //dt.forTrainTestInstance();
-        dt.completeData();
-        /*
+        //dt.forKfoldValidationInstance();
         dt.forTrainTestInstance();
-        dt.forTrainInstance();
-        dt.forTestInstance();
-        */
+        dt.completeData();
+        Instances instances = dt.getInstances();    //get data
 
+        ///////////////////////////////////////////////////////////////////
+        Instances mepaInstances = Filter.useFilter(instances, new MEPA());
+
+
+        //////////////////////////////////////////////////////////////////
+        Evaluation eval = new Evaluation(instances);
+        eval.crossValidateModel(new APN(), instances, 10, RANDOM_SEED);
+        //eval.evalTrainTestModel(new APN(), instances, RANDOM_SEED);
+
+
+        System.out.println(dt.getInstances().getCurrentMode());
         System.out.println();
         System.out.println("Attribute size : "+dt.getInstances().getAttributeMap().size());
-        dt.getInstances().getAttributeMap().forEach((k,v)->{
-            System.out.println("Attr : " + k + " isString : " +v.getAttributeType()+ " Value : "+v.getAllValue());
-        });
-
         System.out.println();
-        IntStream.range(0, dt.getInstances().getAttributeMap().size()).forEach(i->{
-            System.out.println("Attr : "+i+" Avg or mode "+dt.getInstances().getAttributeMap().get(i).getMissingValue());
-        });
 
-        System.out.println();
-        IntStream.range(0, dt.getInstances().getAttributeMap().size()).forEach(i->{
-            System.out.println("Attr : "+i+" Avg or mode "+dt.getInstances().getAttributeMap().get(i).getMissingValueTest());
-        });
-
-        System.out.println();
-        System.out.println(dt.getInstances().getCurrentMode());
-
-        /*
-        dt.getInstances().getTestInstanceMap().forEach((k,v)->{
-            System.out.println("Ind : " + k+ " value : "+v.getInstanceMap());
-        });
-
-        dt.getInstances().getTrainInstanceMap().forEach((k,v)->{
-            System.out.println("Ind : " + k + " value : "+v.getInstanceMap());
-        });
-
-        dt.getInstances().getInstanceMap().forEach((k,v)->{
-            System.out.println("Ind : " + k + " value : "+v.getInstanceMap());
-        });
 
         /*
         dt.getInstances().getTrainInstanceMap().forEach((k,v)->{

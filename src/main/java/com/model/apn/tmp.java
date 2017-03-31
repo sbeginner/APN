@@ -18,7 +18,13 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+        int a = IntStream.range(0, attrValueSorted.size())
+                .reduce((maxThresholdInd, curThresholdInd) -> {
+                    double  maxThresholdPerformance = evalInformationGain(calcFatherEntropy(groupByTargetLevel), calcSplitChildsEntropy(groupByLevel, attrValueSorted.get(maxThresholdInd)));
+                    double  curThresholdPerformance = evalInformationGain(calcFatherEntropy(groupByTargetLevel), calcSplitChildsEntropy(groupByLevel, attrValueSorted.get(curThresholdInd)));
 
+                    return maxThresholdPerformance < curThresholdPerformance ? curThresholdInd : maxThresholdInd;
+                }).getAsInt();
 public class tmp {
     void aaa(String str[]){
         List<String> strings = Arrays.asList("abc", "", "bc", "efg", "abcd","", "jkl");

@@ -1,12 +1,11 @@
 package com.model.apn.DataStructure;
 import com.model.apn.Config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.awt.*;
+import java.util.*;
+import java.util.stream.IntStream;
 
-import static com.model.apn.Config.ATTRIBUTE_NUM;
-import static com.model.apn.Config.INSTANCE_NUM;
+import static com.model.apn.Config.*;
 
 /**
  * Created by jack on 2017/3/20.
@@ -17,6 +16,7 @@ public class Instances {
 
     HashMap<Integer, Attribute> attributesMap;
     HashMap<Integer, Instance> instanceMap;
+    HashMap<Integer, Instance> shuffleInstanceMap;    //Optional. shuffle the elements in instanceMap
     HashMap<Integer, Instance> trainInstanceMap;
     HashMap<Integer, Instance> testInstanceMap;
 
@@ -118,5 +118,84 @@ public class Instances {
 
     private int autoResizeIndex(HashMap targetmap){
         return targetmap.size();
+    }
+
+
+
+
+
+
+
+
+
+
+    private void splitTrainTestInEachFold(int valid){
+        //Only for k-fold validation, this function splits train and test data for classification
+        HashMap<Integer, Instance> currentInstanceMap;
+        this.trainInstanceMap.clear();
+        this.testInstanceMap.clear();
+
+        if(!INSTANCEORDER_SHUFFLE_BTN){
+            currentInstanceMap = instanceMap;
+        }else {
+            currentInstanceMap = shuffleInstanceMap;
+        }
+
+        int front = splitMethodInWeka(valid)[0];
+        int back = splitMethodInWeka(valid)[1];
+
+        //train
+        currentInstanceMap.entrySet().stream().filter(item -> !(item.getKey() >= front && item.getKey() < back))
+                .forEach(item -> {
+                    this.trainInstanceMap.put(autoResizeIndex(trainInstanceMap), item.getValue());
+                });
+
+        //test
+        currentInstanceMap.entrySet().stream().filter(item -> item.getKey() >= front && item.getKey() < back)
+                .forEach(item -> {
+                    this.testInstanceMap.put(autoResizeIndex(testInstanceMap), item.getValue());
+                });
+    }
+
+    private int[] splitMethodInWeka(int valid){
+
+        int numInstForFold = INSTANCE_NUM / MAX_FOLDNUM;
+        int offset, front, back;
+
+        if(valid < INSTANCE_NUM % MAX_FOLDNUM){
+            numInstForFold++;
+            offset = valid;
+        }else {
+            offset = INSTANCE_NUM % MAX_FOLDNUM;
+        }
+
+        front = valid * numInstForFold + offset;
+        back = front + numInstForFold;
+
+        return new int[]{front, back};
+    }
+
+    public void autoCVInKFold(int valid){
+        splitTrainTestInEachFold(valid);
+    }
+
+    public void autoShuffleInstanceOrder(){
+        //Only for k-fold validation, this function shuffles the original instance item order by random (random seed is set).
+        if(!INSTANCEORDER_SHUFFLE_BTN){
+            return;
+        }
+
+        shuffleInstanceMap = new HashMap(INSTANCE_NUM);
+        ArrayList<Integer> shufflekeylist = new ArrayList(instanceMap.keySet());
+        Collections.shuffle(shufflekeylist, new Random(RANDOM_SEED));
+        shufflekeylist.stream().forEach(orderedkey -> shuffleInstanceMap.put(orderedkey, instanceMap.get(orderedkey)));
+    }
+
+    public void setMaxFoldNum(int maxfoldnum){
+        MAX_FOLDNUM = maxfoldnum;
+    }
+
+    public void setRandSeed(int randseed){
+        RANDOM_SEED = randseed;
     }
 }

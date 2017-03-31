@@ -38,28 +38,6 @@ public class DataInput extends DataInputException {
         this.instances = new Instances();
     }
 
-    private void setFoldForValidation(int valid){
-        instances.getInstanceMap();
-        int maxfoldnum = 10;
-        int numInstForFold = INSTANCE_NUM / maxfoldnum;
-        int offset,front,back;
-
-        if(valid < INSTANCE_NUM % maxfoldnum){
-            numInstForFold++;
-            offset = valid;
-        }else {
-            offset = INSTANCE_NUM % maxfoldnum;
-        }
-
-        front = valid * numInstForFold + offset;
-        back = front + numInstForFold;
-
-        System.out.println(front +", "+ back+" "+INSTANCE_NUM);
-        instances.getInstanceMap().entrySet().stream().filter(item -> item.getKey() >= front && item.getKey() < back)
-                .forEach(item -> {
-                    System.out.println(item.getKey()+" => "+item.getValue().getInstanceMap().get(instances.getAttribute(0)));
-                });
-    }
 
     public void forKfoldValidationInstance() throws IOException{
         switchForKFoldvalidation(true);
@@ -67,16 +45,13 @@ public class DataInput extends DataInputException {
 
         BufferedReader inputBuffer = Files.newBufferedReader(inputPath, charset);
         setAttributeInfo(inputBuffer);
-        switchOnlyFirstTime();
         setInstanceInfo(inputBuffer);
 
-        transAttrValueMap();
-        inputBuffer.close();
+        switchOnlyFirstTime();    //Always becomes true
 
-        IntStream.range(0,10).forEach(i->{
-            setFoldForValidation(i);
-        });
-        //System.out.println(((Attribute)instances.getAttributeList().get(4)).getAllValue());
+        transAttrValueMap();
+
+        inputBuffer.close();
     }
 
     public void forKfoldValidationInstance(String filePath) throws IOException{
@@ -93,10 +68,10 @@ public class DataInput extends DataInputException {
         setTrainInstanceInfo(inputBuffer);
 
         transAttrValueMap();
-        inputBuffer.close();
-        switchSecondTime();
 
-        //System.out.println(((Attribute)instances.getAttributeMap().get(4)).getAllValue());
+        switchSecondTime();    //The next becomes the opposite of current state, for checking something like attribute member are matched or other else...
+
+        inputBuffer.close();
     }
 
     public void forTrainInstance(String filePath) throws IOException{
@@ -113,10 +88,10 @@ public class DataInput extends DataInputException {
         setTestInstanceInfo(inputBuffer);
 
         transAttrValueMap();
-        inputBuffer.close();
-        switchSecondTime();
 
-        //System.out.println(((Attribute)instances.getAttributeMap().get(4)).getAllValue());
+        switchSecondTime();    //The next becomes the opposite of current state, for checking something like attribute member are matched or other else...
+
+        inputBuffer.close();
     }
 
     public void forTestInstance(String filePath) throws IOException{
@@ -158,6 +133,7 @@ public class DataInput extends DataInputException {
 
         attributeList.forEach(unitItem -> instances.setAttribute(unitItem));    //Set attribute only once
         ATTRIBUTE_NUM = Math.toIntExact(attributeList.size());    //Reset attribute number
+        TARGET_ATTRIBUTE = ATTRIBUTE_NUM - 1;    //For default, the last one is the target attribute
         switchAttributeFound();    //Switch on, cause the attribute is found
     }
 
@@ -319,6 +295,9 @@ public class DataInput extends DataInputException {
 
                     //Variable: checkAttrisStr, -1 as Digital, >= 0 as String.
                     curattr.setAttributeType(checkAttrisStr >= 0);
+
+                    //Create digital list if the type is digital
+                    curattr.createDoubleList(!curattr.getAttributeType());
                 });
     }
 
@@ -399,6 +378,7 @@ public class DataInput extends DataInputException {
         }
     }
 
+
     public void completeData(){
         //Missing value process
         missingValueProcess();
@@ -435,7 +415,6 @@ public class DataInput extends DataInputException {
                     });
         }
     }
-
 
     public Instances getInstances(){
         return instances;

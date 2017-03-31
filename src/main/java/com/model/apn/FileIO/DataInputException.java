@@ -51,6 +51,7 @@ public class DataInputException {
     protected void switchSecondTime(){
         //Only for train-test, this function makes sure all the data source(includes train and test data) have been scanned
         //The attribute value will be set in the second time (switchSecondTime == true).
+        //To avoid add the same attributes again.
         switchSecondTime = !switchSecondTime;
     }
 
