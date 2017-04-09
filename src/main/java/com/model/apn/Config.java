@@ -16,6 +16,7 @@ public class Config {
      public static int NONVALUE_INTEGER = -1;
      public static int MAX_FOLDNUM = 10;
      public static int RANDOM_SEED = 1994;
+     public static int DIVIDE_CONSTRAINTNUM = 1;    //The split number, if = 0, can only split to two level
 
 
      public static String FILEPATH = "C:/Data/test4";

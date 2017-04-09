@@ -16,10 +16,6 @@ public class MEPAConcernAttr {
         return concernAttribute;
     }
 
-    public StringBuilder getTargetAttribute(){
-        return targetAttribute;
-    }
-
     public String getTargetAttributeString(){
         return targetAttribute.toString();
     }

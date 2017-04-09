@@ -1,5 +1,8 @@
 package com.model.apn.DataStructure;
 import com.model.apn.Config;
+import com.model.apn.Container.MEPAMembership;
+import com.model.apn.Container.MEPAMembershipMap;
+import org.w3c.dom.Attr;
 
 import java.awt.*;
 import java.util.*;
@@ -10,18 +13,40 @@ import static com.model.apn.Config.*;
 /**
  * Created by jack on 2017/3/20.
  */
-public class Instances {
+public class Instances{
 
     boolean currentMode = false;    //Train-test as true, k fold validation as false
 
-    HashMap<Integer, Attribute> attributesMap;
-    HashMap<Integer, Instance> instanceMap;
-    HashMap<Integer, Instance> shuffleInstanceMap;    //Optional. shuffle the elements in instanceMap
-    HashMap<Integer, Instance> trainInstanceMap;
-    HashMap<Integer, Instance> testInstanceMap;
+    private HashMap<Integer, Attribute> attributesMap;
+    private HashMap<Integer, Instance> instanceMap;
+    private HashMap<Integer, Instance> shuffleInstanceMap;    //Optional. shuffle the elements in instanceMap
+    private HashMap<Integer, Instance> trainInstanceMap;
+    private HashMap<Integer, Instance> testInstanceMap;
 
-    HashMap<Integer, ArrayList<Integer>> missingValueMap;//(lineNum, attributeInd list)
-    HashMap<Integer, ArrayList<Integer>> missingValueMapforTest;//(lineNum, attributeInd list)
+    private HashMap<Integer, ArrayList<Integer>> missingValueMap;    //(lineNum, attributeInd list)
+    private HashMap<Integer, ArrayList<Integer>> missingValueMapforTest;    //(lineNum, attributeInd list)
+
+    private MEPAMembershipMap MEPAMembershipEachFoldForTrain;
+    private MEPAMembershipMap MEPAMembershipEachFoldForTest;
+
+
+    public void setMEPAMembershipEachFold(Attribute curAttr, ArrayList<MEPAMembership> MEPAMembershipList, boolean isTest){
+        if(isTest){
+            MEPAMembershipEachFoldForTest.put(curAttr, MEPAMembershipList);
+        }else
+            MEPAMembershipEachFoldForTrain.put(curAttr, MEPAMembershipList);
+    }
+
+    public ArrayList<MEPAMembership> getMEPAMembershipEachFold(Attribute curAttr, boolean isTest){
+        if(isTest){
+            return MEPAMembershipEachFoldForTest.get(curAttr);
+        }else
+            return MEPAMembershipEachFoldForTrain.get(curAttr);
+    }
+
+    public ArrayList<MEPAMembership> getMEPAMembershipEachFold(int curAttrInd, boolean isTest){
+        return getMEPAMembershipEachFold(this.getAttribute(curAttrInd), isTest);
+    }
 
     public Instances(){
         attributesMap = new HashMap(ATTRIBUTE_NUM);
@@ -31,7 +56,12 @@ public class Instances {
 
         missingValueMap = new HashMap(ATTRIBUTE_NUM);
         missingValueMapforTest = new HashMap(ATTRIBUTE_NUM);
+
+
+        MEPAMembershipEachFoldForTrain = new MEPAMembershipMap();
+        MEPAMembershipEachFoldForTest = new MEPAMembershipMap();
     }
+
 
     public void setMissingValueMap(Integer errorLine, ArrayList<Integer> missingValueAttrInd, boolean checkIsTrainTestmodeAndIsTest){
         //train-test mode: train and k-fold mode as same process, train-test mode: test might use other container to store it.
@@ -65,7 +95,18 @@ public class Instances {
     }
 
     public void setCurrentMode(boolean currentMode){
+        //Train-test as true, k fold validation as false
         this.currentMode = currentMode;
+    }
+
+    public void setRandSeed(int randseed){
+        //For fixed
+        RANDOM_SEED = randseed;
+    }
+
+    public void setMaxFoldNum(int maxfoldnum){
+        //Set the max fold num
+        MAX_FOLDNUM = maxfoldnum;
     }
 
 
@@ -116,19 +157,6 @@ public class Instances {
     }
 
 
-    private int autoResizeIndex(HashMap targetmap){
-        return targetmap.size();
-    }
-
-
-
-
-
-
-
-
-
-
     private void splitTrainTestInEachFold(int valid){
         //Only for k-fold validation, this function splits train and test data for classification
         HashMap<Integer, Instance> currentInstanceMap;
@@ -136,29 +164,37 @@ public class Instances {
         this.testInstanceMap.clear();
 
         if(!INSTANCEORDER_SHUFFLE_BTN){
+            //For no shuffle
             currentInstanceMap = instanceMap;
         }else {
             currentInstanceMap = shuffleInstanceMap;
         }
+        //front [0]; back [1]
+        int[] frontback = splitMethodInWeka(valid);
+        splitTrainTest(currentInstanceMap, frontback);
+    }
 
-        int front = splitMethodInWeka(valid)[0];
-        int back = splitMethodInWeka(valid)[1];
-
+    private void splitTrainTest(HashMap<Integer, Instance> currentInstanceMap, int[] frontback){
         //train
-        currentInstanceMap.entrySet().stream().filter(item -> !(item.getKey() >= front && item.getKey() < back))
+        currentInstanceMap.entrySet()
+                .stream()
+                .filter(item -> !(item.getKey() >= frontback[0] && item.getKey() < frontback[1]))
                 .forEach(item -> {
                     this.trainInstanceMap.put(autoResizeIndex(trainInstanceMap), item.getValue());
                 });
 
         //test
-        currentInstanceMap.entrySet().stream().filter(item -> item.getKey() >= front && item.getKey() < back)
+        currentInstanceMap.entrySet()
+                .stream()
+                .filter(item -> item.getKey() >= frontback[0] && item.getKey() < frontback[1])
                 .forEach(item -> {
                     this.testInstanceMap.put(autoResizeIndex(testInstanceMap), item.getValue());
                 });
     }
 
     private int[] splitMethodInWeka(int valid){
-
+        //A way reference from weka CV method
+        //find front [0] and back [1]
         int numInstForFold = INSTANCE_NUM / MAX_FOLDNUM;
         int offset, front, back;
 
@@ -175,9 +211,6 @@ public class Instances {
         return new int[]{front, back};
     }
 
-    public void autoCVInKFold(int valid){
-        splitTrainTestInEachFold(valid);
-    }
 
     public void autoShuffleInstanceOrder(){
         //Only for k-fold validation, this function shuffles the original instance item order by random (random seed is set).
@@ -191,11 +224,12 @@ public class Instances {
         shufflekeylist.stream().forEach(orderedkey -> shuffleInstanceMap.put(orderedkey, instanceMap.get(orderedkey)));
     }
 
-    public void setMaxFoldNum(int maxfoldnum){
-        MAX_FOLDNUM = maxfoldnum;
+    public void autoCVInKFold(int valid){
+        //Only for k-fold validation, split the train and test instance in each fold.
+        splitTrainTestInEachFold(valid);
     }
 
-    public void setRandSeed(int randseed){
-        RANDOM_SEED = randseed;
+    private int autoResizeIndex(HashMap targetmap){
+        return targetmap.size();
     }
 }

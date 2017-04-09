@@ -7,8 +7,10 @@ import com.model.apn.DataStructure.Instances;
  */
 public class Filter{
     public static Instances useFilter(Instances instances, MEPA mepaFilter){
+        //This filter uses MEPA method
         mepaFilter.setInstances(instances);
         mepaFilter.useFilter();
+
         return mepaFilter.getInstances();
     }
 }

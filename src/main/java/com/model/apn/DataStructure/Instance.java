@@ -45,7 +45,7 @@ public class Instance {
                 .forEach(currentAttributeInd -> {
 
                     instances.getAttribute(currentAttributeInd)
-                            .setHashMapValue(instanceItem.get(currentAttributeInd), !isTestOrTrain);
+                            .setAttributeValue(instanceItem.get(currentAttributeInd), !isTestOrTrain);
 
                     item.put(instances.getAttribute(currentAttributeInd), instanceItem.get(currentAttributeInd));
                 });
@@ -56,14 +56,14 @@ public class Instance {
 
         IntStream.range(0, ATTRIBUTE_NUM)
                 .forEach(currentAttributeInd -> {
-                    instances.getAttribute(currentAttributeInd).setHashMapValue(instanceItem.get(currentAttributeInd), false);
+                    instances.getAttribute(currentAttributeInd).setAttributeValue(instanceItem.get(currentAttributeInd), false);
                     item.put(instances.getAttribute(currentAttributeInd), instanceItem.get(currentAttributeInd));
                 });
 
     }
 
     public void changeItemValue(ArrayList<Integer> attributeList, boolean checkIsTest){
-
+        //Replace Missing Value
         if(checkIsTest){
             attributeList.stream().forEach(i->{
                 item.replace(instances.getAttribute(i), instances.getAttribute(i).getMissingValueTest());
@@ -74,6 +74,10 @@ public class Instance {
         attributeList.stream().forEach(i->{
             item.replace(instances.getAttribute(i), instances.getAttribute(i).getMissingValue());
         });
+    }
+
+    public void changeItemValueToStr(int attrIndex, String digitalToStr){
+        item.replace(instances.getAttribute(attrIndex), digitalToStr);
     }
 
     public StringBuilder getInstanceValue(int attrIndex){

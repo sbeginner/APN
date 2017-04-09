@@ -280,13 +280,13 @@ public class DataInput extends DataInputException {
                 .forEach(currentAttributeInd -> {
                     Attribute curattr = instances.getAttributeMap().get(currentAttributeInd);
                     //Transfer attribute value set type to arraylist type.
-                    curattr.transAttrValueSet2AttrValueList();
+                    curattr.transTrainAttrValueSet2AttrValueList();
 
                     //Find out all the value under each attribute is digital or string.
-                    int checkAttrisStr = IntStream.range(0, instances.getAttributeMap().get(currentAttributeInd).getAllValueSize())
+                    int checkAttrisStr = IntStream.range(0, instances.getAttributeMap().get(currentAttributeInd).getAllTTValueSize())
                             .filter(currentValuenum -> {
                                 //return attribute value when the string type find out, when the string is detected then break the loop
-                                String curattrValue = curattr.getValue(currentValuenum).toString();
+                                String curattrValue = curattr.getTTValue(currentValuenum).toString();
                                 Boolean curValueisStr = !checkCreatable(curattrValue);
                                 return curValueisStr;
                             })
@@ -328,7 +328,7 @@ public class DataInput extends DataInputException {
 
                     instances.getAttributeMap()
                             .get(currentAttributeInd)
-                            .setformissingValue(modeAttrvalue, checkIsTest);
+                            .setForMissingValue(modeAttrvalue, checkIsTest);
                 });
 
         //For Digital type, choose the average
@@ -354,7 +354,7 @@ public class DataInput extends DataInputException {
 
                     double average = Arithmetic.div(countValueFrequency, totalnum);
 
-                    instances.getAttributeMap().get(currentAttributeInd).setformissingValue(average, checkIsTest);
+                    instances.getAttributeMap().get(currentAttributeInd).setForMissingValue(average, checkIsTest);
                 });
     }
 
@@ -415,6 +415,7 @@ public class DataInput extends DataInputException {
                     });
         }
     }
+
 
     public Instances getInstances(){
         return instances;
