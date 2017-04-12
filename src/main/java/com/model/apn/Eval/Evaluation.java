@@ -1,10 +1,12 @@
 package com.model.apn.Eval;
 
+import com.model.apn.Container.MEPAMembership;
 import com.model.apn.DataStructure.Instances;
 import com.model.apn.Model.APN;
 import com.model.apn.Preprocess.Filter;
 import com.model.apn.Preprocess.MEPA;
 
+import java.nio.channels.MembershipKey;
 import java.util.stream.IntStream;
 
 import static com.model.apn.Config.MAX_FOLDNUM;
@@ -30,25 +32,24 @@ public class Evaluation {
 
         IntStream.range(0, MAX_FOLDNUM).forEach(curfoldInd -> {
 
-            System.out.println(curfoldInd+">>>");
+            System.out.println("[ Fold: "+curfoldInd+" ]");
             instances.autoCVInKFold(curfoldInd);
+            Instances mepaInstances = Filter.useFilter(instances, new MEPA());
             //model do something
 
-            Instances mepaInstances = Filter.useFilter(instances, new MEPA());
 
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(0, true).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(1, true).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(2, true).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(3, true).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(4, true).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(0, true).size());
 
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(0, false).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(1, false).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(2, false).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(3, false).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(4, false).get(0).getMembershipDegree());
-            System.out.println(mepaInstances.getMEPAMembershipEachFold(0, false).size());
+            for(int i=0;i<mepaInstances.getMEPAMembership(0, true).size();i++){
+                MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, true).get(i);
+                System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
+            }
+
+            if(false)
+            for(int i=0;i<mepaInstances.getMEPAMembership(0, false).size();i++){
+                MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, false).get(i);
+                System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
+            }
+
         });
         /*
         instances.getInstanceMap().forEach((k,v)->{
@@ -62,21 +63,19 @@ public class Evaluation {
 
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
         instances.setRandSeed(randseed);         //Optional
+        Instances mepaInstances = Filter.useFilter(instances, new MEPA());
         //model do something
 
-        System.out.println(instances.getMEPAMembershipEachFold(0, true).get(1).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(1, true).get(1).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(2, true).get(1).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(3, true).get(1).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(4, true).get(1).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(0, true).size());
+        for(int i=0;i<mepaInstances.getMEPAMembership(0, true).size();i++){
+            MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, true).get(i);
+            System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
+        }
 
-        System.out.println(instances.getMEPAMembershipEachFold(0, false).get(0).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(1, false).get(0).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(2, false).get(0).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(3, false).get(0).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(4, false).get(0).getMembershipDegree());
-        System.out.println(instances.getMEPAMembershipEachFold(0, false).size());
+        for(int i=0;i<mepaInstances.getMEPAMembership(0, false).size();i++){
+            MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, false).get(i);
+            System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
+        }
+
         /*
         System.out.println();
         instances.getTestInstanceMap().forEach((k,v)->{

@@ -55,11 +55,12 @@ public class MEPAEntropy {
         //BFS is used
         splitChildInstance(concernAttrArrayList, bestThreshold);
 
-        if(checkDivConstraintNumCnt() || getQueueForChildInstance().isEmpty()){
+        if(checkDivConstraintNumCnt() || getQueueForChildInstance().isEmpty() || attrValueList.isEmpty()){
             //Don't need to find the next threshold, cause of this limitation
             initQueueForChildInstance();    //Remove all item in queue;
             return;
         }
+
 
         calcEntropy(getQueueForChildInstance().poll(), attrValueList);
     }
@@ -79,6 +80,7 @@ public class MEPAEntropy {
                     //Return the Information Gain larger one and the index
                     return maxThresholdPerformance < curThresholdPerformance ? curThresholdInd : maxThresholdInd;
                 }).getAsInt();
+
 
         return attrValueList.get(bestThresholdInd);
     }

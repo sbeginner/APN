@@ -18,19 +18,19 @@ public class Starton {
 
     public static void main(String str[]) throws IOException {
         DataInput dt =new DataInput();
-        //dt.forKfoldValidationInstance();
-        dt.forTrainTestInstance();
+        dt.forKfoldValidationInstance();
+        //dt.forTrainTestInstance();
         dt.completeData();
         Instances instances = dt.getInstances();    //get data
 
         ///////////////////////////////////////////////////////////////////
-        Instances mepaInstances = Filter.useFilter(instances, new MEPA());
+        //Instances mepaInstances = Filter.useFilter(instances, new MEPA());
 
 
         //////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
-        //eval.crossValidateModel(new APN(), instances, 10, RANDOM_SEED);
-        eval.evalTrainTestModel(new APN(), instances, RANDOM_SEED);
+        eval.crossValidateModel(new APN(), instances, 10, RANDOM_SEED);
+        //eval.evalTrainTestModel(new APN(), instances, RANDOM_SEED);
 
 
         System.out.println(dt.getInstances().getCurrentMode());

@@ -26,26 +26,26 @@ public class Instances{
     private HashMap<Integer, ArrayList<Integer>> missingValueMap;    //(lineNum, attributeInd list)
     private HashMap<Integer, ArrayList<Integer>> missingValueMapforTest;    //(lineNum, attributeInd list)
 
-    private MEPAMembershipMap MEPAMembershipEachFoldForTrain;
-    private MEPAMembershipMap MEPAMembershipEachFoldForTest;
+    private MEPAMembershipMap MEPAMembershipForTrain;
+    private MEPAMembershipMap MEPAMembershipForTest;
 
 
-    public void setMEPAMembershipEachFold(Attribute curAttr, ArrayList<MEPAMembership> MEPAMembershipList, boolean isTest){
+    public void setMEPAMembership(Attribute curAttr, ArrayList<MEPAMembership> MEPAMembershipList, boolean isTest){
         if(isTest){
-            MEPAMembershipEachFoldForTest.put(curAttr, MEPAMembershipList);
+            MEPAMembershipForTest.put(curAttr, MEPAMembershipList);
         }else
-            MEPAMembershipEachFoldForTrain.put(curAttr, MEPAMembershipList);
+            MEPAMembershipForTrain.put(curAttr, MEPAMembershipList);
     }
 
-    public ArrayList<MEPAMembership> getMEPAMembershipEachFold(Attribute curAttr, boolean isTest){
+    public ArrayList<MEPAMembership> getMEPAMembership(Attribute curAttr, boolean isTest){
         if(isTest){
-            return MEPAMembershipEachFoldForTest.get(curAttr);
+            return MEPAMembershipForTest.get(curAttr);
         }else
-            return MEPAMembershipEachFoldForTrain.get(curAttr);
+            return MEPAMembershipForTrain.get(curAttr);
     }
 
-    public ArrayList<MEPAMembership> getMEPAMembershipEachFold(int curAttrInd, boolean isTest){
-        return getMEPAMembershipEachFold(this.getAttribute(curAttrInd), isTest);
+    public ArrayList<MEPAMembership> getMEPAMembership(int curAttrInd, boolean isTest){
+        return getMEPAMembership(this.getAttribute(curAttrInd), isTest);
     }
 
     public Instances(){
@@ -58,8 +58,8 @@ public class Instances{
         missingValueMapforTest = new HashMap(ATTRIBUTE_NUM);
 
 
-        MEPAMembershipEachFoldForTrain = new MEPAMembershipMap();
-        MEPAMembershipEachFoldForTest = new MEPAMembershipMap();
+        MEPAMembershipForTrain = new MEPAMembershipMap();
+        MEPAMembershipForTest = new MEPAMembershipMap();
     }
 
 

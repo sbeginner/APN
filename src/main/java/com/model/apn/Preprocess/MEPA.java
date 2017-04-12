@@ -78,7 +78,7 @@ public class MEPA extends MEPAEntropy{
                 .map(item -> new MEPAMembership(item.getValue().getInstanceValue(curAttribute).toString(), 1))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        instances.setMEPAMembershipEachFold(curAttribute, MEPAMembershipList, isTest);
+        instances.setMEPAMembership(curAttribute, MEPAMembershipList, isTest);
     }
 
     private void setTrainInstanceInfo(Attribute curAttribute){
@@ -94,11 +94,11 @@ public class MEPA extends MEPAEntropy{
                 .stream()
                 .map(trainInstance -> {
                     //It's not necessary to calculate the membership degree in training data, therefore, just directly set the degree in 1.0
-                    return new MEPAMembership(trainInstance.getValue().getInstanceValue(curAttribute).toString(), 1);
+                    return detectValueRangeChangeToStr(createDouble(trainInstance.getValue().getInstanceValue(curAttribute).toString()),false);
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        instances.setMEPAMembershipEachFold(curAttribute, MEPAMembershipList, false);
+        instances.setMEPAMembership(curAttribute, MEPAMembershipList, false);
     }
 
     private void calcTargetValueNumInEachAttribute(int attributeInd){
@@ -107,7 +107,7 @@ public class MEPA extends MEPAEntropy{
 
         //Set attribute value list, and select the list item to travel the whole instances,
         //this work aims to find out the best split threshold (by using the concept of entropy).
-        ArrayList<Double> curAttrValueList = getInputInstances().getAttribute(attributeInd).getAllTrainValueInDigital();
+        ArrayList<Double> curAttrValueList = new ArrayList(getInputInstances().getAttribute(attributeInd).getAllTrainValueInDigital());
 
         //transfer the whole train instances to only two columns(attributes), including considered column and target.
         ArrayList<MEPAConcernAttr> transTrainInstanceList = transTrainInstance(attributeInd);
@@ -145,39 +145,87 @@ public class MEPA extends MEPAEntropy{
         ArrayList<MEPAMembership> MEPAMembershipList =  instances.getTestInstanceMap()
                 .entrySet()
                 .stream()
-                .map(item -> detectValueRangeChangeToStr(createDouble(item.getValue().getInstanceValue(curAttribute).toString())))
+                .map(item -> detectValueRangeChangeToStr(createDouble(item.getValue().getInstanceValue(curAttribute).toString()), true))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        instances.setMEPAMembershipEachFold(curAttribute, MEPAMembershipList, true);
+        instances.setMEPAMembership(curAttribute, MEPAMembershipList, true);
     }
 
-    private MEPAMembership detectValueRangeChangeToStr(double curNum){
+
+    private MEPAMembership detectValueRangeChangeToStr(double curNum, boolean isTest){
         //The number categorize into its range
         String replaceStr;
-        if(bestThresholdList.get(0) >= curNum){
-            replaceStr = String.valueOf("[ "+bestThresholdList.get(0)+", -inf]");
+        boolean degreeIsUnderEstimate;
+
+        //Special case in divide num = 0
+        if(bestThresholdList.size() == 1){
+            if(bestThresholdList.get(0) >= curNum){
+                replaceStr = String.valueOf("T0");
+                return new MEPAMembership(replaceStr, 1);
+            }else {
+                replaceStr = String.valueOf("T1");
+                return new MEPAMembership(replaceStr, 1);
+            }
+        }
+
+        //minMargin
+        if(detectValueRangeOverMinMargin(curNum)){
+            replaceStr = String.valueOf("T0");
             return new MEPAMembership(replaceStr, 1);
         }
 
-        if(curNum > bestThresholdList.get(bestThresholdList.size() - 1)){
-            replaceStr = String.valueOf("[ inf, "+bestThresholdList.get(bestThresholdList.size() - 1)+"+]");
+        //maxMargin
+        if(detectValueRangeOverMaxMargin(curNum)){
+            replaceStr = String.valueOf("T" + (bestThresholdList.size() - 1));
             return new MEPAMembership(replaceStr, 1);
         }
 
-        int middleNum = IntStream.range(0, bestThresholdList.size() - 1)
+        //Others in middle side
+        int frontInRange = IntStream.range(0, bestThresholdList.size() - 1)
                 .filter(i -> bestThresholdList.get(i+1) >= curNum && curNum > bestThresholdList.get(i))
                 .findFirst()
                 .orElse(-99);
+        int frontInRangeNext = frontInRange + 1;
+        double leftThreshold = bestThresholdList.get(frontInRange);
+        double rightThreshold = bestThresholdList.get(frontInRangeNext);
 
-        double leftThreshold = bestThresholdList.get(middleNum+1);
-        double rightThreshold = bestThresholdList.get(middleNum);
-        replaceStr = String.valueOf("[ "+bestThresholdList.get(middleNum+1)+", "+bestThresholdList.get(middleNum)+"+]");
+        if(Math.abs(curNum - bestThresholdList.get(frontInRangeNext)) >= Math.abs(curNum - bestThresholdList.get(frontInRange))){
+            //curNum is close to left side
+            degreeIsUnderEstimate = true;
+            replaceStr = String.valueOf("T" + frontInRange);
+        }else {
+            degreeIsUnderEstimate = false;
+            replaceStr = String.valueOf("T" + frontInRangeNext);
+        }
 
-        return new MEPAMembership(replaceStr, membershipDegree(leftThreshold, rightThreshold, curNum));
+        if(isTest){
+            if(degreeIsUnderEstimate){
+                return new MEPAMembership(replaceStr, Arithmetic.sub(1, membershipDegree(leftThreshold, rightThreshold, curNum)));
+            }
+
+            return new MEPAMembership(replaceStr, membershipDegree(leftThreshold, rightThreshold, curNum));
+        }else{
+            //It's not necessary to calculate the membership degree in training data, therefore, just directly set the degree in 1.0
+            return new MEPAMembership(replaceStr, 1);
+        }
+    }
+
+    private boolean detectValueRangeOverMinMargin(double curNum){
+        if(bestThresholdList.get(0) >= curNum){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean detectValueRangeOverMaxMargin(double curNum){
+        if(curNum >= bestThresholdList.get(bestThresholdList.size() - 1)){
+            return true;
+        }
+        return false;
     }
 
     private double membershipDegree(double leftThreshold, double rightThreshold, double currentNum){
-        return Arithmetic.div(Arithmetic.sub(currentNum, rightThreshold), Arithmetic.sub(leftThreshold, rightThreshold));
+        return Arithmetic.div(Arithmetic.sub(currentNum, leftThreshold), Arithmetic.sub(rightThreshold, leftThreshold));
     }
 
 
