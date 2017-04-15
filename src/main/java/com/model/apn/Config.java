@@ -18,8 +18,10 @@ public class Config {
      public static int RANDOM_SEED = 1994;
      public static int DIVIDE_CONSTRAINTNUM = 2;    //The split number, if = 0, can only split to two level
 
+     public static double MIN_DOUBLENUM = 0.0001;
 
-     public static String FILEPATH = "C:/Data/test4";
+
+     public static String FILEPATH = "C:/Data/test";
      public static String FILENAME = "origin.txt";
      public static String FILETRAINNAME = "train.txt";
      public static String FILETESTNAME = "test.txt";

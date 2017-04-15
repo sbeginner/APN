@@ -1,20 +1,17 @@
 package com.model.apn.Preprocess;
 
-import com.model.apn.Container.MEPAConcernAttr;
-import com.model.apn.Container.MEPAConcernAttrList;
-import com.model.apn.Container.MEPAMembership;
+import com.model.apn.Container.*;
 import com.model.apn.DataStructure.Attribute;
 import com.model.apn.DataStructure.Instance;
 import com.model.apn.DataStructure.Instances;
 import com.model.apn.Math.Arithmetic;
 
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.model.apn.Config.ATTRIBUTE_NUM;
-import static com.model.apn.Config.TARGET_ATTRIBUTE;
-import static com.model.apn.Config.DIVIDE_CONSTRAINTNUM;
+import static com.model.apn.Config.*;
 import static com.model.apn.Math.Arithmetic.createDouble;
 
 /**
@@ -62,6 +59,48 @@ public class MEPA extends MEPAEntropy{
             setTestInstanceInfo(curAttribute);
         }
 
+        if(attributeInd == TARGET_ATTRIBUTE){
+            return;
+        }
+
+        priorProbabilityCalc(curAttribute);
+    }
+
+    private void priorProbabilityCalc(Attribute curAttribute){
+        //Calculate the Prior probability for each attribute
+        //The Prior probability use for support the situation that classification couldn't classify (e.g. The predict number is all in 0)
+
+        ArrayList<MEPAMembership>  MEPAMemberList = instances.getMEPAMembership(curAttribute, false);
+        MEPAConcernAttrList concernAttrListtmp = new MEPAConcernAttrList();
+
+        getInputInstances().getTrainInstanceMap().entrySet().stream().forEach(instance -> {
+            StringBuilder concernAttribute = new StringBuilder(MEPAMemberList.get(instance.getKey()).getMembership());
+            StringBuilder targetAttribute = instance.getValue().getInstanceValue(TARGET_ATTRIBUTE);
+            concernAttrListtmp.addMEPAConcernAttr(concernAttribute, targetAttribute);
+        });
+
+
+        MEPAMembershipMap membershipMap = instances.getMEPAMembershipMap(false);
+        membershipMap.setTargetValue(instances.getAttribute(TARGET_ATTRIBUTE), instances.getAttribute(TARGET_ATTRIBUTE).getAllValue());
+
+        ArrayList<String> attributeValueList = new ArrayList(ATTRIBUTEVALUE_NUM);
+        PriorProbabilityAttr priorProbabilityAttr = new PriorProbabilityAttr();
+        priorProbabilityAttr.setTargetValue(membershipMap.getAttributeValue(instances.getAttribute(TARGET_ATTRIBUTE)));
+
+        groupByLevelFunc(concernAttrListtmp.getConcernAttrList(), true)
+                .forEach((attributeValue,attrValue2TargetFrequency) ->{
+                    //System.out.println(k+": "+v);
+                    priorProbabilityAttr.set(attributeValue, attrValue2TargetFrequency);
+                    attributeValueList.add(attributeValue);
+                });
+
+        membershipMap.setAttributeValue(curAttribute, attributeValueList);
+
+        //System.out.println(priorProbabilityAttr.getProbabilityByAttributeValue(0, 0));
+
+        membershipMap.setPriorProbabilityMap(curAttribute, priorProbabilityAttr);
+
+        System.out.println(instances.getMEPAMembershipMap(false).getPriorProbabilityMap().get(curAttribute).getProbabilityByAttributeValue(0,0));
     }
 
     private void remainInstanceInfo(Attribute curAttribute, boolean isTest){

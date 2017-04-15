@@ -1,20 +1,12 @@
 package com.model.apn.FileIO;
 
-import com.model.apn.Config;
-import com.model.apn.DataStructure.Instance;
-import com.model.apn.Math.Arithmetic;
-import com.sun.deploy.xml.XMLAttributeBuilder;
+import com.model.apn.DataStructure.Instances;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.io.IOException;
 
 import static com.model.apn.Config.ATTRIBUTE_NUM;
-import static com.model.apn.Config.AUTO_MISSINGVALUE_BTN;
-import static com.model.apn.Math.Arithmetic.createDouble;
-import static com.model.apn.Math.Arithmetic.mul;
+import static com.model.apn.Config.INSTANCE_NUM;
 import static org.junit.Assert.*;
 
 /**
@@ -23,58 +15,40 @@ import static org.junit.Assert.*;
 public class DataInputTest {
 
     @Test
-    private void setAttributeInfo(BufferedReader inputBuffer){
+    public void TestTTmode() throws IOException {
 
-        //test
-        /*
-        System.out.println(instances.getAttributeList());
-        IntStream.range(0, instances.getAttributeList().size())
-               .peek(i -> System.out.println(instances.getAttributeList().get(i).getAttributeName()))
-               .forEach(System.out::println);
-               */
+        String str1 = this.getClass().getResource("/TTmodeData/Testdata1").getPath().replaceFirst("/", "");
+        String str2 = this.getClass().getResource("/TTmodeData/Traindata1").getPath().replaceFirst("/", "");
+        //System.out.println(str1);
+        //System.out.println(str2);
+
+        DataInput dt = new DataInput();
+        dt.forTrainTestInstance(str1, str2);
+        dt.getInstances();
+        Instances instances = dt.getInstances();
+
+        //System.out.println(instances.getAttributeMap().size() + ", " + ATTRIBUTE_NUM);
+        assertEquals(instances.getAttributeMap().size(), ATTRIBUTE_NUM);
+        assertEquals(instances.getTestInstanceMap().size() + instances.getTrainInstanceMap().size(), INSTANCE_NUM);
+
+
+
+        dt.completeData();
     }
 
-    private void setTrainInstanceInfo(BufferedReader inputBuffer){
+    @Test
+    public void Testkfoldmode() throws IOException {
 
-        //test
-        //System.out.println(instances.getInstanceList());
-        //IntStream.range(0, instances.getInstanceList().size())
-        //        .peek(i -> System.out.println(instances.getInstanceList().get(i).getInstanceMap()))
-        //        .forEach(System.out::println);
-    }
+        String str1 = this.getClass().getResource("/kFoldmodeData/kFolddata1").getPath().replaceFirst("/", "");
+        //System.out.println(str1);
 
-    private void setTestInstanceInfo(BufferedReader inputBuffer){
+        DataInput dt =new DataInput();
+        dt.forKfoldValidationInstance(str1);
+        dt.completeData();
+        Instances instances = dt.getInstances();
 
-        //test
-        //System.out.println(instances.getInstanceList());
-        //IntStream.range(0, instances.getInstanceList().size())
-        //        .peek(i -> System.out.println(instances.getInstanceList().get(i).getInstanceMap()))
-        //        .forEach(System.out::println);
-    }
-
-    private void setInstanceInfo(BufferedReader inputBuffer){
-        //test
-        //System.out.println(instances.getInstanceList());
-        //IntStream.range(0, instances.getInstanceList().size())
-        //        .peek(i -> System.out.println(instances.getInstanceList().get(i).getInstanceMap()))
-        //        .forEach(System.out::println);
-    }
-
-    private void transAttrValueMap(){
-
-        /*
-        checkModeAndIsTest(false, false);
-        checkModeAndIsTest(false, true);
-        checkModeAndIsTest(true, false);
-        checkModeAndIsTest(true, true);
-        System.out.println(checkCurrentMode()+", "+checkIsTrainTest());
-        */
-    }
-
-    private void missingValueProcess(boolean checkIsTest){
-        //missing value
-        //double i = NumberUtils.createDouble(instances.getAttributeMap().get(0).getValue(0).toString());
-        //System.out.println(NumberUtils.isCreatable(instances.getAttributeMap().get(0).toString())+" "+instances.getAttributeMap().get(0).getValue(0).toString());
+        assertEquals(instances.getAttributeMap().size(), ATTRIBUTE_NUM);
+        assertEquals(instances.getInstanceMap().size(), INSTANCE_NUM);
     }
 
 }

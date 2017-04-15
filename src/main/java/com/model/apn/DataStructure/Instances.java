@@ -48,6 +48,13 @@ public class Instances{
         return getMEPAMembership(this.getAttribute(curAttrInd), isTest);
     }
 
+    public MEPAMembershipMap getMEPAMembershipMap(boolean isTest){
+        if(isTest){
+            return MEPAMembershipForTest;
+        }else
+            return MEPAMembershipForTrain;
+    }
+
     public Instances(){
         attributesMap = new HashMap(ATTRIBUTE_NUM);
         instanceMap = new HashMap(INSTANCE_NUM);
@@ -56,7 +63,6 @@ public class Instances{
 
         missingValueMap = new HashMap(ATTRIBUTE_NUM);
         missingValueMapforTest = new HashMap(ATTRIBUTE_NUM);
-
 
         MEPAMembershipForTrain = new MEPAMembershipMap();
         MEPAMembershipForTest = new MEPAMembershipMap();
@@ -182,6 +188,7 @@ public class Instances{
                 .forEach(item -> {
                     this.trainInstanceMap.put(autoResizeIndex(trainInstanceMap), item.getValue());
                 });
+        INSTANCE_NUM_TRAIN =  this.trainInstanceMap.size();
 
         //test
         currentInstanceMap.entrySet()
@@ -190,6 +197,7 @@ public class Instances{
                 .forEach(item -> {
                     this.testInstanceMap.put(autoResizeIndex(testInstanceMap), item.getValue());
                 });
+        INSTANCE_NUM_TEST =  this.testInstanceMap.size();
     }
 
     private int[] splitMethodInWeka(int valid){

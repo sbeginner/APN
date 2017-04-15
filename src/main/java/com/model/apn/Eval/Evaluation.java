@@ -9,7 +9,7 @@ import com.model.apn.Preprocess.MEPA;
 import java.nio.channels.MembershipKey;
 import java.util.stream.IntStream;
 
-import static com.model.apn.Config.MAX_FOLDNUM;
+import static com.model.apn.Config.*;
 
 /**
  * Created by jack on 2017/3/29.
@@ -35,27 +35,16 @@ public class Evaluation {
             System.out.println("[ Fold: "+curfoldInd+" ]");
             instances.autoCVInKFold(curfoldInd);
             Instances mepaInstances = Filter.useFilter(instances, new MEPA());
-            //model do something
+            //model do something;
 
+            test(mepaInstances);
 
-
-            for(int i=0;i<mepaInstances.getMEPAMembership(0, true).size();i++){
-                MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, true).get(i);
-                System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
-            }
-
-            if(false)
-            for(int i=0;i<mepaInstances.getMEPAMembership(0, false).size();i++){
-                MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, false).get(i);
-                System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
-            }
+            APNmodel.setInstances(mepaInstances);
+            APNmodel.setAPNnetworkStructure();
+            APNmodel.travelAPNmodel();
+            APNmodel.getOutput();
 
         });
-        /*
-        instances.getInstanceMap().forEach((k,v)->{
-            System.out.println("Ind : " + k + " value : "+v.getInstanceMap());
-        });
-        */
 
     }
 
@@ -66,40 +55,25 @@ public class Evaluation {
         Instances mepaInstances = Filter.useFilter(instances, new MEPA());
         //model do something
 
-        for(int i=0;i<mepaInstances.getMEPAMembership(0, true).size();i++){
-            MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, true).get(i);
-            System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
-        }
-
-        for(int i=0;i<mepaInstances.getMEPAMembership(0, false).size();i++){
-            MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, false).get(i);
-            System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
-        }
-
-        /*
-        System.out.println();
-        instances.getTestInstanceMap().forEach((k,v)->{
-            System.out.println("Ind : " + k+ " value : "+v.getInstanceMap());
-        });
-
-        System.out.println();
-        instances.getTrainInstanceMap().forEach((k,v)->{
-            System.out.println("Ind : " + k + " value : "+v.getInstanceMap());
-        });
-
-        System.out.println();
-        IntStream.range(0, instances.getAttributeMap().size()).forEach(i->{
-            System.out.println("Attr : "+i+" Avg or mode "+instances.getAttributeMap().get(i).getMissingValue());
-        });
-
-        System.out.println();
-        IntStream.range(0, instances.getAttributeMap().size()).forEach(i->{
-            System.out.println("Attr : "+i+" Avg or mode "+instances.getAttributeMap().get(i).getMissingValueTest());
-        });
-        */
+        test(mepaInstances);
     }
 
     public void toMatrixString(){
 
+    }
+
+    private void test(Instances mepaInstances){
+        if(true)
+        return;
+        for(int i=0;i<INSTANCE_NUM_TEST - 1;i++){
+            MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, true).get(i);
+            System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
+        }
+
+        if(false)
+            for(int i=0;i<mepaInstances.getMEPAMembership(0, false).size();i++){
+                MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, false).get(i);
+                System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());
+            }
     }
 }

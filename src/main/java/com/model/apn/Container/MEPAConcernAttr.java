@@ -4,16 +4,28 @@ package com.model.apn.Container;
  * Created by jack on 2017/3/31.
  */
 public class MEPAConcernAttr {
-    double concernAttribute;
+    double concernAttributeD;
     StringBuilder targetAttribute;
+    StringBuilder concernAttribute;
 
-    MEPAConcernAttr(double concernAttribute, StringBuilder targetAttribute){
+    public MEPAConcernAttr(StringBuilder concernAttribute, StringBuilder targetAttribute){
         this.concernAttribute = concernAttribute;
         this.targetAttribute = targetAttribute;
     }
 
-    public double getConcernAttribute(){
-        return concernAttribute;
+    public MEPAConcernAttr(double concernAttribute, StringBuilder targetAttribute){
+        this.concernAttributeD = concernAttribute;
+        this.targetAttribute = targetAttribute;
+    }
+
+    public String getConcernAttribute(){
+        //For string type
+        return concernAttribute.toString();
+    }
+
+    public double getConcernAttributeD(){
+        //For double type
+        return concernAttributeD;
     }
 
     public String getTargetAttributeString(){

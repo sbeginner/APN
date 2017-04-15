@@ -172,6 +172,14 @@ public class MEPAEntropy {
         //In this structure will look like => {(a0 => t0 ,t1,...,tn),(a1 => t0 ,t1,...,tn),...,(a2 => t0 ,t1,...,tn)}
         //,and keep the "Target attribute value" frequency in each attribute value an occurs
         return concernAttrArrayList.stream()
+                .collect(Collectors.groupingBy(MEPAConcernAttr::getConcernAttributeD,
+                        Collectors.groupingBy(MEPAConcernAttr::getTargetAttributeString, Collectors.counting())));
+    }
+
+    protected Map<String, Map<String, Long>> groupByLevelFunc(ArrayList<MEPAConcernAttr> concernAttrArrayList, boolean isProcessed){
+        //After MEPA processed
+        //Use for calculate Prior probability
+        return concernAttrArrayList.stream()
                 .collect(Collectors.groupingBy(MEPAConcernAttr::getConcernAttribute,
                         Collectors.groupingBy(MEPAConcernAttr::getTargetAttributeString, Collectors.counting())));
     }
@@ -208,7 +216,7 @@ public class MEPAEntropy {
     private ArrayList<MEPAConcernAttr> splitChildInstance(ArrayList<MEPAConcernAttr> concernAttrArrayList, double bestThreshold, boolean isUpper){
         //Split into two child instance
         return concernAttrArrayList.stream()
-                .filter(item -> item.getConcernAttribute() >= bestThreshold == isUpper)
+                .filter(item -> item.getConcernAttributeD() >= bestThreshold == isUpper)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 

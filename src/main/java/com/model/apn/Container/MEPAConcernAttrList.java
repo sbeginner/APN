@@ -2,6 +2,8 @@ package com.model.apn.Container;
 
 import java.util.ArrayList;
 
+import static com.model.apn.Config.INSTANCE_NUM_TRAIN;
+
 /**
  * Created by jack on 2017/3/31.
  */
@@ -11,10 +13,14 @@ public class MEPAConcernAttrList {
     ArrayList<MEPAConcernAttr> concernAttrList;
 
     public MEPAConcernAttrList(){
-        concernAttrList = new ArrayList();
+        concernAttrList = new ArrayList(INSTANCE_NUM_TRAIN);
     }
 
     public void addMEPAConcernAttr(double concernAttribute, StringBuilder targetAttribute){
+        concernAttrList.add(new MEPAConcernAttr(concernAttribute, targetAttribute));
+    }
+
+    public void addMEPAConcernAttr(StringBuilder concernAttribute, StringBuilder targetAttribute){
         concernAttrList.add(new MEPAConcernAttr(concernAttribute, targetAttribute));
     }
 

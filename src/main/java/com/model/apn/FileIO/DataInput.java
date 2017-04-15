@@ -71,6 +71,7 @@ public class DataInput extends DataInputException {
 
         switchSecondTime();    //The next becomes the opposite of current state, for checking something like attribute member are matched or other else...
 
+
         inputBuffer.close();
     }
 
@@ -146,7 +147,7 @@ public class DataInput extends DataInputException {
                 .peek(instanceItem -> new Instance(instanceItem, instances, true))
                 .count();
 
-        Config.INSTANCE_NUM_TRAIN = Math.toIntExact(InstanceNum);    //Reset train instance number
+        INSTANCE_NUM_TRAIN = Math.toIntExact(InstanceNum);    //Reset train instance number
     }
 
     private void setTestInstanceInfo(BufferedReader inputBuffer){
@@ -158,7 +159,7 @@ public class DataInput extends DataInputException {
                 .peek(instanceItem -> new Instance(instanceItem, instances, false))
                 .count();
 
-        Config.INSTANCE_NUM_TEST = Math.toIntExact(InstanceNum);
+        INSTANCE_NUM_TEST = Math.toIntExact(InstanceNum);
     }
 
     private void setInstanceInfo(BufferedReader inputBuffer){
@@ -170,7 +171,7 @@ public class DataInput extends DataInputException {
                 .peek(instanceItem -> new Instance(instanceItem, instances))
                 .count();
 
-        Config.INSTANCE_NUM = Math.toIntExact(InstanceNum);
+        INSTANCE_NUM = Math.toIntExact(InstanceNum);
     }
 
     private boolean isBothAttributeMatch(ArrayList<String> currentAttributeList){
@@ -258,6 +259,11 @@ public class DataInput extends DataInputException {
         //Do something about attribute information processing and other works.
         if(!checkIsSecondTime()){
             return;
+        }
+
+        //Total instance num for TestTrain mode only, k-fold mode is already done
+        if(checkCurrentMode()){
+            INSTANCE_NUM = INSTANCE_NUM_TRAIN + INSTANCE_NUM_TEST;
         }
 
         //Set current mode, train-test as true, k fold validation as false.
