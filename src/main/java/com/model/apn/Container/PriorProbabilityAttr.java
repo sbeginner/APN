@@ -1,14 +1,7 @@
 package com.model.apn.Container;
 
-import com.model.apn.DataStructure.Attribute;
-import com.model.apn.DataStructure.Instance;
 import com.model.apn.Math.Arithmetic;
-import com.sun.istack.internal.Nullable;
-
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.model.apn.Config.MIN_DOUBLENUM;
 
@@ -16,9 +9,9 @@ import static com.model.apn.Config.MIN_DOUBLENUM;
  * Created by JACK on 2017/4/16.
  */
 public class PriorProbabilityAttr {
-    ArrayList<String> targetValueList;
-    ArrayList<String> attributeValueList;
-    HashMap<String, ArrayList<Double>> attributeValueMap;//attributeValue, probability for each target
+    private ArrayList<String> targetValueList;
+    private ArrayList<String> attributeValueList;
+    private HashMap<String, ArrayList<Double>> attributeValueMap;//attributeValue, probability for each target
 
     public PriorProbabilityAttr(){
         attributeValueMap = new HashMap();
@@ -33,7 +26,7 @@ public class PriorProbabilityAttr {
         attributeValueList.add(attributeValue);
     }
 
-    public void set(String attributeValue, Map<String, Long> attrValue2TargetFrequency){
+    public void setAttributeValueMap(String attributeValue, Map<String, Long> attrValue2TargetFrequency){
         ArrayList<Double> probabilityList = new  ArrayList(targetValueList.size());
         setAttributeValue(attributeValue);
 
@@ -50,13 +43,16 @@ public class PriorProbabilityAttr {
         });
 
         attributeValueMap.put(attributeValue, probabilityList);
-        System.out.println(attributeValueMap);
     }
 
     private long sumCalc(Map<String, Long> attrValue2TargetFrequency){
         return new ArrayList<>(attrValue2TargetFrequency.values()).stream()
                 .reduce(Long::sum)
                 .orElse((long) 0);
+    }
+
+    public HashMap<String, ArrayList<Double>> getProbabilityByAttributeValueMap(){
+        return attributeValueMap;
     }
 
     public double getProbabilityByAttributeValue(String attributeValue, String targetValue){
@@ -69,10 +65,11 @@ public class PriorProbabilityAttr {
     }
 
     public double getProbabilityByAttributeValue(int attributeValueInd, int targetValueInd){
+        System.out.println(attributeValueInd+", "+targetValueInd);
         String attributeValue = attributeValueList.get(attributeValueInd);
         String targetValue = targetValueList.get(targetValueInd);
 
-        //System.out.println(attributeValue+", "+targetValue+" "+getProbabilityByAttributeValue(attributeValue, targetValue));
+        System.out.println(attributeValue+", "+targetValue+" "+getProbabilityByAttributeValue(attributeValue, targetValue));
         return getProbabilityByAttributeValue(attributeValue, targetValue);
     }
 

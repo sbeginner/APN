@@ -1,6 +1,7 @@
 package com.model.apn.Eval;
 
 import com.model.apn.Container.MEPAMembership;
+import com.model.apn.Container.MEPAMembershipMap;
 import com.model.apn.DataStructure.Instances;
 import com.model.apn.Model.APN;
 import com.model.apn.Preprocess.Filter;
@@ -15,7 +16,7 @@ import static com.model.apn.Config.*;
  * Created by jack on 2017/3/29.
  */
 public class Evaluation {
-    Instances instances;
+    private Instances instances;
 
     public Evaluation(Instances instances){
         instances.getAttributeMap().forEach((k,v)->{
@@ -43,6 +44,7 @@ public class Evaluation {
             APNmodel.setAPNnetworkStructure();
             APNmodel.travelAPNmodel();
             APNmodel.getOutput();
+            APNmodel.test();
 
         });
 
@@ -56,6 +58,8 @@ public class Evaluation {
         //model do something
 
         test(mepaInstances);
+        APNmodel.setInstances(mepaInstances);
+        APNmodel.test();
     }
 
     public void toMatrixString(){
@@ -65,6 +69,12 @@ public class Evaluation {
     private void test(Instances mepaInstances){
         if(true)
         return;
+
+        System.out.println(mepaInstances.getMEPAMembershipMap(false).getAttributeValue(0));
+        System.out.println(mepaInstances.getMEPAMembershipMap(false).getAllInstanceByAttr(0).get(0).getMembership());
+        System.out.println(mepaInstances.getMEPAMembershipMap(false).getPriorProbabilityValueByAttr(0).getProbabilityByAttributeValue(
+                mepaInstances.getMEPAMembershipMap(false).getAllInstanceByAttr(0).get(0).getMembership(),"Iris-virginica"));
+
         for(int i=0;i<INSTANCE_NUM_TEST - 1;i++){
             MEPAMembership mtmp = mepaInstances.getMEPAMembership(0, true).get(i);
             System.out.println(mtmp.getMembership() + " " + mtmp.getMembershipDegree());

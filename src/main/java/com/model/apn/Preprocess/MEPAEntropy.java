@@ -176,14 +176,6 @@ public class MEPAEntropy {
                         Collectors.groupingBy(MEPAConcernAttr::getTargetAttributeString, Collectors.counting())));
     }
 
-    protected Map<String, Map<String, Long>> groupByLevelFunc(ArrayList<MEPAConcernAttr> concernAttrArrayList, boolean isProcessed){
-        //After MEPA processed
-        //Use for calculate Prior probability
-        return concernAttrArrayList.stream()
-                .collect(Collectors.groupingBy(MEPAConcernAttr::getConcernAttribute,
-                        Collectors.groupingBy(MEPAConcernAttr::getTargetAttributeString, Collectors.counting())));
-    }
-
     private Map<String, Long> groupByTargetLevelFunc(ArrayList<MEPAConcernAttr> concernAttrArrayList){
         //"Target attribute value" Attribute[T] - t0 ,t1,...,tn, and keep the frequency
         return concernAttrArrayList.stream()

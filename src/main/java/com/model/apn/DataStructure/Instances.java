@@ -23,37 +23,12 @@ public class Instances{
     private HashMap<Integer, Instance> trainInstanceMap;
     private HashMap<Integer, Instance> testInstanceMap;
 
-    private HashMap<Integer, ArrayList<Integer>> missingValueMap;    //(lineNum, attributeInd list)
-    private HashMap<Integer, ArrayList<Integer>> missingValueMapforTest;    //(lineNum, attributeInd list)
+    private HashMap<Integer, ArrayList<Integer>> missingValueMap;    //HashMap(lineNum, attributeInd list)
+    private HashMap<Integer, ArrayList<Integer>> missingValueMapforTest;    //HashMap(lineNum, attributeInd list)
 
-    private MEPAMembershipMap MEPAMembershipForTrain;
-    private MEPAMembershipMap MEPAMembershipForTest;
+    private MEPAMembershipMap MEPAMembershipForTrain;    //The MEPA-processed train instances, can get some information, e.g. 'MEPA membership degree'
+    private MEPAMembershipMap MEPAMembershipForTest;    //The MEPA-processed test instances, can get some information, same as MEPAMembershipForTrain
 
-
-    public void setMEPAMembership(Attribute curAttr, ArrayList<MEPAMembership> MEPAMembershipList, boolean isTest){
-        if(isTest){
-            MEPAMembershipForTest.put(curAttr, MEPAMembershipList);
-        }else
-            MEPAMembershipForTrain.put(curAttr, MEPAMembershipList);
-    }
-
-    public ArrayList<MEPAMembership> getMEPAMembership(Attribute curAttr, boolean isTest){
-        if(isTest){
-            return MEPAMembershipForTest.get(curAttr);
-        }else
-            return MEPAMembershipForTrain.get(curAttr);
-    }
-
-    public ArrayList<MEPAMembership> getMEPAMembership(int curAttrInd, boolean isTest){
-        return getMEPAMembership(this.getAttribute(curAttrInd), isTest);
-    }
-
-    public MEPAMembershipMap getMEPAMembershipMap(boolean isTest){
-        if(isTest){
-            return MEPAMembershipForTest;
-        }else
-            return MEPAMembershipForTrain;
-    }
 
     public Instances(){
         attributesMap = new HashMap(ATTRIBUTE_NUM);
@@ -64,8 +39,8 @@ public class Instances{
         missingValueMap = new HashMap(ATTRIBUTE_NUM);
         missingValueMapforTest = new HashMap(ATTRIBUTE_NUM);
 
-        MEPAMembershipForTrain = new MEPAMembershipMap();
-        MEPAMembershipForTest = new MEPAMembershipMap();
+        MEPAMembershipForTrain = new MEPAMembershipMap(this);
+        MEPAMembershipForTest = new MEPAMembershipMap(this);
     }
 
 
@@ -115,6 +90,14 @@ public class Instances{
         MAX_FOLDNUM = maxfoldnum;
     }
 
+    public void setMEPAMembership(Attribute curAttr, ArrayList<MEPAMembership> MEPAMembershipList, boolean isTest){
+        //Set train or test MEPAMembership by attribute index
+        if(isTest){
+            MEPAMembershipForTest.setMEPAMembershipMap(curAttr, MEPAMembershipList);
+        }else
+            MEPAMembershipForTrain.setMEPAMembershipMap(curAttr, MEPAMembershipList);
+    }
+
 
     public Attribute getAttribute(int index){
         return this.attributesMap.get(index);
@@ -156,6 +139,27 @@ public class Instances{
         }
         //System.out.println(missingValueMap);
         return this.missingValueMap;
+    }
+
+    public MEPAMembershipMap getMEPAMembershipMap(boolean isTest){
+        //Get train or test MEPAMembershipMap
+        if(isTest){
+            return MEPAMembershipForTest;
+        }else
+            return MEPAMembershipForTrain;
+    }
+
+    public ArrayList<MEPAMembership> getMEPAMembership(Attribute curAttr, boolean isTest){
+        //Get train or test MEPAMembership by attribute
+        if(isTest){
+            return MEPAMembershipForTest.getAllInstanceByAttr(curAttr);
+        }else
+            return MEPAMembershipForTrain.getAllInstanceByAttr(curAttr);
+    }
+
+    public ArrayList<MEPAMembership> getMEPAMembership(int curAttrInd, boolean isTest){
+        //Get train or test MEPAMembership by attribute index
+        return getMEPAMembership(this.getAttribute(curAttrInd), isTest);
     }
 
     public boolean getCurrentMode(){
