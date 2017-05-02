@@ -88,7 +88,7 @@ public class Attribute{
 
     public void setThresholdList(ArrayList<Double> thresholdList){
         //Set threshold for MEPA
-       this.thresholdList = thresholdList;
+        this.thresholdList = new ArrayList(thresholdList);
     }
 
 
@@ -178,7 +178,7 @@ public class Attribute{
 
     public ArrayList<Double> getThresholdList(){
         //Get threshold for MEPA
-        return this.thresholdList;
+        return thresholdList;
     }
 
 

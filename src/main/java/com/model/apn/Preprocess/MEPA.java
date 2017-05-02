@@ -91,10 +91,7 @@ public class MEPA extends MEPAEntropy{
         ArrayList<MEPAMembership> MEPAMembershipList = instances.getTrainInstanceMap()
                 .entrySet()
                 .stream()
-                .map(trainInstance -> {
-                    //It's not necessary to calculate the membership degree in training data, therefore, just directly set the degree in 1.0
-                    return detectValueRangeChangeToStr(createDouble(trainInstance.getValue().getInstanceValue(curAttribute).toString()),false);
-                })
+                .map(trainInstance -> detectValueRangeChangeToStr(createDouble(trainInstance.getValue().getInstanceValue(curAttribute).toString()),false))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         instances.setMEPAMembership(curAttribute, MEPAMembershipList, false);
@@ -203,16 +200,11 @@ public class MEPA extends MEPAEntropy{
             replaceStr = String.valueOf("T" + frontInRangeNext);
         }
 
-        if(isTest){
-            if(degreeIsUnderEstimate){
-                return new MEPAMembership(replaceStr, Arithmetic.sub(1, membershipDegree(leftThreshold, rightThreshold, curNum)));
-            }
-
-            return new MEPAMembership(replaceStr, membershipDegree(leftThreshold, rightThreshold, curNum));
-        }else{
-            //It's not necessary to calculate the membership degree in training data, therefore, just directly set the degree in 1.0
-            return new MEPAMembership(replaceStr, 1);
+        if(degreeIsUnderEstimate){
+            return new MEPAMembership(replaceStr, Arithmetic.sub(1, membershipDegree(leftThreshold, rightThreshold, curNum)));
         }
+
+        return new MEPAMembership(replaceStr, membershipDegree(leftThreshold, rightThreshold, curNum));
     }
 
     private boolean detectValueRangeOverMinMargin(double curNum){

@@ -1,5 +1,6 @@
 package com.model.apn.Model;
 
+import com.model.apn.Container.MEPAMembership;
 import com.model.apn.Container.MEPAMembershipMap;
 import com.model.apn.DataStructure.Instances;
 
@@ -32,7 +33,19 @@ public class APN {
     }
 
     public void test(){
+        MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
 
+        System.out.println(instances.getAttribute(0).getThresholdList()+" "+instances.getAttribute(0).getIndex()+" "+instances.getAttributeMap().size());
+
+        for(int i = 0;i<5;i++){
+            MEPAMembership mtmp = trainMEPAMembershipMap.getAllInstanceByAttr(0).get(i);
+            System.out.print(instances.getTrainInstance(i).getInstanceValue(0)+" "+mtmp.getMembership()+" "+mtmp.getMembershipDegree());
+            System.out.println();
+        }
+
+    }
+
+    private void test1(){
         MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
 
         for(int i=0;i<ATTRIBUTE_NUM;i++){
@@ -49,7 +62,11 @@ public class APN {
                     +trainMEPAMembershipMap.getPriorProbabilityValueByAttr(i).getProbabilityByAttributeValue(
                     trainMEPAMembershipMap.getAllInstanceByAttr(i).get(0).getMembership(),"Iris-virginica"));
 
+            System.out.println();
+            trainMEPAMembershipMap.getPriorProbabilityValueByAttr(i).getProbabilityByAttributeValue(0,0);
+            System.out.println();
         }
 
     }
+
 }
