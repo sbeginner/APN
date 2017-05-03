@@ -3,7 +3,7 @@ package com.model.apn.FileIO;
 /**
  * Created by jack on 2017/3/28.
  */
-public class DataInputException {
+public class DataIOException {
 
     protected boolean switchSecondTime = false;      //For whether train or test command first,only use in train-test mode
     protected boolean switchTrainTest = false;       //For train-test mode, check current stage is train or test

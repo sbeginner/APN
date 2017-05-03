@@ -6,11 +6,13 @@ import com.model.apn.DataStructure.Instances;
  * Created by jack on 2017/3/31.
  */
 public class Filter{
-    public static Instances useFilter(Instances instances, MEPA mepaFilter){
+    public static Instances useFilter(Instances instances, MEPA MEPAFilter){
         //This filter uses MEPA method
-        mepaFilter.setInstances(instances);
-        mepaFilter.useFilter();
+        MEPAFilter.setInstances(instances);
+        MEPAFilter.useFilter();
 
-        return mepaFilter.getInstances();
+        MEPAFilter.MEPAInstancesOutput();
+
+        return MEPAFilter.getInstances();
     }
 }

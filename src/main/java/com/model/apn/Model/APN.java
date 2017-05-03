@@ -5,6 +5,7 @@ import com.model.apn.Container.MEPAMembershipMap;
 import com.model.apn.DataStructure.Instances;
 
 import static com.model.apn.Config.ATTRIBUTE_NUM;
+import static com.model.apn.Config.INSTANCE_NUM_TRAIN;
 import static com.model.apn.Config.TARGET_ATTRIBUTE;
 
 /**
@@ -33,19 +34,24 @@ public class APN {
     }
 
     public void test(){
-        MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
-
-        System.out.println(instances.getAttribute(0).getThresholdList()+" "+instances.getAttribute(0).getIndex()+" "+instances.getAttributeMap().size());
-
-        for(int i = 0;i<5;i++){
-            MEPAMembership mtmp = trainMEPAMembershipMap.getAllInstanceByAttr(0).get(i);
-            System.out.print(instances.getTrainInstance(i).getInstanceValue(0)+" "+mtmp.getMembership()+" "+mtmp.getMembershipDegree());
-            System.out.println();
-        }
 
     }
 
     private void test1(){
+
+
+        /*
+        MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
+        for(int i=0;i<ATTRIBUTE_NUM;i++){
+            System.out.println(instances.getAttribute(i).getThresholdList()+" "+instances.getAttribute(i).getIndex()+" "+instances.getAttributeMap().size());
+            for(int j = 0;j<5;j++){
+                MEPAMembership mtmp = trainMEPAMembershipMap.getAllInstanceByAttr(i).get(j);
+                System.out.print(instances.getTrainInstance(j).getInstanceValue(i)+" "+mtmp.getMembership()+" "+mtmp.getMembershipDegree());
+                System.out.println();
+            }
+        }
+        */
+
         MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
 
         for(int i=0;i<ATTRIBUTE_NUM;i++){

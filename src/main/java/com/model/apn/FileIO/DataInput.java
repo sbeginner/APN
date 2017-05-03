@@ -26,7 +26,7 @@ import static com.model.apn.Math.Arithmetic.mul;
 /**
  * Created by jack on 2017/3/21.
  */
-public class DataInput extends DataInputException {
+public class DataInput extends DataIOException {
 
     private Instances instances;
     private Path inputPath = Paths.get(Config.FILEPATH, Config.FILENAME);

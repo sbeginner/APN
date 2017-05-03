@@ -15,7 +15,8 @@ import static com.model.apn.Config.*;
  */
 public class Instances{
 
-    boolean currentMode = false;    //Train-test as true, k fold validation as false
+    private boolean currentMode = false;    //Train-test as true, k fold validation as false
+    private int currentFoldValid = 0;
 
     private HashMap<Integer, Attribute> attributesMap;
     private HashMap<Integer, Instance> instanceMap;
@@ -166,6 +167,10 @@ public class Instances{
         return this.currentMode;
     }
 
+    public int getCurrentFoldValid(){
+        return this.currentFoldValid;
+    }
+
 
     private void splitTrainTestInEachFold(int valid){
         //Only for k-fold validation, this function splits train and test data for classification
@@ -238,6 +243,7 @@ public class Instances{
 
     public void autoCVInKFold(int valid){
         //Only for k-fold validation, split the train and test instance in each fold.
+        this.currentFoldValid = valid;
         splitTrainTestInEachFold(valid);
     }
 

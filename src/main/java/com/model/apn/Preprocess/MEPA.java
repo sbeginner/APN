@@ -4,11 +4,15 @@ import com.model.apn.Container.*;
 import com.model.apn.DataStructure.Attribute;
 import com.model.apn.DataStructure.Instance;
 import com.model.apn.DataStructure.Instances;
+import com.model.apn.FileIO.DataOutput;
 import com.model.apn.Math.Arithmetic;
+import com.sun.istack.internal.Nullable;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.model.apn.Config.*;
 import static com.model.apn.Math.Arithmetic.createDouble;
@@ -33,7 +37,6 @@ public class MEPA extends MEPAEntropy{
         //Set the number for the range to split, divide constraint number
         DIVIDE_CONSTRAINTNUM = divConstraintNum;
     }
-
 
     public void useFilter(){
         //Travel all attributes
@@ -122,7 +125,7 @@ public class MEPA extends MEPAEntropy{
                 .sorted()
                 .collect(Collectors.toCollection(ArrayList::new));
         //Attribute set thresholdList
-        curAttribute.setThresholdList(bestThresholdList);
+        curAttribute.setThresholdList(new ArrayList(bestThresholdList));
     }
 
     private ArrayList<MEPAConcernAttr> transTrainInstance(int attributeInd){
@@ -233,5 +236,98 @@ public class MEPA extends MEPAEntropy{
 
     public Instances getInstances(){
         return instances;
+    }
+
+    public void MEPAInstancesOutput(){
+        MEPATestInstancesOutput();
+        MEPATrainInstancesOutput();
+    }
+
+    private void MEPATestInstancesOutput(){
+        MEPATestInstancesOutput(true);
+    }
+
+    private void MEPATrainInstancesOutput(){
+        MEPATestInstancesOutput(false);
+    }
+
+    private void MEPATestInstancesOutput( boolean isTest){
+        DataOutput dataOutput = new DataOutput(instances.getCurrentMode(), instances.getCurrentFoldValid());
+        MEPAMembershipMap mMEPAMembershipMap = instances.getMEPAMembershipMap(isTest);
+        int maxInstanceNum;
+
+        if(isTest){
+            maxInstanceNum = INSTANCE_NUM_TEST;
+        }else {
+            maxInstanceNum = INSTANCE_NUM_TRAIN;
+        }
+
+        StringBuilder OriginData = setAttributeTitle();
+        StringBuilder MembershipNameStr = setAttributeTitle();
+        StringBuilder MembershipDegreeStr = setAttributeTitle();
+
+        IntStream.range(0, maxInstanceNum)
+                .peek(instanceNum -> {
+                    IntStream.range(0, ATTRIBUTE_NUM).forEach(attributeNum ->{
+                        if(isTest){
+                            OriginData.append(instances.getTestInstance(instanceNum).getInstanceValue(attributeNum));
+                        }else {
+                            OriginData.append(instances.getTrainInstance(instanceNum).getInstanceValue(attributeNum));
+                        }
+
+                        if(attributeNum % ATTRIBUTE_NUM != (ATTRIBUTE_NUM-1)){
+                            OriginData.append(',');
+                        }
+                    });
+                    OriginData.append(System.getProperty("line.separator"));
+                })
+                .boxed()
+                .flatMap(instanceNum -> IntStream.range(0, ATTRIBUTE_NUM)
+                        .mapToObj(attributeNum -> {
+
+                            if(attributeNum % ATTRIBUTE_NUM == 0) {
+                                if(instanceNum == 0){
+                                    //do nothing
+                                }else{
+                                    MembershipNameStr.append(System.getProperty("line.separator"));
+                                    MembershipDegreeStr.append(System.getProperty("line.separator"));
+                                }
+                            }else {
+                                MembershipNameStr.append(',');
+                                MembershipDegreeStr.append(',');
+                            }
+
+                            return mMEPAMembershipMap.getAllInstanceByAttr(attributeNum).get(instanceNum);    //MEPAMembership type
+                        }))
+                .forEach(MEPAMembershipItem ->{
+                    MembershipNameStr.append(MEPAMembershipItem.getMembership());
+                    MembershipDegreeStr.append(MEPAMembershipItem.getMembershipDegree());
+                });
+
+        if(isTest){
+            dataOutput.outputTestMembership(OriginData, "_TestOriginData");
+            dataOutput.outputTestMembership(MembershipNameStr, "_TestMembershipName");
+            dataOutput.outputTestMembership(MembershipDegreeStr, "_TestMembershipDegree");
+        }else {
+            dataOutput.outputTrainMembership(OriginData, "_TrainOriginData");
+            dataOutput.outputTrainMembership(MembershipNameStr, "_TrainMembershipName");
+            dataOutput.outputTrainMembership(MembershipDegreeStr, "_TrainMembershipDegree");
+        }
+
+    }
+
+    private StringBuilder setAttributeTitle(){
+        StringBuilder cpAppendStr = new StringBuilder();
+
+        IntStream.range(0, ATTRIBUTE_NUM).forEach(attributeNum -> {
+            cpAppendStr.append(instances.getAttribute(attributeNum).getAttributeName());
+            if(attributeNum % ATTRIBUTE_NUM != (ATTRIBUTE_NUM-1)){
+                cpAppendStr.append(',');
+            }
+        });
+
+        cpAppendStr.append(System.getProperty("line.separator"));
+
+        return cpAppendStr;
     }
 }

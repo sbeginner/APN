@@ -44,7 +44,7 @@ public class MEPAMembershipMap {
         }
 
         bestThresholdMap.put(curAttribute, bestThresholdList);
-        System.out.println(curAttribute.getIndex() + " " +bestThresholdList);
+        //System.out.println(curAttribute.getIndex() + " " +bestThresholdList);
     }
 
     private void setAttributeValue(Attribute curAttr, ArrayList<String> attributeValueList){

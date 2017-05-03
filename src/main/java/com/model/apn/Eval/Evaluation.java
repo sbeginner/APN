@@ -37,10 +37,7 @@ public class Evaluation {
             instances.autoCVInKFold(curfoldInd);
             Instances mepaInstances = Filter.useFilter(instances, new MEPA());
             //model do something;
-            System.out.println(mepaInstances.getAttribute(0).getThresholdList());
-            System.out.println(mepaInstances.getAttribute(1).getThresholdList());
-            System.out.println(mepaInstances.getAttribute(2).getThresholdList());
-            System.out.println(mepaInstances.getAttribute(3).getThresholdList());
+
 
             //test(mepaInstances);
 
@@ -50,7 +47,6 @@ public class Evaluation {
             APNmodel.travelAPNmodel();
             APNmodel.getOutput();
             APNmodel.test();
-
         });
 
     }
