@@ -2,6 +2,8 @@ package com.model.apn.Preprocess;
 
 import com.model.apn.DataStructure.Instances;
 
+import static com.model.apn.Config.MEPADATA_OUTPUT_BTN;
+
 /**
  * Created by jack on 2017/3/31.
  */
@@ -11,7 +13,8 @@ public class Filter{
         MEPAFilter.setInstances(instances);
         MEPAFilter.useFilter();
 
-        MEPAFilter.MEPAInstancesOutput();
+        if(MEPADATA_OUTPUT_BTN) MEPAFilter.MEPAInstancesOutput();
+
 
         return MEPAFilter.getInstances();
     }

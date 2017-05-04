@@ -244,17 +244,21 @@ public class MEPA extends MEPAEntropy{
     }
 
     private void MEPATestInstancesOutput(){
-        MEPATestInstancesOutput(true);
+        MEPAInstancesOutputProcess(true);
     }
 
     private void MEPATrainInstancesOutput(){
-        MEPATestInstancesOutput(false);
+        MEPAInstancesOutputProcess(false);
     }
 
-    private void MEPATestInstancesOutput( boolean isTest){
+    private void MEPAInstancesOutputProcess( boolean isTest){
         DataOutput dataOutput = new DataOutput(instances.getCurrentMode(), instances.getCurrentFoldValid());
         MEPAMembershipMap mMEPAMembershipMap = instances.getMEPAMembershipMap(isTest);
+
         int maxInstanceNum;
+        StringBuilder OriginData = setAttributeTitle();
+        StringBuilder MembershipNameStr = setAttributeTitle();
+        StringBuilder MembershipDegreeStr = setAttributeTitle();
 
         if(isTest){
             maxInstanceNum = INSTANCE_NUM_TEST;
@@ -262,20 +266,13 @@ public class MEPA extends MEPAEntropy{
             maxInstanceNum = INSTANCE_NUM_TRAIN;
         }
 
-        StringBuilder OriginData = setAttributeTitle();
-        StringBuilder MembershipNameStr = setAttributeTitle();
-        StringBuilder MembershipDegreeStr = setAttributeTitle();
-
         IntStream.range(0, maxInstanceNum)
                 .peek(instanceNum -> {
                     IntStream.range(0, ATTRIBUTE_NUM).forEach(attributeNum ->{
-                        if(isTest){
-                            OriginData.append(instances.getTestInstance(instanceNum).getInstanceValue(attributeNum));
-                        }else {
-                            OriginData.append(instances.getTrainInstance(instanceNum).getInstanceValue(attributeNum));
-                        }
 
-                        if(attributeNum % ATTRIBUTE_NUM != (ATTRIBUTE_NUM-1)){
+                        OriginData.append(instances.getInstance(isTest, instanceNum).getInstanceValue(attributeNum));
+
+                        if(attributeNum % ATTRIBUTE_NUM != (ATTRIBUTE_NUM - 1)){
                             OriginData.append(',');
                         }
                     });
@@ -312,6 +309,7 @@ public class MEPA extends MEPAEntropy{
             dataOutput.outputTrainMembership(OriginData, "_TrainOriginData");
             dataOutput.outputTrainMembership(MembershipNameStr, "_TrainMembershipName");
             dataOutput.outputTrainMembership(MembershipDegreeStr, "_TrainMembershipDegree");
+            dataOutput.outputTrainMembership(setAttrThreshold(), "_AttrThreshold");
         }
 
     }
@@ -330,4 +328,21 @@ public class MEPA extends MEPAEntropy{
 
         return cpAppendStr;
     }
+
+    private StringBuilder setAttrThreshold(){
+
+        StringBuilder cpAttrThresholdStr = new StringBuilder();
+        IntStream.range(0, ATTRIBUTE_NUM).forEach(attributeNum ->{
+            cpAttrThresholdStr.append("Attribute["+instances.getAttribute(attributeNum).getIndex()+"] ");
+            cpAttrThresholdStr.append(instances.getAttribute(attributeNum).getAttributeName()+" => ");
+            cpAttrThresholdStr.append(instances.getAttribute(attributeNum).getThresholdList()+" ");
+            if(attributeNum == TARGET_ATTRIBUTE){
+                cpAttrThresholdStr.append(" :: \" This is the target attribute! \"");
+            }
+            cpAttrThresholdStr.append(System.getProperty("line.separator"));
+        });
+
+        return cpAttrThresholdStr;
+    }
+
 }

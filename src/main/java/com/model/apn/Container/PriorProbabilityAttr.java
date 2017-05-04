@@ -65,11 +65,11 @@ public class PriorProbabilityAttr {
     }
 
     public double getProbabilityByAttributeValue(int attributeValueInd, int targetValueInd){
-        System.out.println(attributeValueInd+", "+targetValueInd);
+        //System.out.println(attributeValueInd+", "+targetValueInd);
         String attributeValue = attributeValueList.get(attributeValueInd);
         String targetValue = targetValueList.get(targetValueInd);
 
-        System.out.println(attributeValue+", "+targetValue+" "+getProbabilityByAttributeValue(attributeValue, targetValue));
+        //System.out.println(attributeValue+", "+targetValue+" "+getProbabilityByAttributeValue(attributeValue, targetValue));
         return getProbabilityByAttributeValue(attributeValue, targetValue);
     }
 

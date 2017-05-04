@@ -12,6 +12,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -36,6 +40,18 @@ public class DataInput extends DataIOException {
 
     public DataInput(){
         this.instances = new Instances();
+        chgCurrentDateTime();
+    }
+
+    private void chgCurrentDateTime(){
+        Date currentDate = new Date();
+
+        Instant now = currentDate.toInstant();
+        ZoneId currentZone = ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(now, currentZone);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSS");
+        CURRENT_TIME = localDateTime.format(formatter);
     }
 
 
@@ -400,25 +416,19 @@ public class DataInput extends DataIOException {
             instances.getmissingValueMap(false)
                     .entrySet()
                     .stream()
-                    .forEach(i -> {
-                        instances.getTrainInstance(i.getKey()).changeItemValue(i.getValue(),false);
-                    });
+                    .forEach(i -> instances.getInstance(false, i.getKey()).changeItemValue(i.getValue(),false));
 
             //train-test: test
             instances.getmissingValueMap(true)
                     .entrySet()
                     .stream()
-                    .forEach(i -> {
-                        instances.getTestInstance(i.getKey()).changeItemValue(i.getValue(),true);
-                    });
+                    .forEach(i -> instances.getInstance(true, i.getKey()).changeItemValue(i.getValue(),true));
         }else{
             //k-fold validation mode
             instances.getmissingValueMap(false)
                     .entrySet()
                     .stream()
-                    .forEach(i -> {
-                        instances.getInstance(i.getKey()).changeItemValue(i.getValue(),false);
-                    });
+                    .forEach(i -> instances.getInstance(i.getKey()).changeItemValue(i.getValue(),false));
         }
     }
 

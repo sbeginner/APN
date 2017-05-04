@@ -28,32 +28,13 @@ public class Starton {
         eval.crossValidateModel(new APN(), instances, 10, RANDOM_SEED);
         //eval.evalTrainTestModel(new APN(), instances, RANDOM_SEED);
 
-
+        /*
         System.out.println(dt.getInstances().getCurrentMode());
         System.out.println();
         System.out.println("Attribute size : "+dt.getInstances().getAttributeMap().size());
         System.out.println();
-
-
-        /*
-        dt.getInstances().getTrainInstanceMap().forEach((k,v)->{
-            System.out.println("Item : " + k + " Count : " +v.getInstanceValue(1));
-        });
-        dt.getInstances().getTestInstanceMap().forEach((k,v)->{
-            System.out.println("Item : " + k + " Count : " +v.getInstanceValue(1));
-        });
         */
 
-        /*
-        System.out.println(dt.getInstances().getTrainInstanceMap().size());
-        dt.getInstances().getTrainInstance(0).getInstanceMap().forEach((k,v)->{
-            System.out.println("Item : " + k + " Count : " + v);
-        });
-        System.out.println(dt.getInstances().getTestInstanceMap().size());
-        dt.getInstances().getTestInstance(6).getInstanceMap().forEach((k,v)->{
-            System.out.println("Item : " + k + " Count : " + v);
-        });
-        */
     }
 
 

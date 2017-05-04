@@ -108,12 +108,20 @@ public class Instances{
         return this.instanceMap.get(index);
     }
 
-    public Instance getTrainInstance(int index){
+    private Instance getTrainInstance(int index){
         return this.trainInstanceMap.get(index);
     }
 
-    public Instance getTestInstance(int index){
+    private Instance getTestInstance(int index){
         return this.testInstanceMap.get(index);
+    }
+
+    public Instance getInstance(boolean isTest, int index){
+        if(isTest){
+            return getTestInstance(index);
+        }
+
+        return getTrainInstance(index);
     }
 
     public  HashMap<Integer, Attribute> getAttributeMap(){
@@ -133,9 +141,7 @@ public class Instances{
     }
 
     public HashMap<Integer, ArrayList<Integer>> getmissingValueMap( boolean checkIsTrainTestmodeAndIsTest){
-        //System.out.println("AA");
         if(checkIsTrainTestmodeAndIsTest){
-            //System.out.println(missingValueMapforTest);
             return this.missingValueMapforTest;
         }
         //System.out.println(missingValueMap);

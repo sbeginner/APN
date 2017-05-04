@@ -19,9 +19,7 @@ public class Evaluation {
     private Instances instances;
 
     public Evaluation(Instances instances){
-        instances.getAttributeMap().forEach((k,v)->{
-            System.out.println("Attr : " + k + " isString : " +v.getAttributeType()+ " Value : "+v.getAllValue());
-        });
+
     }
 
     public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum, int randseed){

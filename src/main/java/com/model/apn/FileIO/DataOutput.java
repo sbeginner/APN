@@ -9,9 +9,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
+import static com.model.apn.Config.CURRENT_TIME;
 
 /**
  * Created by JACK on 2017/5/4.
@@ -21,7 +26,7 @@ public class DataOutput{
     private boolean currentMode = false;
     private int currentFoldValid = 0;
     private Path outputPath;
-    private String outputRootPath = Config.FILEPATH+"/output/";
+    private String outputRootPath = Config.FILEPATH+"/output_"+CURRENT_TIME;
     private String outputTrainPath = outputRootPath+"/train/";
     private String outputTestPath = outputRootPath+"/test/";
     private Charset charset = Charset.forName(Config.CHARSETTYPE);
@@ -42,7 +47,7 @@ public class DataOutput{
         }
     }
 
-    private void outputData(StringBuilder MembershipNameStr, Path outputPath){
+    private void outputDataProcess(StringBuilder MembershipNameStr, Path outputPath){
         BufferedWriter outputBuffer;
 
         try {
@@ -56,14 +61,28 @@ public class DataOutput{
     }
 
     public void outputTrainMembership(StringBuilder MembershipNameStr, String fileName){
-        outputPath = Paths.get(outputTrainPath, "Fold"+currentFoldValid+fileName+".txt");
-        outputData(MembershipNameStr, outputPath);
+        String outputTrainPathtmp;
+        if(currentMode){
+            outputTrainPathtmp = outputTrainPath+"/";
+        }else{
+            outputTrainPathtmp = outputTrainPath+"/Fold"+currentFoldValid+"/";
+        }
+
+        checkOutputDirIsExist(outputTrainPathtmp);
+        outputPath = Paths.get(outputTrainPathtmp, fileName+".txt");
+        outputDataProcess(MembershipNameStr, outputPath);
     }
 
     public void outputTestMembership(StringBuilder MembershipNameStr, String fileName){
-        outputPath = Paths.get(outputTestPath, "Fold"+currentFoldValid+fileName+".txt");
-        outputData(MembershipNameStr, outputPath);
+        String outputTestPathtmp;
+        if(currentMode){
+            outputTestPathtmp = outputTestPath+"/";
+        }else{
+            outputTestPathtmp = outputTestPath+"/Fold"+currentFoldValid+"/";
+        }
+        checkOutputDirIsExist(outputTestPathtmp);
+        outputPath = Paths.get(outputTestPathtmp,  fileName+".txt");
+        outputDataProcess(MembershipNameStr, outputPath);
     }
-
 
 }
