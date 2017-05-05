@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="MEPAProcess">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../MEPAProcess/out/artifacts/MEPAProcess_jar/MEPAProcess.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/MEPAProcess.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
