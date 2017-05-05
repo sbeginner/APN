@@ -18,7 +18,7 @@ public class Starton {
         dt.forKfoldValidationInstance();
         //dt.forTrainTestInstance();
         dt.completeData();
-        Instances instances = dt.getInstances();    //get data
+        Instances instances = dt.getInstances();    //get data//
 
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
