@@ -14,5 +14,5 @@ dependencies {
 }
 
 dependencies {
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+    compile 'org.apache.commons:commons-lang3:3.5'
 }

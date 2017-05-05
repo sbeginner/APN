@@ -1,12 +1,11 @@
 package com.model.apn.Model;
 
-import com.model.apn.Container.MEPAMembership;
-import com.model.apn.Container.MEPAMembershipMap;
-import com.model.apn.DataStructure.Instances;
+import Container.MEPAMembershipMap;
+import DataStructure.Instances;
+import com.model.apn.NetworkStructure.APNNetworkStructure;
 
-import static com.model.apn.Config.ATTRIBUTE_NUM;
-import static com.model.apn.Config.INSTANCE_NUM_TRAIN;
-import static com.model.apn.Config.TARGET_ATTRIBUTE;
+import static Setup.Config.ATTRIBUTE_NUM;
+import static Setup.Config.TARGET_ATTRIBUTE;
 
 /**
  * Created by jack on 2017/3/29.
@@ -22,7 +21,9 @@ public class APN {
     }
 
     public void setAPNnetworkStructure(){
-
+        System.out.println(instances.getAttribute(0).getAttributeName());
+        APNNetworkStructure APNnet = new APNNetworkStructure(instances);
+        APNnet.testa();
     }
 
     public void travelAPNmodel(){

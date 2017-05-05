@@ -1,16 +1,14 @@
 package com.model.apn.Eval;
 
-import com.model.apn.Container.MEPAMembership;
-import com.model.apn.Container.MEPAMembershipMap;
-import com.model.apn.DataStructure.Instances;
+import Container.MEPAMembership;
+import DataStructure.Instances;
+import Preprocess.Filter;
+import Preprocess.MEPA;
 import com.model.apn.Model.APN;
-import com.model.apn.Preprocess.Filter;
-import com.model.apn.Preprocess.MEPA;
-
-import java.nio.channels.MembershipKey;
 import java.util.stream.IntStream;
 
-import static com.model.apn.Config.*;
+import static Setup.Config.INSTANCE_NUM_TEST;
+import static Setup.Config.MAX_FOLDNUM;
 
 /**
  * Created by jack on 2017/3/29.

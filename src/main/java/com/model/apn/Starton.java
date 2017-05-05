@@ -1,16 +1,13 @@
 package com.model.apn;
 
-import com.model.apn.DataStructure.Instances;
+import DataStructure.Instances;
+import FileIO.DataInput;
 import com.model.apn.Eval.Evaluation;
-import com.model.apn.FileIO.DataInput;
 import com.model.apn.Model.APN;
-import com.model.apn.Preprocess.Filter;
-import com.model.apn.Preprocess.MEPA;
 
 import java.io.IOException;
 
-import static com.model.apn.Config.RANDOM_SEED;
-
+import static Setup.Config.RANDOM_SEED;
 /**
  * Created by jack on 2017/3/20.
  */
