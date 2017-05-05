@@ -31,7 +31,6 @@ public class Starton {
         System.out.println("Attribute size : "+dt.getInstances().getAttributeMap().size());
         System.out.println();
         */
-
     }
 
 
