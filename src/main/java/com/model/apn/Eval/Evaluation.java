@@ -5,11 +5,12 @@ import DataStructure.Instances;
 import Preprocess.Filter;
 import Preprocess.MEPA;
 import com.model.apn.Model.APN;
+
 import java.util.stream.IntStream;
 
-import static Setup.Config.INSTANCE_NUM_TEST;
-import static Setup.Config.MAX_FOLDNUM;
 
+import static com.model.apn.Setup.Config.MAX_FOLDNUM;
+import static com.model.apn.Setup.Config.INSTANCE_NUM_TEST;
 /**
  * Created by jack on 2017/3/29.
  */
@@ -38,7 +39,8 @@ public class Evaluation {
             //test(mepaInstances);
 
             APNmodel.setInstances(mepaInstances);
-            APNmodel.setAPNnetworkStructure();
+            APNmodel.setAPNNetworkStructure(true);
+            APNmodel.setAPNNetworkStructureParameters(curfoldInd);
             //APNmodel.setBionicsAPNnetworkStructure(new ABC());
             APNmodel.travelAPNmodel();
             APNmodel.getOutput();
@@ -56,6 +58,9 @@ public class Evaluation {
 
         test(mepaInstances);
         APNmodel.setInstances(mepaInstances);
+        APNmodel.setAPNNetworkStructure(true);
+        APNmodel.setAPNNetworkStructureParameters(1);
+        APNmodel.travelAPNmodel();
         APNmodel.test();
     }
 
@@ -65,7 +70,7 @@ public class Evaluation {
 
     private void test(Instances mepaInstances){
         if(true)
-        return;
+            return;
 
         System.out.println(mepaInstances.getMEPAMembershipMap(false).getAttributeValue(0));
         System.out.println(mepaInstances.getMEPAMembershipMap(false).getAllInstanceByAttr(0).get(0).getMembership());
