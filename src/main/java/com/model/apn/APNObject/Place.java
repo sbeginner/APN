@@ -24,6 +24,13 @@ public class Place {
     private boolean isRoot = false;
     private boolean isLeaf = false;
 
+    private String testAttributeValue = "";
+
+    public void reset(){
+        relationshipDegree = NONVALUE_INTEGER;
+        testAttributeValue = "";
+    }
+
     public Place(Attribute currentAttr){
         init(currentAttr);
     }
@@ -47,6 +54,19 @@ public class Place {
 
     public void isLeafPlace(){
         isLeaf = true;
+    }
+
+    public void setTestAttributeValue(String testAttributeValue){
+        if(isRoot){
+            this.testAttributeValue = currentAttr.getAllValue().get(rootIndex).toString();//attribute value must be discrete value
+            return;
+        }
+
+        this.testAttributeValue = testAttributeValue;
+    }
+
+    public String getTestAttributeValue(){
+        return this.testAttributeValue;
     }
 
     public void setRelationshipDegree(double relationshipDegree){
@@ -80,9 +100,9 @@ public class Place {
         }
 
         if(isRoot){
-            System.out.println(getTypeName()+" "+currentAttr.getAttributeName()+"["+index+", "+rootIndex+"]"+" => "+relationshipDegree);
+            System.out.println(":traceback: "+getTypeName()+" "+currentAttr.getAttributeName()+"["+index+", "+rootIndex+"]"+" => "+relationshipDegree);
         }else {
-            System.out.println(getTypeName()+" "+currentAttr.getAttributeName()+"["+index+"]"+" => "+relationshipDegree);
+            System.out.println(":traceback: "+getTypeName()+" "+currentAttr.getAttributeName()+"["+index+"]"+" => "+relationshipDegree);
         }
     }
 

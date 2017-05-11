@@ -18,7 +18,7 @@ import static com.model.apn.Setup.Config.THRESHOLD_NUM;
 public class APN {
     private Instances instances;
     private APNNetwork APNNet;
-    private APNNetworkStructure APNNetStruct;
+    private APNNetworkStructure APNNetStructure;
     private boolean isAPNNetSet = false;
 
     public APN(){
@@ -35,12 +35,12 @@ public class APN {
         }
 
         isAPNNetSet = isFixed;
-        this.APNNetStruct = new APNNetworkStructure(instances);
-        APNNetStruct.createNetworkStructure();
+        this.APNNetStructure = new APNNetworkStructure(instances);
+        APNNetStructure.createNetworkStructure();
     }
 
-    public void setAPNNetworkStructureParameters(int t){
-        APNNetwork nettmp = new APNNetwork(this.APNNetStruct);
+    public void setAPNNetworkStructureParameters(int curfoldInd){
+        APNNetwork nettmp = new APNNetwork(this.APNNetStructure, this.instances);
 
         ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));
         list.set(2,0.9);
@@ -56,7 +56,7 @@ public class APN {
     }
 
     public void getOutput(){
-        APNNet.printPlaceMap();
+
     }
 
     public void test(){
@@ -78,26 +78,7 @@ public class APN {
         }
         */
 
-        MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
 
-        for(int i=0;i<ATTRIBUTE_NUM;i++){
-
-            System.out.println(" => ");
-            System.out.println("Attr "+i+" ["+instances.getAttribute(i).getAttributeName()+"] values: "+trainMEPAMembershipMap.getAttributeValue(i));
-            System.out.println("instance 0, Attr "+i+" "+trainMEPAMembershipMap.getAllInstanceByAttr(i).get(0).getMembership());
-            System.out.println("Attr "+i+" ,name: "+instances.getAttribute(i).getAttributeName().toString());
-
-            if (i == TARGET_ATTRIBUTE) continue;
-
-            System.out.println("Attr "+i+" prior-prob => "+trainMEPAMembershipMap.getPriorProbabilityMap().get(instances.getAttribute(i)).getProbabilityByAttributeValueMap());
-            System.out.println("Attr"+i+" value "+trainMEPAMembershipMap.getAllInstanceByAttr(i).get(0).getMembership()+", Iris-virginica"+" "
-                    +trainMEPAMembershipMap.getPriorProbabilityValueByAttr(i).getProbabilityByAttributeValue(
-                    trainMEPAMembershipMap.getAllInstanceByAttr(i).get(0).getMembership(),"Iris-virginica"));
-
-            System.out.println();
-            trainMEPAMembershipMap.getPriorProbabilityValueByAttr(i).getProbabilityByAttributeValue(0,0);
-            System.out.println();
-        }
 
     }
 

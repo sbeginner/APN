@@ -5,9 +5,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static com.model.apn.Config.ATTRIBUTE_NUM;
-import static com.model.apn.Config.INSTANCE_NUM;
-import static org.junit.Assert.*;
+import static com.model.apn.Setup.Config.ATTRIBUTE_NUM;
+import static com.model.apn.Setup.Config.INSTANCE_NUM;
 
 /**
  * Created by jack on 2017/3/28.

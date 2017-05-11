@@ -1,13 +1,18 @@
 package com.model.apn;
 
+import Container.MEPAMembershipMap;
 import DataStructure.Instances;
 import FileIO.DataInput;
+import Preprocess.Filter;
+import Preprocess.MEPA;
 import com.model.apn.Eval.Evaluation;
 import com.model.apn.Model.APN;
 import com.model.apn.Setup.Config;
 
 import java.io.IOException;
 
+import static Setup.Config.ATTRIBUTE_NUM;
+import static Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.RANDOM_SEED;
 /**
  * Created by jack on 2017/3/20.
@@ -33,7 +38,6 @@ public class Starton {
     }
 
     private static void forTrainTest() throws IOException {
-
         DataInput dt =new DataInput();
         dt.forTrainTestInstance();
         //dt.completeData();

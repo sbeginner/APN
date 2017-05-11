@@ -38,6 +38,10 @@ public class Transition {
         outputPlaceSet = new HashSet(HALF_ATTRIBUTE_NUM);
     }
 
+    public void reset(){
+        minRDSelectedInputDegree = NONVALUE_INTEGER;
+    }
+
     private void setParametersConfidenceThreshold(double confThreshold){
         this.confThreshold = confThreshold;
     }
@@ -138,6 +142,10 @@ public class Transition {
 
     public int getIndex(){
         return index;
+    }
+
+    public HashSet<Place> getInputPlaceSet(){
+        return inputPlaceSet;
     }
 
     public Place getRDSelectedInputPlace(){
