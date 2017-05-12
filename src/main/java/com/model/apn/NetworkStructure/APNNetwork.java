@@ -37,14 +37,14 @@ public class APNNetwork {
         IntStream.range(0, INSTANCE_NUM_TEST).forEach(testInstanceInd -> {
 
             setAPNNetPlaceInEachTestInstance(placeMap, testInstanceInd);
-
             printTracebackTitle();
+
             transitionMap.values()
                     .stream()
                     .sorted((transitionInd, transition) -> transition.getTravelPriority())
                     .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
 
-
+            printTransitionMap();
             printPlaceMap();
             reset(placeMap, transitionMap);
         });
@@ -110,7 +110,21 @@ public class APNNetwork {
     private void printTransitionMap(){
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
 
-        transitionMap.values().stream().forEach(transition -> transition.getTravelPriority());
+        System.out.println();
+        System.out.println("<---- Transition Info ---->");
+        transitionMap.values().stream().forEach(transition -> {
+            int index = transition.getIndex();
+            int priority = transition.getTravelPriority();
+            double confidence = transition.getConfidence();
+            ArrayList<Double> supportList = transition.getSupport();
+
+            double confThreshold = transition.getConfidenceThreshold();
+            ArrayList<Double> supThreshold = transition.getSupportThreshold();
+
+            System.out.println("Transition["+index+"], Priority: "+priority+", Confidence: "+confidence+", Support: "+supportList);
+            System.out.println("[Threshold] => Confidence: "+confThreshold+", Support: "+supThreshold);
+            System.out.println();
+        });
     }
 
     public void printPlaceMap(){
