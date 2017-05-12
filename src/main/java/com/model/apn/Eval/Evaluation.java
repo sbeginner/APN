@@ -51,7 +51,7 @@ public class Evaluation {
         //test(mepaInstances);
         APNmodel.setInstances(mepaInstances);
         APNmodel.setAPNNetworkStructure(true);
-        APNmodel.setAPNNetworkStructureParameters(curfoldInd);
+        APNmodel.setAPNNetworkStructureParameters();
         //APNmodel.setBionicsAPNnetworkStructure(new ABC());
         APNmodel.travelAPNmodel();
         APNmodel.getOutput();
@@ -73,7 +73,7 @@ public class Evaluation {
     private void evalTrainTestModelAPNProcess(APN APNmodel, Instances mepaInstances){
         APNmodel.setInstances(mepaInstances);
         APNmodel.setAPNNetworkStructure(true);
-        APNmodel.setAPNNetworkStructureParameters(1);
+        APNmodel.setAPNNetworkStructureParameters();
         APNmodel.travelAPNmodel();
         APNmodel.test();
     }

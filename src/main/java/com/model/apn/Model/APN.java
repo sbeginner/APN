@@ -39,7 +39,7 @@ public class APN {
         APNNetStructure.createNetworkStructure();
     }
 
-    public void setAPNNetworkStructureParameters(int curfoldInd){
+    public void setAPNNetworkStructureParameters(){
         APNNetwork nettmp = new APNNetwork(this.APNNetStructure, this.instances);
 
         ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));

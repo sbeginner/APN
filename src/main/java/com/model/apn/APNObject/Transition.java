@@ -9,6 +9,7 @@ import static MathCalculate.Arithmetic.mul;
 import static com.model.apn.Setup.Config.NONVALUE_INTEGER;
 import static com.model.apn.Setup.Config.HALF_ATTRIBUTE_NUM;
 import static org.apache.commons.lang3.math.NumberUtils.max;
+import static org.apache.commons.lang3.math.NumberUtils.min;
 
 /**
  * Created by JACK on 2017/5/5.
@@ -89,6 +90,8 @@ public class Transition {
     public void addOutputPlaceMap(Place place){
         outputPlaceSet.add(place);
         place.addInputTransitionMap(this);
+
+        this.travelPriority = this.travelPriority + place.getTypeValue();
     }
 
     public void calcInputPlaceRelationshipDegree(){
@@ -188,4 +191,11 @@ public class Transition {
         return supportSet;
     }
 
+    public double getConfidenceThreshold(){
+        return confThreshold;
+    }
+
+    public ArrayList<Double> getSupportThreshold(){
+        return supThresholdSet;
+    }
 }
