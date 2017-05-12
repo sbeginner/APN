@@ -74,6 +74,11 @@ public class Place {
     }
 
     public void setMaxRelationshipDegree(){
+
+        inputTransitionSet.stream()
+                .filter(inputTransition -> !inputTransition.checkIsTransitionMinRelationshipDegreeSet())
+                .forEach(inputTransition -> inputTransition.calcInputPlaceRelationshipDegree());
+
         Transition maxTransition = inputTransitionSet.stream()
                 .max(Comparator.comparingDouble(inputTransition -> inputTransition.getRDSelectedInputDegree()))
                 .orElse(null);

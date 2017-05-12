@@ -34,21 +34,15 @@ public class APNNetwork {
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
         HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
 
-        if(PRINT_TRACETRAVELHISTORY_BTN){
-            System.out.println();
-            System.out.println("<---- APN travel traceback ---->");
-        }
-
         IntStream.range(0, INSTANCE_NUM_TEST).forEach(testInstanceInd -> {
-            System.out.println(testInstanceInd+">>");
+
             setAPNNetPlaceInEachTestInstance(placeMap, testInstanceInd);
 
+            printTracebackTitle();
             transitionMap.values()
                     .stream()
                     .sorted((transitionInd, transition) -> transition.getTravelPriority())
                     .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
-
-            System.out.println();
 
 
             printPlaceMap();
@@ -59,6 +53,7 @@ public class APNNetwork {
 
     private void setAPNNetPlaceInEachTestInstance(HashMap<Integer, Place> placeMap, int testInstanceInd){
 
+        printTestInstanceInd(testInstanceInd);
         MEPAMembershipMap testEPAMembershipMap = instances.getMEPAMembershipMap(true);
 
         placeMap.values()
@@ -70,7 +65,7 @@ public class APNNetwork {
                     place.setRelationshipDegree(relationshipDegree);
                 });
 
-        placeMap.values().stream().forEach(p -> System.out.println(p.getRelationshipDegree()+", "+p.getTestAttributeValue()) );
+        printPlaceInitInfo(placeMap);
     }
 
     private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
@@ -83,6 +78,40 @@ public class APNNetwork {
                 .forEach(transition-> transition.reset());
     }
 
+    private void printTestInstanceInd(int testInstanceInd){
+        System.out.println();
+        System.out.println("- - - - [ "+testInstanceInd+"'th test instance ] - - - -");
+    }
+
+    private void printPlaceInitInfo(HashMap<Integer, Place> placeMap){
+        System.out.println();
+        System.out.println("<---- Places init Info ---->");
+        placeMap.values()
+                .stream()
+                .forEach(place -> {
+                    System.out.print("Member degree = "+place.getRelationshipDegree());
+                    if(place.getTypeValue() == ROOT_PLACE){
+                        System.out.println(", place"+place.getIndex()+" ("+place.getRootIndex()+") = "+place.getTestAttributeValue());
+                    }else {
+                        System.out.println(", place"+place.getIndex()+" = "+place.getTestAttributeValue());
+                    }
+                });
+    }
+
+    private void printTracebackTitle(){
+        if(!PRINT_TRACETRAVELHISTORY_BTN){
+            return;
+        }
+
+        System.out.println();
+        System.out.println("<---- APN travel traceback ---->");
+    }
+
+    private void printTransitionMap(){
+        HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
+
+        transitionMap.values().stream().forEach(transition -> transition.getTravelPriority());
+    }
 
     public void printPlaceMap(){
         //Print the route, for explain used
@@ -96,7 +125,12 @@ public class APNNetwork {
                 .forEach(place -> {
                     Place curPlace = place;
                     while (!Objects.isNull(curPlace)){
-                        System.out.print("( "+curPlace.getAttribute().getAttributeName()+","+curPlace.getRootIndex()+" => "+curPlace.getRelationshipDegree()+") ");
+
+                        if(curPlace.getTypeValue() == ROOT_PLACE){
+                            System.out.print("( "+curPlace.getAttribute().getAttributeName()+" ("+curPlace.getTestAttributeValue()+") => "+curPlace.getRelationshipDegree()+") ");
+                        }else {
+                            System.out.print("( "+curPlace.getAttribute().getAttributeName()+" => "+curPlace.getRelationshipDegree()+") ");
+                        }
                         curPlace = curPlace.getMaxRDSelectedInputPlace();
                     }
                     System.out.println();

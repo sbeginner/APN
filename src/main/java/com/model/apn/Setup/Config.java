@@ -26,6 +26,6 @@ public class Config extends Setup.Config{
 
         DIVIDE_CONSTRAINTNUM = 2;
         MAX_FOLDNUM = 10;
-        RANDOM_SEED = 1994;
+        RANDOM_SEED = 1;
     }
 }

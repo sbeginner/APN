@@ -97,11 +97,10 @@ public class Transition {
         //if not, we need to set the value to the previous one first
         //if the previous one is satisfied, then we can set the relationship degree(multiply the confidence) to the current place
         inputPlaceSet.stream()
+                .filter(inputPlace -> !inputPlace.checkIsRelationshipDegreeSet())
                 .forEach(inputPlace -> {
-                    if(!inputPlace.checkIsRelationshipDegreeSet()){
-                        HashSet<Transition> curPlaceInputTrasition = inputPlace.getInputTransitionSet();
-                        curPlaceInputTrasition.stream().forEach(Transition::calcInputPlaceRelationshipDegree);
-                    }
+                    HashSet<Transition> curPlaceInputTrasition = inputPlace.getInputTransitionSet();
+                    curPlaceInputTrasition.stream().forEach(Transition::calcInputPlaceRelationshipDegree);
                 });
 
         Place minPlace = inputPlaceSet.stream()
@@ -156,6 +155,11 @@ public class Transition {
         return minRDSelectedInputDegree;
     }
 
+    public boolean checkIsTransitionMinRelationshipDegreeSet(){
+        return minRDSelectedInputDegree >= 0;
+    }
+
+
     public double getActiveInputDegree(){
         return mul(minRDSelectedInputDegree, confidence);
     }
@@ -174,6 +178,14 @@ public class Transition {
 
     public int getTravelPriority(){
         return travelPriority;
+    }
+
+    public double getConfidence(){
+        return confidence;
+    }
+
+    public ArrayList<Double> getSupport(){
+        return supportSet;
     }
 
 }
