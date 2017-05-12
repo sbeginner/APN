@@ -1,6 +1,7 @@
 package com.model.apn.NetworkStructure;
 
 import Container.MEPAMembershipMap;
+import Container.PriorProbabilityAttr;
 import DataStructure.Instances;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
@@ -9,7 +10,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static MathCalculate.Arithmetic.mul;
+import static MathCalculate.Arithmetic.sub;
 import static Setup.Config.INSTANCE_NUM_TEST;
+import static Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.LEAF_PLACE;
 import static com.model.apn.Setup.Config.PRINT_TRACETRAVELHISTORY_BTN;
 import static com.model.apn.Setup.Config.ROOT_PLACE;
@@ -37,16 +41,16 @@ public class APNNetwork {
         IntStream.range(0, INSTANCE_NUM_TEST).forEach(testInstanceInd -> {
 
             setAPNNetPlaceInEachTestInstance(placeMap, testInstanceInd);
+
             printTracebackTitle();
+            travelProcess(transitionMap);
 
-            transitionMap.values()
-                    .stream()
-                    .sorted((transitionInd, transition) -> transition.getTravelPriority())
-                    .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
+            getOutputResult(placeMap, testInstanceInd);
 
 
-            printOutputResult(placeMap, testInstanceInd);
+
             printTransitionMap();
+            printOutputResult();
             printPlaceMap();
             reset(placeMap, transitionMap);
         });
@@ -70,6 +74,75 @@ public class APNNetwork {
         printPlaceInitInfo(placeMap);
     }
 
+    private void travelProcess(HashMap<Integer, Transition> transitionMap){
+        transitionMap.values()
+                .stream()
+                .sorted((transitionInd, transition) -> transition.getTravelPriority())
+                .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
+    }
+
+    private void getOutputResult(HashMap<Integer, Place> placeMap, int testInstanceInd){
+
+        ArrayList<String> attributeValueList = instances.getMEPAMembershipMap(false).getAttributeValue(TARGET_ATTRIBUTE);
+        Iterator iterator = attributeValueList.iterator();
+        double maxValue = -1;
+        String maxTargetValue = "";
+        while (iterator.hasNext()){
+            String curTargetValue = iterator.next().toString();
+
+            double targetPriorProbability = placeMap.values()
+                    .stream()
+                    .filter(place -> place.getTypeValue() != ROOT_PLACE)
+                    .mapToDouble(place -> {
+                        MEPAMembershipMap trainMEPAMembershipMap  = instances.getMEPAMembershipMap(false);
+                        PriorProbabilityAttr ppAttr = trainMEPAMembershipMap.getPriorProbabilityValueByAttr(place.getAttribute());
+                        //System.out.println(place.getTestAttributeValue()+" "+curTargetValue+" "+ppAttr.getProbabilityByAttributeValue(place.getTestAttributeValue(), curTargetValue));
+                        return ppAttr.getProbabilityByAttributeValue(place.getTestAttributeValue(), curTargetValue);
+                    })
+                    .reduce(1, (totalNum, curNum) -> mul(totalNum, curNum));
+
+            System.out.println(curTargetValue+" "+targetPriorProbability);
+
+            if(targetPriorProbability > maxValue){
+                maxTargetValue = curTargetValue;
+                maxValue = targetPriorProbability;
+            }
+        }
+
+        System.out.println(maxTargetValue+" "+maxValue);
+
+        Place maxPlace = placeMap.values()
+                .stream()
+                .filter(place -> place.getTypeValue() == ROOT_PLACE)
+                .max(Comparator.comparing(Place::getRelationshipDegree))
+                .orElse(null);
+        System.out.println(maxPlace.getRelationshipDegree()+" "+maxPlace.getTestAttributeValue());
+
+        placeMap.values()
+                .stream()
+                .filter(place -> place.getTypeValue() == ROOT_PLACE)
+                .forEach(place -> System.out.println("class["+place.getRootIndex()+"] "+place.getTestAttributeValue()+" => "+place.getRelationshipDegree()));
+
+        String curTestInstanceIndTarget = instances.getMEPAMembershipMap(true)
+                .getAllInstanceByAttr(TARGET_ATTRIBUTE)
+                .get(testInstanceInd)
+                .getMembership();
+
+        System.out.println(curTestInstanceIndTarget);
+
+        double a = placeMap.values()
+                .stream()
+                .filter(place -> place.getTypeValue() == ROOT_PLACE)
+                .mapToDouble(place -> {
+                    if(curTestInstanceIndTarget.equals(place.getTestAttributeValue())){
+                        return mul(sub(1, place.getRelationshipDegree()), sub(1, place.getRelationshipDegree()));
+                    }else {
+                        return mul(sub(0, place.getRelationshipDegree()), sub(0, place.getRelationshipDegree()));
+                    }
+                }).sum();
+        System.out.println(a);
+    }
+
     private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
         placeMap.values()
                 .stream()
@@ -85,9 +158,11 @@ public class APNNetwork {
         System.out.println("- - - - [ "+testInstanceInd+"'th test instance ] - - - -");
     }
 
-    private void printOutputResult(HashMap<Integer, Place> placeMap, int testInstanceInd){
+    private void printOutputResult(){
+        HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+
         System.out.println();
-        System.out.println("<---- "+testInstanceInd+"'th output result  ---->");
+        System.out.println("<---- output result  ---->");
         placeMap.values()
                 .stream()
                 .filter(place -> place.getTypeValue() == ROOT_PLACE)
