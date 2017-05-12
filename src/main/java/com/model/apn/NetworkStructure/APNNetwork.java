@@ -44,6 +44,8 @@ public class APNNetwork {
                     .sorted((transitionInd, transition) -> transition.getTravelPriority())
                     .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
 
+
+            printOutputResult(placeMap, testInstanceInd);
             printTransitionMap();
             printPlaceMap();
             reset(placeMap, transitionMap);
@@ -83,6 +85,24 @@ public class APNNetwork {
         System.out.println("- - - - [ "+testInstanceInd+"'th test instance ] - - - -");
     }
 
+    private void printOutputResult(HashMap<Integer, Place> placeMap, int testInstanceInd){
+        System.out.println();
+        System.out.println("<---- "+testInstanceInd+"'th output result  ---->");
+        placeMap.values()
+                .stream()
+                .filter(place -> place.getTypeValue() == ROOT_PLACE)
+                .forEach(place -> System.out.println("class["+place.getRootIndex()+"] "+place.getTestAttributeValue()+" => "+place.getRelationshipDegree()));
+    }
+
+    private void printTracebackTitle(){
+        if(!PRINT_TRACETRAVELHISTORY_BTN){
+            return;
+        }
+
+        System.out.println();
+        System.out.println("<---- APN travel traceback ---->");
+    }
+
     private void printPlaceInitInfo(HashMap<Integer, Place> placeMap){
         System.out.println();
         System.out.println("<---- Places init Info ---->");
@@ -96,15 +116,6 @@ public class APNNetwork {
                         System.out.println(", place"+place.getIndex()+" = "+place.getTestAttributeValue());
                     }
                 });
-    }
-
-    private void printTracebackTitle(){
-        if(!PRINT_TRACETRAVELHISTORY_BTN){
-            return;
-        }
-
-        System.out.println();
-        System.out.println("<---- APN travel traceback ---->");
     }
 
     private void printTransitionMap(){
