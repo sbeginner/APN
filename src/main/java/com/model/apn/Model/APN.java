@@ -56,7 +56,7 @@ public class APN {
     }
 
     public void getOutput(){
-
+        
     }
 
     public void test(){

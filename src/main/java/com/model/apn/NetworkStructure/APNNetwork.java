@@ -5,6 +5,8 @@ import Container.PriorProbabilityAttr;
 import DataStructure.Instances;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
+import com.model.apn.Container.APNOutputInfo;
+import com.model.apn.Container.APNOutputInstanceInfo;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ import static com.model.apn.Setup.Config.ROOT_PLACE;
 public class APNNetwork {
     APNNetworkStructure APNNetStruct;
     Instances instances;
+    APNOutputInfo vAPNOutputInfo;
 
     public APNNetwork(APNNetworkStructure APNNetStruct, Instances instances){
         this.APNNetStruct = APNNetStruct;
@@ -36,6 +39,7 @@ public class APNNetwork {
     public void travel(){
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
         HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+        HashMap<Integer, Place> rootPlaceMap = new HashMap(getRootPlaceMap(placeMap));
 
         IntStream.range(0, INSTANCE_NUM_TEST).forEach(testInstanceInd -> {
 
@@ -44,8 +48,7 @@ public class APNNetwork {
             printTracebackTitle();
             travelProcess(transitionMap);
 
-            getOutputResult(placeMap, testInstanceInd);
-
+            getOutputResult(rootPlaceMap, placeMap, testInstanceInd);
 
 
             printTransitionMap();
@@ -54,6 +57,17 @@ public class APNNetwork {
             reset(placeMap, transitionMap);
         });
 
+    }
+
+    private  Map<Integer, Place> getRootPlaceMap(HashMap<Integer, Place> placeMap){
+        Map<Integer, Place> rootPlaceMap = placeMap.entrySet()
+                .stream()
+                .filter(placeMapItem -> placeMapItem.getValue().getTypeValue() == ROOT_PLACE)
+                .collect(Collectors.toMap(
+                        placeMapItem -> placeMapItem.getKey(),
+                        placeMapItem -> placeMapItem.getValue()
+                ));
+        return rootPlaceMap;
     }
 
     private void setAPNNetPlaceInEachTestInstance(HashMap<Integer, Place> placeMap, int testInstanceInd){
@@ -80,107 +94,10 @@ public class APNNetwork {
                 .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
     }
 
-    private  HashMap<String, Double> calcTargetPriorProbability(HashMap<Integer, Place> placeMap){
-        //While the APN model output relationship degree can't directly predict (classify)
-        ArrayList<String> attributeValueList = instances.getMEPAMembershipMap(false).getAttributeValue(TARGET_ATTRIBUTE);
-        Iterator iterator = attributeValueList.iterator();
-        HashMap<String, Double> targetPriorProbabilityMap = new HashMap(ATTRIBUTEVALUE_NUM);
-
-        while (iterator.hasNext()){
-            String curTargetValue = iterator.next().toString();
-
-            //Find the highest prior-probability target value,ex: "class0" 0.12, "class1" 0.58,..., "classn" 0.77
-            double targetPriorProbability = placeMap.values()
-                    .stream()
-                    .filter(place -> place.getTypeValue() != ROOT_PLACE)
-                    .mapToDouble(place -> {
-                        MEPAMembershipMap trainMEPAMembershipMap  = instances.getMEPAMembershipMap(false);
-                        PriorProbabilityAttr ppAttr = trainMEPAMembershipMap.getPriorProbabilityValueByAttr(place.getAttribute());
-                        return ppAttr.getProbabilityByAttributeValue(place.getTestAttributeValue(), curTargetValue);
-                    })
-                    .reduce(1, (multiplyTotalNum, curNum) -> mul(multiplyTotalNum, curNum));
-
-            targetPriorProbabilityMap.put(curTargetValue, targetPriorProbability);
-        }
-
-        return targetPriorProbabilityMap;
-    }
-
-    private String getProbabilityPredictTarget(HashMap<Integer, Place> placeMap, double maxAPNRelationshipDegree){
-        HashMap<String, Double> targetPriorProbabilityMap = calcTargetPriorProbability(placeMap);
-
-
-
-        List<Place> pList = placeMap.values()
-                .stream()
-                .filter(place -> place.getTypeValue() == ROOT_PLACE)
-                .filter(place -> place.getRelationshipDegree()== maxAPNRelationshipDegree)
-                .collect(Collectors.toList());
-
-        Place maxPlace = pList.stream()
-                .max(Comparator.comparing(place -> targetPriorProbabilityMap.get(place.getTestAttributeValue())))
-                .orElse(null);
-
-        return maxPlace.getTestAttributeValue();
-    }
-
-    private boolean checkAPNOutputMultipleSameDegreeIsExist(HashMap<Integer, Place> placeMap, double maxAPNRelationshipDegree){
-        boolean MultipleSameDegree = placeMap.values()
-                .stream()
-                .filter(place -> place.getTypeValue() == ROOT_PLACE)
-                .filter(place -> place.getRelationshipDegree() == maxAPNRelationshipDegree)
-                .count() > 1;
-        return MultipleSameDegree;
-    }
-
-    private Place getAPNMaxRelationshipTarget(HashMap<Integer, Place> placeMap){
-        Place maxPlace = placeMap.values()
-                .stream()
-                .filter(place -> place.getTypeValue() == ROOT_PLACE)
-                .max(Comparator.comparing(Place::getRelationshipDegree))
-                .orElse(null);
-        return maxPlace;
-    }
-
-    private String getCurrentInstanceRealTarget(int testInstanceInd){
-        String curTestInstanceIndTarget = instances.getMEPAMembershipMap(true)
-                .getAllInstanceByAttr(TARGET_ATTRIBUTE)
-                .get(testInstanceInd)
-                .getMembership();
-
-        return curTestInstanceIndTarget;
-    }
-
-    private double getMeanSquaredError(HashMap<Integer, Place> placeMap, String currentInstanceRealTarget){
-        double MSE = placeMap.values()
-                .stream()
-                .filter(place -> place.getTypeValue() == ROOT_PLACE)
-                .mapToDouble(place -> {
-                    if(currentInstanceRealTarget.equals(place.getTestAttributeValue())){
-                        return mul(sub(1, place.getRelationshipDegree()), sub(1, place.getRelationshipDegree()));
-                    }else {
-                        return mul(sub(0, place.getRelationshipDegree()), sub(0, place.getRelationshipDegree()));
-                    }
-                }).sum();
-
-        return MSE;
-    }
-
-    private void getOutputResult(HashMap<Integer, Place> placeMap, int testInstanceInd){
-        Place maxPlace = getAPNMaxRelationshipTarget(placeMap);
-        double maxAPNRelationshipDegree = maxPlace.getRelationshipDegree();
-        System.out.println("APN predict => "+maxPlace.getTestAttributeValue());
-
-        if(checkAPNOutputMultipleSameDegreeIsExist(placeMap, maxAPNRelationshipDegree)){
-            String probabilityPredictTarget = getProbabilityPredictTarget(placeMap, maxAPNRelationshipDegree);
-            System.out.println("probability predict target: "+probabilityPredictTarget);
-        }
-
-        String currentInstanceRealTarget = getCurrentInstanceRealTarget(testInstanceInd);
-        double MSE = getMeanSquaredError(placeMap, currentInstanceRealTarget);
-
-        System.out.println("real => "+currentInstanceRealTarget+" "+MSE);
-        System.out.println();
+    private void getOutputResult(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap, int testInstanceInd){
+        APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(testInstanceInd, this.instances);
+        outputInstanceInfo.getOutputResult(rootPlaceMap, placeMap);
+        outputInstanceInfo.print();
     }
 
     private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
