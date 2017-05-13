@@ -2,6 +2,7 @@ package com.model.apn.Model;
 
 import Container.MEPAMembershipMap;
 import DataStructure.Instances;
+import com.model.apn.Container.APNOutputInfo;
 import com.model.apn.NetworkStructure.APNNetwork;
 import com.model.apn.NetworkStructure.APNNetworkStructure;
 
@@ -20,6 +21,7 @@ public class APN {
     private APNNetwork APNNet;
     private APNNetworkStructure APNNetStructure;
     private boolean isAPNNetSet = false;
+    APNOutputInfo vAPNOutputInfo;
 
     public APN(){
 
@@ -37,18 +39,18 @@ public class APN {
         isAPNNetSet = isFixed;
         this.APNNetStructure = new APNNetworkStructure(instances);
         APNNetStructure.createNetworkStructure();
+        APNNet = new APNNetwork(this.APNNetStructure, this.instances);
     }
 
     public void setAPNNetworkStructureParameters(){
-        APNNetwork nettmp = new APNNetwork(this.APNNetStructure, this.instances);
 
+        APNNet.setInstances(instances);
         ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));
         list.set(2,0.9);
         list.set(5,0.9);
         list.set(7,0.9);
-        nettmp.setParameters(list);
+        APNNet.setParameters(list);
 
-        APNNet = nettmp;
     }
 
     public void travelAPNmodel(){
@@ -56,29 +58,10 @@ public class APN {
     }
 
     public void getOutput(){
-        
+        APNNet.getOutput();
     }
 
     public void test(){
-
-    }
-
-    private void test1(){
-
-
-        /*
-        MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
-        for(int i=0;i<ATTRIBUTE_NUM;i++){
-            System.out.println(instances.getAttribute(i).getThresholdList()+" "+instances.getAttribute(i).getIndex()+" "+instances.getAttributeMap().size());
-            for(int j = 0;j<5;j++){
-                MEPAMembership mtmp = trainMEPAMembershipMap.getAllInstanceByAttr(i).get(j);
-                System.out.print(instances.getTrainInstance(j).getInstanceValue(i)+" "+mtmp.getMembership()+" "+mtmp.getMembershipDegree());
-                System.out.println();
-            }
-        }
-        */
-
-
 
     }
 

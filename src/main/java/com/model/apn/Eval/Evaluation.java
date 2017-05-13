@@ -17,6 +17,8 @@ import static Setup.Config.ATTRIBUTE_NUM;
 import static Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.MAX_FOLDNUM;
 import static com.model.apn.Setup.Config.INSTANCE_NUM_TEST;
+import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
+
 /**
  * Created by jack on 2017/3/29.
  */
@@ -42,7 +44,6 @@ public class Evaluation {
             printInfo(mepaInstances);
             //model do something;
             crossValidateModelAPNProcess(APNmodel, mepaInstances, curfoldInd);
-
 
         });
     }
@@ -88,6 +89,10 @@ public class Evaluation {
 
     private void attributeInfo(Instances instances){
         //Attribute Information
+        if(!PRINT_DETAIL_BTN){
+            return;
+        }
+
         MEPAMembershipMap trainMEPAMembershipMap = instances.getMEPAMembershipMap(false);
 
         System.out.println();

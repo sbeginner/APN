@@ -12,7 +12,9 @@ public class Config extends Setup.Config{
     public static int LEAF_PLACE = 1000;
 
 
-    public static boolean PRINT_TRACETRAVELHISTORY_BTN = true;
+    public static boolean PRINT_TRACETRAVELHISTORY_BTN = false;
+    public static boolean PRINT_DETAIL_BTN = false;
+    public static boolean PROBABILITY_PREDICT_BTN = false;
 
     public Config(){
         AUTO_MISSINGVALUE_BTN = false;

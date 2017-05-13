@@ -8,11 +8,13 @@ import com.model.apn.APNObject.Place;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static MathCalculate.Arithmetic.div;
 import static MathCalculate.Arithmetic.mul;
 import static MathCalculate.Arithmetic.sub;
 import static Setup.Config.ATTRIBUTEVALUE_NUM;
 import static Setup.Config.NONVALUE_INTEGER;
 import static Setup.Config.TARGET_ATTRIBUTE;
+import static com.model.apn.Setup.Config.PROBABILITY_PREDICT_BTN;
 import static com.model.apn.Setup.Config.ROOT_PLACE;
 
 /**
@@ -23,7 +25,9 @@ public class APNOutputInstanceInfo {
     private int testInstanceInd = NONVALUE_INTEGER;
     private HashMap<String, Double> APNPredictTargetDegreeMap;    //The predict degree in each target value
     private String APNPredict;    //APN predict target value
-    private double APNPredictDegree;
+    private double APNPredictDegreeNormalize;    // APNPredictDegreeNormalize = APNPredictDegree/totalAPNPredictDegree
+    private double APNPredictDegree;    //Only the APN selected target predict degree
+    private double totalAPNPredictDegree;    //All the target predict degree
     private boolean IsAPNPredictSameDegree = false;
     private String APNProbabilityPredict;   //When APN predict the same value, we can use this to get the most probability target value(answer)
     private String RealTargetValue;
@@ -33,6 +37,18 @@ public class APNOutputInstanceInfo {
     public APNOutputInstanceInfo(int testInstanceInd, Instances instances){
         this.testInstanceInd = testInstanceInd;
         this.instances = instances;
+    }
+
+    public void create(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap){
+
+        setAPNPredictTargetDegreeMap(rootPlaceMap);
+        setAPNPredict(rootPlaceMap);
+
+        setIsAPNPredictSameDegree(rootPlaceMap, getAPNPredictDegree());
+        if(IsAPNPredictSameDegree) setAPNProbabilityPredict(rootPlaceMap, placeMap, getAPNPredictDegree());
+
+        setCurrentInstanceRealTarget();
+        setMSE(rootPlaceMap);
     }
 
     private  HashMap<String, Double> calcTargetPriorProbability(HashMap<Integer, Place> placeMap){
@@ -115,17 +131,6 @@ public class APNOutputInstanceInfo {
         return MSE;
     }
 
-    public void getOutputResult(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap){
-
-        setAPNPredictTargetDegreeMap(rootPlaceMap);
-        setAPNPredict(rootPlaceMap);
-
-        setIsAPNPredictSameDegree(rootPlaceMap, getAPNPredictDegree());
-        if(IsAPNPredictSameDegree) setAPNProbabilityPredict(rootPlaceMap, placeMap, getAPNPredictDegree());
-
-        setCurrentInstanceRealTarget();
-        setMSE(rootPlaceMap);
-    }
 
     private void setAPNPredictTargetDegreeMap(HashMap<Integer, Place> rootPlaceMap){
         Map<String, Double> APNPredictTargetDegreeMaptmp = rootPlaceMap
@@ -136,11 +141,20 @@ public class APNOutputInstanceInfo {
         this.APNPredictTargetDegreeMap = new HashMap(APNPredictTargetDegreeMaptmp);
     }
 
+    private double setTotalAPNPredictDegree(HashMap<Integer, Place> rootPlaceMap){
+        return rootPlaceMap
+                .values()
+                .stream()
+                .mapToDouble(Place::getRelationshipDegree).sum();
+    }
+
     private void setAPNPredict(HashMap<Integer, Place> rootPlaceMap){
         Place maxPlace = getAPNMaxRelationshipTarget(rootPlaceMap);
 
         this.APNPredict = maxPlace.getTestAttributeValue();
         this.APNPredictDegree = maxPlace.getRelationshipDegree();
+        this.totalAPNPredictDegree = setTotalAPNPredictDegree(rootPlaceMap);
+        this.APNPredictDegreeNormalize = div(APNPredictDegree, totalAPNPredictDegree);
     }
 
     private void setAPNProbabilityPredict(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap, double maxAPNRelationshipDegree){
@@ -163,15 +177,34 @@ public class APNOutputInstanceInfo {
         return this.APNPredictDegree;
     }
 
-    public void print(){
+    public double getAPNPredictDegreeNormalize(){
+        return this.APNPredictDegreeNormalize;
+    }
 
+    public String getAPNPredict(){
+        if(this.IsAPNPredictSameDegree && PROBABILITY_PREDICT_BTN){
+            return this.APNProbabilityPredict;
+        }
+        return this.APNPredict;
+    }
+
+    public String getRealTargetValue(){
+        return RealTargetValue;
+    }
+
+    public double getMeanSquaredError(){
+        return MSE;
+    }
+
+
+    public void print(){
         System.out.println();
-        System.out.println(testInstanceInd+" "+APNPredictTargetDegreeMap);
-        System.out.println(APNPredict+" "+APNPredictDegree);
-        System.out.println(IsAPNPredictSameDegree+" "+APNProbabilityPredict);
-        System.out.println(RealTargetValue);
-        System.out.println(MSE);
+        System.out.println(getAPNPredict()+" "+ getAPNPredictDegreeNormalize());
+        System.out.println(getRealTargetValue());
+        System.out.println(getMeanSquaredError());
         System.out.println();
     }
+
+
 
 }
