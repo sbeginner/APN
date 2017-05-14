@@ -8,7 +8,12 @@ import com.model.apn.NetworkStructure.APNNetworkStructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
+import static MathCalculate.Arithmetic.div;
+import static Setup.Config.INSTANCE_NUM;
+import static Setup.Config.MAX_FOLDNUM;
+import static Setup.Config.RANDOM_SEED;
 import static com.model.apn.Setup.Config.ATTRIBUTE_NUM;
 import static com.model.apn.Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.THRESHOLD_NUM;
@@ -21,7 +26,6 @@ public class APN {
     private APNNetwork APNNet;
     private APNNetworkStructure APNNetStructure;
     private boolean isAPNNetSet = false;
-    APNOutputInfo vAPNOutputInfo;
 
     public APN(){
 
@@ -38,31 +42,60 @@ public class APN {
 
         isAPNNetSet = isFixed;
         this.APNNetStructure = new APNNetworkStructure(instances);
-        APNNetStructure.createNetworkStructure();
-        APNNet = new APNNetwork(this.APNNetStructure, this.instances);
+        this.APNNetStructure.createNetworkStructure();
+        this.APNNet = new APNNetwork(this.APNNetStructure, this.instances);
+        this.APNNet.setInstances(instances);
+
+        APNNetStructure.printStructureValue();
     }
 
     public void setAPNNetworkStructureParameters(){
-
-        APNNet.setInstances(instances);
         ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));
-        list.set(2,0.9);
-        list.set(5,0.9);
-        list.set(7,0.9);
         APNNet.setParameters(list);
+    }
 
+    private void setBionicsAPNNetworkStructureParameters(int initRandomSeed, int randomSeed){
+        initRandomSeed += randomSeed;
+
+        System.out.println(initRandomSeed);
+        Random rnd = new Random(initRandomSeed);
+        System.out.println(randomFunc(rnd));
+        System.out.println(randomFunc(rnd));
+        System.out.println(randomFunc(rnd));
+        System.out.println(randomFunc(rnd));
+        System.out.println(randomFunc(rnd));
+        System.out.println(randomFunc(rnd));
+
+        ArrayList<Double> thresholdList = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));
+        //System.out.println(thresholdList);
+        APNNet.setParameters(thresholdList);
+    }
+
+    private double randomFunc(Random rnd){
+        return div(rnd.nextInt(10000), 10000);
+    }
+
+    public void setBionicsAPNnetworkStructure(int curfoldInd){
+        int initRandomSeed = (int)(RANDOM_SEED * MAX_FOLDNUM * INSTANCE_NUM * (0.87))+curfoldInd;
+
+        setBionicsAPNNetworkStructureParameters(initRandomSeed, 0);
+        travelBionicsAPNmodel();
+    }
+
+    public void travelBionicsAPNmodel(){
+        APNNet.bioTravel();
     }
 
     public void travelAPNmodel(){
         APNNet.travel();
     }
 
-    public void getOutput(){
-        APNNet.getOutput();
+    public void getEachOutput(){
+        APNNet.getEachConfusionMatrixOutput();
     }
 
-    public void test(){
-
+    public void getTotalOutput(){
+        APNNet.getTotalConfusionMatrixOutput();
     }
 
 }
