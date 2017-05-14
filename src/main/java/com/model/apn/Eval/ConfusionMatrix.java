@@ -46,6 +46,10 @@ public class ConfusionMatrix {
         int[][] confusionMatrix = new int[targetValueNum][targetValueNum];
 
         APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
+            System.out.println(outputInstanceInfo.getAPNPredict().toString() + " " +outputInstanceInfo.getRealTargetValue() );
+        });
+
+        APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
             int predictInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getAPNPredict().toString());
             int realInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getRealTargetValue());
             confusionMatrix[predictInd][realInd] += 1;

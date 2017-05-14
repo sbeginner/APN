@@ -127,14 +127,14 @@ public class APNNetworkStructure {
         networkStructure[2][3] = 10;
         networkStructure[2][0] = 0;
         networkStructure[2][1] = 0;
-        networkStructure[3][0] = 4;
+        networkStructure[3][0] = 1;
         networkStructure[3][1] = 1;
         networkStructure[4][2] = 2;
-        networkStructure[5][2] = 2;
-        networkStructure[6][2] = 2;
-        networkStructure[4][3] = 3;
-        networkStructure[5][3] = 3;
-        networkStructure[6][3] = 3;
+        networkStructure[5][2] = 3;
+        networkStructure[6][2] = 4;
+        networkStructure[4][3] = 5;
+        networkStructure[5][3] = 6;
+        networkStructure[6][3] = 7;
 
         return networkStructure;
     }

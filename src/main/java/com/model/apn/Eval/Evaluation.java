@@ -8,8 +8,11 @@ import DataStructure.Instances;
 import Preprocess.Filter;
 import Preprocess.MEPA;
 import Setup.Config;
+import com.model.apn.Model.ABC;
 import com.model.apn.Model.APN;
+import com.model.apn.Model.Bionics;
 
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -24,14 +27,17 @@ import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
  * Created by jack on 2017/3/29.
  */
 public class Evaluation {
-
-    public Evaluation(){
-
+    Instances instances;
+    public Evaluation(Instances instances){
+        this.instances = instances;
     }
 
-    public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum, int randseed){
+    public void setRandomSeed(int randseed){
+        instances.setRandSeed(randseed);//Optional
+    }
 
-        instances.setRandSeed(randseed);         //Optional
+    public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum, Bionics bionics){
+
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
         instances.setMaxFoldNum(maxfoldnum);
 
@@ -43,44 +49,44 @@ public class Evaluation {
             printInfo(mepaInstances);
 
             //model do something;
-            crossValidateModelAPNProcess(APNmodel, mepaInstances, curfoldInd, true);
+            evalAPNProcess(APNmodel, mepaInstances, curfoldInd, bionics);
 
         });
 
+        //result
         toMatrixString(APNmodel);
     }
 
-    private void crossValidateModelAPNProcess(APN APNmodel, Instances mepaInstances, int curfoldInd, boolean Bionics){
-        //test(mepaInstances);
-        APNmodel.setInstances(mepaInstances);
-        APNmodel.setAPNNetworkStructure(true);
-        APNmodel.setAPNNetworkStructureParameters();
-        if(Bionics){
-            //APNmodel.setBionicsAPNnetworkStructure(new ABC());
-            APNmodel.setBionicsAPNnetworkStructure(curfoldInd);
-        }
-        APNmodel.travelAPNmodel();
-        APNmodel.getEachOutput();
+    public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum){
+        crossValidateModel(APNmodel,instances, maxfoldnum, null);
     }
 
-    public void evalTrainTestModel(APN APNmodel, Instances instances, int randseed){
+    public void evalTrainTestModel(APN APNmodel, Instances instances, Bionics bionics){
 
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
-        instances.setRandSeed(randseed);         //Optional
         Instances mepaInstances = Filter.useFilter(instances, new MEPA());
         printInfo(mepaInstances);
 
         //model do something
-        evalTrainTestModelAPNProcess(APNmodel, mepaInstances);
+        evalAPNProcess(APNmodel, mepaInstances, 0, bionics);
 
+        //result
         toMatrixString(APNmodel);
     }
 
-    private void evalTrainTestModelAPNProcess(APN APNmodel, Instances mepaInstances){
+    public void evalTrainTestModel(APN APNmodel, Instances instances){
+        evalTrainTestModel(APNmodel,instances, null);
+    }
+
+    private void evalAPNProcess(APN APNmodel, Instances mepaInstances, int curfoldInd, Bionics bionics){
         APNmodel.setInstances(mepaInstances);
         APNmodel.setAPNNetworkStructure(true);
         APNmodel.setAPNNetworkStructureParameters();
+        if(!Objects.isNull(bionics)){
+            APNmodel.setBionicsAPNnetworkStructure(curfoldInd, bionics);
+        }
         APNmodel.travelAPNmodel();
+        APNmodel.getEachOutput();
     }
 
     public void toMatrixString(APN APNmodel){

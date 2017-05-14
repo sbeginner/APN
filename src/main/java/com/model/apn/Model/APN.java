@@ -9,13 +9,12 @@ import com.model.apn.NetworkStructure.APNNetworkStructure;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import static MathCalculate.Arithmetic.div;
 import static Setup.Config.INSTANCE_NUM;
 import static Setup.Config.MAX_FOLDNUM;
 import static Setup.Config.RANDOM_SEED;
-import static com.model.apn.Setup.Config.ATTRIBUTE_NUM;
-import static com.model.apn.Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.THRESHOLD_NUM;
 
 /**
@@ -54,36 +53,48 @@ public class APN {
         APNNet.setParameters(list);
     }
 
-    private void setBionicsAPNNetworkStructureParameters(int initRandomSeed, int randomSeed){
+    public void setAPNNetworkStructureParameters(ArrayList<Double> list){
+        APNNet.setParameters(list);
+    }
+
+    private ArrayList<Double> setBionicsAPNNetworkStructureParameters(int initRandomSeed, int randomSeed){
         initRandomSeed += randomSeed;
 
-        System.out.println(initRandomSeed);
         Random rnd = new Random(initRandomSeed);
-        System.out.println(randomFunc(rnd));
-        System.out.println(randomFunc(rnd));
-        System.out.println(randomFunc(rnd));
-        System.out.println(randomFunc(rnd));
-        System.out.println(randomFunc(rnd));
-        System.out.println(randomFunc(rnd));
 
-        ArrayList<Double> thresholdList = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));
-        //System.out.println(thresholdList);
+        ArrayList<Double> thresholdList = new ArrayList(THRESHOLD_NUM);
+        IntStream.range(0, THRESHOLD_NUM).forEach(thresholdInd -> thresholdList.add(randomFunc(rnd)));
+
+        Collections.shuffle(thresholdList, rnd);
+
         APNNet.setParameters(thresholdList);
+
+        return thresholdList;
     }
 
     private double randomFunc(Random rnd){
         return div(rnd.nextInt(10000), 10000);
     }
 
-    public void setBionicsAPNnetworkStructure(int curfoldInd){
-        int initRandomSeed = (int)(RANDOM_SEED * MAX_FOLDNUM * INSTANCE_NUM * (0.87))+curfoldInd;
+    public void setBionicsAPNnetworkStructure(int curfoldInd, Bionics bionics){
+        int initRandomSeed = (int)(RANDOM_SEED * MAX_FOLDNUM * INSTANCE_NUM * (0.87)) & (curfoldInd + 1);
 
-        setBionicsAPNNetworkStructureParameters(initRandomSeed, 0);
-        travelBionicsAPNmodel();
+        double min = 9999;
+        ArrayList<Double> arrayList = new ArrayList();
+        for(int i=0;i<1000;i++){
+            ArrayList<Double> arrayListtmp = setBionicsAPNNetworkStructureParameters(initRandomSeed, i);
+
+            if(min > travelBionicsAPNmodel()){
+                min = travelBionicsAPNmodel();
+                arrayList = arrayListtmp;
+            }
+        }
+
+        setAPNNetworkStructureParameters(arrayList);
     }
 
-    public void travelBionicsAPNmodel(){
-        APNNet.bioTravel();
+    public double travelBionicsAPNmodel(){
+       return APNNet.getTotalAverageMSE();
     }
 
     public void travelAPNmodel(){

@@ -66,8 +66,8 @@ public class APNNetwork {
         APNOutputInfoCenter.setAPNOutputInstanceInfo(APNOutputInstanceInfoList);
     }
 
-    public void bioTravel(){
-        APNOutputInfoCenter.calcAverageMSE(getTotalMSE());
+    public double getTotalAverageMSE(){
+        return APNOutputInfoCenter.calcAverageMSE(getTotalMSE());
     }
 
     private double getTotalMSE(){
