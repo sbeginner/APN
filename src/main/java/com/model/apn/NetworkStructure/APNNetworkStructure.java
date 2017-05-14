@@ -19,6 +19,7 @@ public class APNNetworkStructure {
     private Instances instances;
     private HashMap<Integer, Transition> transitionMap;
     private HashMap<Integer, Place> placeMap;
+    private int[][] networkStructure;
 
     public APNNetworkStructure(Instances instances){
         this.instances = instances;
@@ -91,11 +92,12 @@ public class APNNetworkStructure {
     }
 
     public void createNetworkStructure(){
-        int[][] networkStructure = netStructureExample();
-        placeMap = createPlace(networkStructure);
-        transitionMap = createTransition(networkStructure, placeMap);
+        this.networkStructure = netStructureExample();
 
-        transitionMap.values()
+        this.placeMap = createPlace(this.networkStructure);
+        this.transitionMap = createTransition(this.networkStructure, this.placeMap);
+
+        this.transitionMap.values()
                 .stream()
                 .forEach(Transition::setSupConf);
     }
@@ -116,7 +118,6 @@ public class APNNetworkStructure {
     }
 
     private int[][] netStructureExample(){
-
         int[][] networkStructure = new int[ALLPLACENUM][FEATUREPLACENUM];
 
         IntStream.range(0, ALLPLACENUM)
@@ -135,18 +136,30 @@ public class APNNetworkStructure {
         networkStructure[5][3] = 3;
         networkStructure[6][3] = 3;
 
-        printStructureValue(networkStructure);
-
         return networkStructure;
     }
 
-    private void printStructureValue(int[][] networkStructure){
-        System.out.println(FEATUREPLACENUM+"*"+ALLPLACENUM);
+    public void printStructureValue(){
+        printStructureValue(this.networkStructure);
+    }
+
+    public void printStructureValue(int[][] networkStructure){
+        System.out.println();
+        System.out.println("<---- APN network structure [ Input: "+FEATUREPLACENUM+", Output: "+ALLPLACENUM+" ] ---->");
+        System.out.println();
+
+        System.out.format("%6s", " ");
+        for (int i=0;i<networkStructure[0].length;i++)
+            System.out.format("%6s","P."+i);
+        System.out.println();
+
         for (int i=0;i<networkStructure.length;i++){
+            System.out.format("%6s","P."+i);
             for (int j=0;j<networkStructure[i].length;j++){
-                System.out.print(networkStructure[i][j]+" ");
+                System.out.format("%6d", networkStructure[i][j]);
             }
             System.out.println();
         }
+        System.out.println();
     }
 }

@@ -58,9 +58,7 @@ public class ConfusionMatrix {
 
     public void printConfusionMatrixInfo(){
         int[][] confusionMatrix = this.confusionMatrix;
-
-        printConfusionMatrix(confusionMatrix);
-        printIndicators(confusionMatrix);
+        printConfusionMatrixInfo(confusionMatrix);
     }
 
     public void printConfusionMatrixInfo(int[][] confusionMatrix){

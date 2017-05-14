@@ -66,6 +66,32 @@ public class APNNetwork {
         APNOutputInfoCenter.setAPNOutputInstanceInfo(APNOutputInstanceInfoList);
     }
 
+    public void bioTravel(){
+        APNOutputInfoCenter.calcAverageMSE(getTotalMSE());
+    }
+
+    private double getTotalMSE(){
+        HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
+        HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+        HashMap<Integer, Place> rootPlaceMap = new HashMap(getRootPlaceMap(placeMap));
+
+        return IntStream.range(0, INSTANCE_NUM_TRAIN)
+                .mapToDouble(trainInstanceInd -> {
+                    double MSE;
+                    setAPNNetPlaceInEachTrainInstance(placeMap, trainInstanceInd);
+                    travelProcess(transitionMap);
+                    MSE = getInstanceMSE(rootPlaceMap, trainInstanceInd);
+                    reset(placeMap, transitionMap);
+                    return MSE;
+                }).sum();
+    }
+
+    private double getInstanceMSE(HashMap<Integer, Place> rootPlaceMap, int instanceInd){
+
+        APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(instanceInd, this.instances);
+        return outputInstanceInfo.getMeanSquaredErrorForBio(rootPlaceMap);
+    }
+
     private  Map<Integer, Place> getRootPlaceMap(HashMap<Integer, Place> placeMap){
         Map<Integer, Place> rootPlaceMap = placeMap.entrySet()
                 .stream()
@@ -75,6 +101,22 @@ public class APNNetwork {
                         placeMapItem -> placeMapItem.getValue()
                 ));
         return rootPlaceMap;
+    }
+
+    private void setAPNNetPlaceInEachTrainInstance(HashMap<Integer, Place> placeMap, int trainInstanceInd){
+
+        MEPAMembershipMap trainEPAMembershipMap = instances.getMEPAMembershipMap(false);
+
+        placeMap.values()
+                .stream()
+                .peek(place -> place.setTestAttributeValue(trainEPAMembershipMap.getAllInstanceByAttr(place.getAttribute()).get(trainInstanceInd).getMembership()))
+                .filter(place -> place.getTypeValue() == LEAF_PLACE)
+                .forEach(place -> {
+                    double relationshipDegree = trainEPAMembershipMap.getAllInstanceByAttr(place.getAttribute()).get(trainInstanceInd).getMembershipDegree();
+                    place.setRelationshipDegree(relationshipDegree);
+                });
+
+        printPlaceInitInfo(placeMap);
     }
 
     private void setAPNNetPlaceInEachTestInstance(HashMap<Integer, Place> placeMap, int testInstanceInd){
@@ -100,6 +142,7 @@ public class APNNetwork {
                 .sorted((transitionInd, transition) -> transition.getTravelPriority())
                 .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
     }
+
 
     private APNOutputInstanceInfo getOutputResult(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap, int testInstanceInd){
         APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(testInstanceInd, this.instances);
@@ -228,12 +271,14 @@ public class APNNetwork {
                 });
     }
 
-    public void getOutput(){
+    public void getEachConfusionMatrixOutput(){
         APNOutputInfoCenter.getConfusionMatrixMap()
                 .values()
                 .stream()
                 .forEach(confusionMatrix -> confusionMatrix.printConfusionMatrixInfo());
+    }
 
+    public void getTotalConfusionMatrixOutput(){
         APNOutputInfoCenter.combineConfusionMatrix();
     }
 }

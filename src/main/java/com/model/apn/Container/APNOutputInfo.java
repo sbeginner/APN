@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.IntStream;
 
+import static MathCalculate.Arithmetic.div;
 import static Setup.Config.*;
 
 /**
@@ -26,6 +27,9 @@ public class APNOutputInfo {
         targetValueNum = instances.getAttribute(TARGET_ATTRIBUTE).getAllValue().size();
     }
 
+    public double calcAverageMSE(double totalMSE){
+        return div(totalMSE, INSTANCE_NUM_TRAIN);
+    }
 
     public void setAPNOutputInstanceInfo(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList) {
         ConfusionMatrix confusionMatrix = new ConfusionMatrix(instances);

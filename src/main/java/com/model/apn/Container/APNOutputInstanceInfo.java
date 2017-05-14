@@ -8,9 +8,7 @@ import com.model.apn.APNObject.Place;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static MathCalculate.Arithmetic.div;
-import static MathCalculate.Arithmetic.mul;
-import static MathCalculate.Arithmetic.sub;
+import static MathCalculate.Arithmetic.*;
 import static Setup.Config.ATTRIBUTEVALUE_NUM;
 import static Setup.Config.NONVALUE_INTEGER;
 import static Setup.Config.TARGET_ATTRIBUTE;
@@ -22,7 +20,7 @@ import static com.model.apn.Setup.Config.ROOT_PLACE;
  */
 public class APNOutputInstanceInfo {
     private Instances instances;
-    private int testInstanceInd = NONVALUE_INTEGER;
+    private int instanceInd = NONVALUE_INTEGER;
     private HashMap<String, Double> APNPredictTargetDegreeMap;    //The predict degree in each target value
     private String APNPredict;    //APN predict target value
     private double APNPredictDegreeNormalize;    // APNPredictDegreeNormalize = APNPredictDegree/totalAPNPredictDegree
@@ -34,8 +32,8 @@ public class APNOutputInstanceInfo {
 
     private double MSE;    //Mean Squared Error
 
-    public APNOutputInstanceInfo(int testInstanceInd, Instances instances){
-        this.testInstanceInd = testInstanceInd;
+    public APNOutputInstanceInfo(int instanceInd, Instances instances){
+        this.instanceInd = instanceInd;
         this.instances = instances;
     }
 
@@ -47,8 +45,16 @@ public class APNOutputInstanceInfo {
         setIsAPNPredictSameDegree(rootPlaceMap, getAPNPredictDegree());
         if(IsAPNPredictSameDegree) setAPNProbabilityPredict(rootPlaceMap, placeMap, getAPNPredictDegree());
 
-        setCurrentInstanceRealTarget();
+        setCurrentInstanceRealTarget(true);
         setMSE(rootPlaceMap);
+    }
+
+    public double getMeanSquaredErrorForBio(HashMap<Integer, Place> rootPlaceMap){
+
+        setCurrentInstanceRealTarget(false);
+        setMSE(rootPlaceMap);
+
+        return getMeanSquaredError();
     }
 
     private  HashMap<String, Double> calcTargetPriorProbability(HashMap<Integer, Place> placeMap){
@@ -108,8 +114,17 @@ public class APNOutputInstanceInfo {
         return maxPlace;
     }
 
-    private String getCurrentInstanceRealTarget(int testInstanceInd){
-        String curTestInstanceIndTarget = instances.getMEPAMembershipMap(true)
+    private String getCurrentInstanceRealTarget(int testInstanceInd, boolean isTest){
+        if(isTest){
+            String curTestInstanceIndTarget = instances.getMEPAMembershipMap(true)
+                    .getAllInstanceByAttr(TARGET_ATTRIBUTE)
+                    .get(testInstanceInd)
+                    .getMembership();
+
+            return curTestInstanceIndTarget;
+        }
+
+        String curTestInstanceIndTarget = instances.getMEPAMembershipMap(false)
                 .getAllInstanceByAttr(TARGET_ATTRIBUTE)
                 .get(testInstanceInd)
                 .getMembership();
@@ -117,7 +132,7 @@ public class APNOutputInstanceInfo {
         return curTestInstanceIndTarget;
     }
 
-    private double getMeanSquaredError(HashMap<Integer, Place> placeMap, String currentInstanceRealTarget){
+    private double calcMeanSquaredError(HashMap<Integer, Place> placeMap, String currentInstanceRealTarget){
         double MSE = placeMap.values()
                 .stream()
                 .mapToDouble(place -> {
@@ -128,7 +143,7 @@ public class APNOutputInstanceInfo {
                     }
                 }).sum();
 
-        return MSE;
+        return round(MSE);
     }
 
 
@@ -165,12 +180,17 @@ public class APNOutputInstanceInfo {
         this.IsAPNPredictSameDegree = checkAPNOutputMultipleSameDegreeIsExist(rootPlaceMap, maxAPNRelationshipDegree);
     }
 
-    private void setCurrentInstanceRealTarget(){
-        this.RealTargetValue = getCurrentInstanceRealTarget(this.testInstanceInd);
+    private void setCurrentInstanceRealTarget(boolean isTest){
+        if(isTest){
+            this.RealTargetValue = getCurrentInstanceRealTarget(this.instanceInd, true);
+            return;
+        }
+
+        this.RealTargetValue = getCurrentInstanceRealTarget(this.instanceInd, false);
     }
 
     private void setMSE(HashMap<Integer, Place> rootPlaceMap){
-        this.MSE = getMeanSquaredError(rootPlaceMap, this.RealTargetValue);
+        this.MSE = calcMeanSquaredError(rootPlaceMap, this.RealTargetValue);
     }
 
     public double getAPNPredictDegree(){
@@ -192,7 +212,7 @@ public class APNOutputInstanceInfo {
         return RealTargetValue;
     }
 
-    public double getMeanSquaredError(){
+    private double getMeanSquaredError(){
         return MSE;
     }
 

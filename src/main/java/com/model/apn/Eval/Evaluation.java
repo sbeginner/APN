@@ -10,6 +10,7 @@ import Preprocess.MEPA;
 import Setup.Config;
 import com.model.apn.Model.APN;
 
+import java.util.Random;
 import java.util.stream.IntStream;
 
 
@@ -23,15 +24,13 @@ import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
  * Created by jack on 2017/3/29.
  */
 public class Evaluation {
-    private Instances instances;
 
-    public Evaluation(Instances instances){
+    public Evaluation(){
 
     }
 
     public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum, int randseed){
 
-        this.instances = instances;
         instances.setRandSeed(randseed);         //Optional
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
         instances.setMaxFoldNum(maxfoldnum);
@@ -42,21 +41,26 @@ public class Evaluation {
             instances.autoCVInKFold(curfoldInd);
             Instances mepaInstances = Filter.useFilter(instances, new MEPA());
             printInfo(mepaInstances);
+
             //model do something;
-            crossValidateModelAPNProcess(APNmodel, mepaInstances, curfoldInd);
+            crossValidateModelAPNProcess(APNmodel, mepaInstances, curfoldInd, true);
 
         });
+
+        toMatrixString(APNmodel);
     }
 
-    private void crossValidateModelAPNProcess(APN APNmodel, Instances mepaInstances, int curfoldInd){
+    private void crossValidateModelAPNProcess(APN APNmodel, Instances mepaInstances, int curfoldInd, boolean Bionics){
         //test(mepaInstances);
         APNmodel.setInstances(mepaInstances);
         APNmodel.setAPNNetworkStructure(true);
         APNmodel.setAPNNetworkStructureParameters();
-        //APNmodel.setBionicsAPNnetworkStructure(new ABC());
+        if(Bionics){
+            //APNmodel.setBionicsAPNnetworkStructure(new ABC());
+            APNmodel.setBionicsAPNnetworkStructure(curfoldInd);
+        }
         APNmodel.travelAPNmodel();
-        APNmodel.getOutput();
-        APNmodel.test();
+        APNmodel.getEachOutput();
     }
 
     public void evalTrainTestModel(APN APNmodel, Instances instances, int randseed){
@@ -69,6 +73,7 @@ public class Evaluation {
         //model do something
         evalTrainTestModelAPNProcess(APNmodel, mepaInstances);
 
+        toMatrixString(APNmodel);
     }
 
     private void evalTrainTestModelAPNProcess(APN APNmodel, Instances mepaInstances){
@@ -76,11 +81,12 @@ public class Evaluation {
         APNmodel.setAPNNetworkStructure(true);
         APNmodel.setAPNNetworkStructureParameters();
         APNmodel.travelAPNmodel();
-        APNmodel.test();
     }
 
-    public void toMatrixString(){
-
+    public void toMatrixString(APN APNmodel){
+        System.out.println();
+        System.out.println("|- - - - - [ Total Result ] - - - - -|");
+        APNmodel.getTotalOutput();
     }
 
     public void printInfo(Instances instances){

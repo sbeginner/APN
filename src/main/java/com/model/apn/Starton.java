@@ -33,7 +33,7 @@ public class Starton {
         //dt.completeData();
         Instances instances = dt.getInstances();    //get data
         ///////////////////////////////////////////////////////////////////
-        Evaluation eval = new Evaluation(instances);
+        Evaluation eval = new Evaluation();
         eval.crossValidateModel(new APN(), instances, 10, RANDOM_SEED);
     }
 
@@ -43,7 +43,7 @@ public class Starton {
         //dt.completeData();
         Instances instances = dt.getInstances();    //get data
         ///////////////////////////////////////////////////////////////////
-        Evaluation eval = new Evaluation(instances);
+        Evaluation eval = new Evaluation();
         eval.evalTrainTestModel(new APN(), instances, RANDOM_SEED);
     }
 
