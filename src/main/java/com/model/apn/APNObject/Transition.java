@@ -25,10 +25,10 @@ public class Transition {
     private HashSet<Place> outputPlaceSet;
     private Place minRDSelectedInputPlace;
 
-    private double confidence = 0.9;
+    private double confidence = NONVALUE_INTEGER;
     private ArrayList<Double> supportSet;
 
-    private double confThreshold =  0.4;
+    private double confThreshold =  0.1;
     private ArrayList<Double> supThresholdSet;
 
     public Transition(int index, Instances instances){
@@ -41,6 +41,24 @@ public class Transition {
 
     public void reset(){
         minRDSelectedInputDegree = NONVALUE_INTEGER;
+    }
+
+    public void createRelationship(){
+        System.out.println(inputPlaceSet.hashCode());
+        inputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()));
+        System.out.println(outputPlaceSet.hashCode());
+        outputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()));
+        System.out.println();
+        createConfidence();
+        createSupport();
+    }
+
+    private void createConfidence(){
+
+    }
+
+    private void createSupport(){
+
     }
 
     private void setParametersConfidenceThreshold(double confThreshold){
@@ -57,13 +75,14 @@ public class Transition {
     }
 
     private void setSupport(){
-        supportSet = new ArrayList(Collections.nCopies(inputPlaceSet.size(), 0.1));
+        supportSet = new ArrayList(Collections.nCopies(inputPlaceSet.size(), 0.2));
         //calc support
     }
 
     private void setConfidence(){
         confidence = 0.9;
         //calc confidence
+
     }
 
     public void setSupConf(){

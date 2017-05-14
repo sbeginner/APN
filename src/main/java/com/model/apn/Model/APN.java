@@ -49,7 +49,7 @@ public class APN {
     }
 
     public void setAPNNetworkStructureParameters(){
-        ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.1));
+        ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.01));
         APNNet.setParameters(list);
     }
 

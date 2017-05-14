@@ -271,6 +271,7 @@ public class APNNetwork {
                 });
     }
 
+
     public void getEachConfusionMatrixOutput(){
         APNOutputInfoCenter.getConfusionMatrixMap()
                 .values()

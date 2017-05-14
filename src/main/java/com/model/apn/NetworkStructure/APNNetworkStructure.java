@@ -83,9 +83,10 @@ public class APNNetworkStructure {
                         })
                 );
 
-        THRESHOLD_NUM = transitionMaptmp.entrySet()
+        THRESHOLD_NUM = transitionMaptmp.values()
                 .stream()
-                .mapToInt(obj -> obj.getValue().setThresholdSize())
+                .peek(transition -> transition.createRelationship())
+                .mapToInt(transition -> transition.setThresholdSize())
                 .sum();
 
         return transitionMaptmp;

@@ -198,7 +198,7 @@ public class APNOutputInstanceInfo {
     }
 
     public double getAPNPredictDegreeNormalize(){
-        return this.APNPredictDegreeNormalize;
+        return new Random(1).nextDouble();
     }
 
     public String getAPNPredict(){
@@ -219,9 +219,8 @@ public class APNOutputInstanceInfo {
 
     public void print(){
         System.out.println();
-        System.out.println(getAPNPredict()+" "+ getAPNPredictDegreeNormalize());
-        System.out.println(getRealTargetValue());
-        System.out.println(getMeanSquaredError());
+        System.out.println(getAPNPredict()+" "+getRealTargetValue()+" "+ getAPNPredictDegreeNormalize());
+        System.out.println(instances.getTestInstanceMap().get(instanceInd).getInstanceItemMap());
         System.out.println();
     }
 

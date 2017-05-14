@@ -4,16 +4,14 @@ import DataStructure.Attribute;
 import DataStructure.Instances;
 import com.model.apn.Container.APNOutputInstanceInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static MathCalculate.Arithmetic.add;
-import static MathCalculate.Arithmetic.div;
-import static MathCalculate.Arithmetic.mul;
+import static MathCalculate.Arithmetic.*;
 import static Setup.Config.NONVALUE_INTEGER;
 import static Setup.Config.TARGET_ATTRIBUTE;
-import static MathCalculate.Arithmetic.sqrt;
 import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
 
 /**
@@ -45,9 +43,12 @@ public class ConfusionMatrix {
     public void setConfusionMatrix(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList) {
         int[][] confusionMatrix = new int[targetValueNum][targetValueNum];
 
-        APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
-            System.out.println(outputInstanceInfo.getAPNPredict().toString() + " " +outputInstanceInfo.getRealTargetValue() );
-        });
+
+       // this.APNPredictDegreeNormalize
+
+        /* For AUC*/
+        prepareAUC(APNOutputInstanceInfoList);
+
 
         APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
             int predictInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getAPNPredict().toString());
@@ -59,6 +60,82 @@ public class ConfusionMatrix {
 
         printConfusionMatrixInfo(confusionMatrix);
     }
+
+
+    private void prepareAUC(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList){
+        List<APNOutputInstanceInfo> sortedList = APNOutputInstanceInfoList.stream()
+                .sorted(Comparator.comparing(APNOutputInstanceInfo::getAPNPredictDegreeNormalize).reversed())
+                .collect(Collectors.toList());
+
+        List<Double> sortedProbabilityList= sortedList.stream()
+                .mapToDouble(APNOutputInstanceInfo::getAPNPredictDegreeNormalize)
+                .boxed()
+                .collect(Collectors.toList());
+
+        List<Double> AUCRankList = calcAUCRank(sortedProbabilityList);
+        int cur = 0;
+
+        List<Boolean> sortedTrueFalseList = new ArrayList<>();
+        sortedList.stream().forEach(outputInstanceInfo->{
+            int realInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getRealTargetValue());
+            if(realInd == cur){
+                sortedTrueFalseList.add(true);
+            }else {
+                sortedTrueFalseList.add(false);
+            }
+        });
+
+        int True = (int) sortedTrueFalseList.stream().filter(Boolean::booleanValue).count();
+        int False = sortedTrueFalseList.size() - True;
+        double TrueSum = IntStream.range(0, sortedTrueFalseList.size()).filter(i->sortedTrueFalseList.get(i)).mapToDouble(i->AUCRankList.get(i)).sum();
+        /*
+        System.out.println(AUCRankList);
+        System.out.println(TrueSum - div(True*(True+1), 2));
+        System.out.println(True * False);
+
+        if(True*False != 0){
+            System.out.println(div(TrueSum - div(True*(True+1), 2), True * False));
+        }
+        */
+
+    }
+
+    private List<Double> calcAUCRank(List<Double> sortedList){
+
+
+        int rank = sortedList.size()+1;
+        List<Double> rankList = new ArrayList(sortedList.size());
+
+        for(int i = 0;i<sortedList.size();i++){
+            int cnt = 0;
+            for(int j = i+1;j<sortedList.size();j++){
+                if(sortedList.get(i).doubleValue()==sortedList.get(j).doubleValue()){
+                    cnt++;
+                    continue;
+                }
+
+                break;
+            }
+
+            rank--;
+
+            if(cnt == 0){
+                rankList.add((double)rank);
+            }else {
+                int start = cnt;
+                while (start >= 0){
+                    rankList.add(div((rank + rank - cnt)*cnt, 2*cnt));
+                    start--;
+                    i++;
+                }
+                rank-=cnt;
+            }
+        }
+
+        return rankList;
+    }
+
+
 
     public void printConfusionMatrixInfo(){
         int[][] confusionMatrix = this.confusionMatrix;
@@ -129,6 +206,7 @@ public class ConfusionMatrix {
 
         printIndicators(TruePositive, FalsePositive, TrueNegative, FalseNegative, testInstanceNum);
     }
+
 
     private double[] calcAccuracy(int[] TruePositive, int[] TrueNegative, int testInstanceNum){
         double[] accuracy = new double[targetValueNum];

@@ -14,7 +14,7 @@ public class Config extends Setup.Config{
 
     public static boolean PRINT_TRACETRAVELHISTORY_BTN = false;
     public static boolean PRINT_DETAIL_BTN = false;
-    public static boolean PROBABILITY_PREDICT_BTN = false;
+    public static boolean PROBABILITY_PREDICT_BTN = true;
 
     public Config(){
         AUTO_MISSINGVALUE_BTN = false;
