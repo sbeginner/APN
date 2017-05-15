@@ -9,6 +9,7 @@ import com.model.apn.APNObject.Transition;
 import javax.swing.text.html.Option;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static MathCalculate.Arithmetic.div;
@@ -42,13 +43,25 @@ public class hashTransitionInfo {
         this.InputOutpuFreqMap = new HashMap();
     }
 
-    public void setSupport(){
-        List<String> arr = new ArrayList<>();
-        this.inputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
-        double inputFreq = getInputOutpuFreqMap(arr);
-        this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
-        double inputUnionOputFreq = getInputOutpuFreqMap(arr);
+    public ArrayList<Double> setSupport(){
+        List<String> arr;
+        ArrayList<Place> totalList_Input = new ArrayList<>(inputPlaceSet);
+        ArrayList<Double> supportList = new ArrayList<>();
 
+
+        for(Place p:totalList_Input){
+            arr = new ArrayList<>();
+            arr.add(p.getTestAttributeValue());
+            arr.addAll(this.outputPlaceSet.stream().map(Place::getTestAttributeValue).collect(Collectors.toList()));
+
+            double eachInputFreq = getInputOutpuFreqMap(arr);
+            double total = INSTANCE_NUM_TRAIN;
+
+
+            supportList.add(div(eachInputFreq, total));
+        }
+
+        return supportList;
     }
 
     public double setConfidence(){
@@ -79,8 +92,6 @@ public class hashTransitionInfo {
 
             calcCProductListFrequency(p1, setCartesianProductList(p1));
         }
-
-        InputOutpuFreqMap.entrySet().stream().forEach(System.out::println);
     }
 
     public void setHashTransitionInfo(int inputPlaceHashcode, int outputPlaceHashcode, int curTransitionHashcode){

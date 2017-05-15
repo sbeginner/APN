@@ -78,10 +78,7 @@ public class Transition {
     }
 
     private void setSupport(){
-        supportSet = new ArrayList<>(Collections.nCopies(inputPlaceSet.size(), 0.2));
-        //calc support
-        hTransitionInfo.setSupport();
-
+        supportSet = hTransitionInfo.setSupport();
     }
 
     private void setConfidence(){
