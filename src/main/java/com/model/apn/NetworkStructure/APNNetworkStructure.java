@@ -124,18 +124,19 @@ public class APNNetworkStructure {
         IntStream.range(0, ALLPLACENUM)
                 .forEach(row -> Arrays.fill(networkStructure[row], -1));
 
-        networkStructure[0][1] = 1000;
-        networkStructure[2][3] = 10;
+        networkStructure[1][0] = 0;
         networkStructure[2][0] = 0;
-        networkStructure[2][1] = 0;
-        networkStructure[3][0] = 1;
-        networkStructure[3][1] = 1;
-        networkStructure[4][2] = 2;
-        networkStructure[5][2] = 3;
-        networkStructure[6][2] = 4;
-        networkStructure[4][3] = 5;
-        networkStructure[5][3] = 6;
-        networkStructure[6][3] = 7;
+        networkStructure[3][0] = 0;
+
+        networkStructure[4][1] = 1;
+        networkStructure[5][2] = 2;
+
+        networkStructure[4][2] = 1;
+
+        networkStructure[6][2] = 3;
+
+        networkStructure[6][3] = 4;
+        networkStructure[2][3] = 5;
 
         return networkStructure;
     }

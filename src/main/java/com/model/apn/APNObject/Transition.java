@@ -1,6 +1,7 @@
 package com.model.apn.APNObject;
 
 import DataStructure.Instances;
+import com.model.apn.Container.hashTransitionInfo;
 
 import java.util.*;
 
@@ -44,11 +45,17 @@ public class Transition {
     }
 
     public void createRelationship(){
+        hashTransitionInfo hTransitionInfo = new hashTransitionInfo(this.instances, this);
+        hTransitionInfo.setHashTransitionInfo(inputPlaceSet.hashCode(), outputPlaceSet.hashCode(), this.hashCode());
+
+
+        instances.getMEPAMembership(0,false).get(0).getMembership();
         System.out.println(inputPlaceSet.hashCode());
-        inputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()));
+        inputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()+" "+i.getAttribute().getAttributeName()));
         System.out.println(outputPlaceSet.hashCode());
-        outputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()));
+        outputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()+" "+i.getAttribute().getAttributeName()));
         System.out.println();
+
         createConfidence();
         createSupport();
     }
@@ -82,7 +89,6 @@ public class Transition {
     private void setConfidence(){
         confidence = 0.9;
         //calc confidence
-
     }
 
     public void setSupConf(){
@@ -118,18 +124,13 @@ public class Transition {
         //it must to check the previous one satisfies or not,
         //if not, we need to set the value to the previous one first
         //if the previous one is satisfied, then we can set the relationship degree(multiply the confidence) to the current place
-        inputPlaceSet.stream()
-                .filter(inputPlace -> !inputPlace.checkIsRelationshipDegreeSet())
-                .forEach(inputPlace -> {
-                    HashSet<Transition> curPlaceInputTrasition = inputPlace.getInputTransitionSet();
-                    curPlaceInputTrasition.stream().forEach(Transition::calcInputPlaceRelationshipDegree);
-                });
+
 
         Place minPlace = inputPlaceSet.stream()
                 .filter(inputPlace -> inputPlace.getRelationshipDegree() > 0)
-                .filter(inputPlace -> checkOverSupportThreshold(inputPlace))
+                .filter(this::checkOverSupportThreshold)
                 .filter(inputPlace -> checkOverConfidenceThreshold())
-                .min(Comparator.comparingDouble(inputPlace -> inputPlace.getRelationshipDegree()))
+                .min(Comparator.comparingDouble(Place::getRelationshipDegree))
                 .orElse(null);
 
         if(Objects.isNull(minPlace)){
@@ -137,7 +138,7 @@ public class Transition {
             minRDSelectedInputPlace = null;
             minRDSelectedInputDegree = 0.0;
             outputPlaceSet.stream()
-                    .forEach(outputPlace -> outputPlace.setMaxRelationshipDegree());
+                    .forEach(Place::setMaxRelationshipDegree);
 
             return;
         }
@@ -167,6 +168,10 @@ public class Transition {
 
     public HashSet<Place> getInputPlaceSet(){
         return inputPlaceSet;
+    }
+
+    public HashSet<Place> getOutputPlaceSet(){
+        return outputPlaceSet;
     }
 
     public Place getRDSelectedInputPlace(){
