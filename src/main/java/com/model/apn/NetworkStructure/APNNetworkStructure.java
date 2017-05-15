@@ -127,6 +127,7 @@ public class APNNetworkStructure {
         networkStructure[1][0] = 0;
         networkStructure[2][0] = 0;
         networkStructure[3][0] = 0;
+        networkStructure[4][0] = 0;
 
         networkStructure[4][1] = 1;
         networkStructure[5][2] = 2;
