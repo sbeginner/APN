@@ -51,6 +51,7 @@ public class APNNetwork {
         IntStream.range(0, INSTANCE_NUM_TEST).forEach(testInstanceInd -> {
 
             setAPNNetPlaceInEachTestInstance(placeMap, testInstanceInd);
+            setAPNNetSupConf(transitionMap);
 
             printTracebackTitle();
             travelProcess(transitionMap);
@@ -64,6 +65,12 @@ public class APNNetwork {
         });
 
         APNOutputInfoCenter.setAPNOutputInstanceInfo(APNOutputInstanceInfoList);
+    }
+
+    private  void setAPNNetSupConf(HashMap<Integer, Transition> transitionMap){
+        transitionMap.values()
+                .stream()
+                .forEach(Transition::setSupConf);
     }
 
     public double getTotalAverageMSE(){
@@ -140,7 +147,7 @@ public class APNNetwork {
         transitionMap.values()
                 .stream()
                 .sorted((transitionInd, transition) -> transition.getTravelPriority())
-                .forEach(transition -> transition.calcInputPlaceRelationshipDegree());
+                .forEach(Transition::calcInputPlaceRelationshipDegree);
     }
 
 

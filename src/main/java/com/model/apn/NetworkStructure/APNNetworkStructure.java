@@ -97,10 +97,6 @@ public class APNNetworkStructure {
 
         this.placeMap = createPlace(this.networkStructure);
         this.transitionMap = createTransition(this.networkStructure, this.placeMap);
-
-        this.transitionMap.values()
-                .stream()
-                .forEach(Transition::setSupConf);
     }
 
     public void setParameters(ArrayList<Double> thresholdList){

@@ -6,10 +6,12 @@ import com.google.common.collect.Lists;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
 
+import javax.swing.text.html.Option;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static MathCalculate.Arithmetic.div;
 import static Setup.Config.INSTANCE_NUM_TEST;
 import static Setup.Config.INSTANCE_NUM_TRAIN;
 import static Setup.Config.TARGET_ATTRIBUTE;
@@ -29,24 +31,56 @@ public class hashTransitionInfo {
     private HashSet<Place> outputPlaceSet;
     private int mixHashcode;
 
-    Iterator inputPlaceSetIterator;
-    Iterator outputPlaceSetIterator;
+    private HashMap<List<String>, Integer> InputOutpuFreqMap;
 
-    ArrayList<Place> totalList;
-    ArrayList<Place> inputarrayList;
-    ArrayList<Place> outputarrayList;
+
     public hashTransitionInfo(Instances instances, Transition transition){
         this.instances = instances;
         this.transition = transition;
         this.inputPlaceSet = transition.getInputPlaceSet();
         this.outputPlaceSet = transition.getOutputPlaceSet();
+        this.InputOutpuFreqMap = new HashMap();
+    }
 
-        this.inputPlaceSetIterator = inputPlaceSet.iterator();
-        this.outputPlaceSetIterator = outputPlaceSet.iterator();
+    public void setSupport(){
+        List<String> arr = new ArrayList<>();
+        this.inputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
+        double inputFreq = getInputOutpuFreqMap(arr);
+        this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
+        double inputUnionOputFreq = getInputOutpuFreqMap(arr);
 
+    }
 
-        combineSet();
-        test2();
+    public double setConfidence(){
+        List<String> arr = new ArrayList<>();
+        this.inputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
+        double inputFreq = getInputOutpuFreqMap(arr);
+        this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
+        double inputUnionOputFreq = getInputOutpuFreqMap(arr);
+
+        return div(inputUnionOputFreq,inputFreq);
+    }
+
+    public void createConfidence(){
+        ArrayList<Place> combineList = combineSet();
+        calcCProductListFrequency(combineList, setCartesianProductList(combineList));
+
+        combineList = new ArrayList<>(inputPlaceSet);
+        calcCProductListFrequency(combineList, setCartesianProductList(combineList));
+    }
+
+    public void createSupport(){
+        ArrayList<Place> totalList_Input = new ArrayList<>(inputPlaceSet);
+        for(Place p:totalList_Input){
+            ArrayList<Place> p1 = new ArrayList<>();
+            p1.add(p);
+            ArrayList<Place> totalList_output = new ArrayList<>(outputPlaceSet);
+            p1.addAll(totalList_output);
+
+            calcCProductListFrequency(p1, setCartesianProductList(p1));
+        }
+
+        InputOutpuFreqMap.entrySet().stream().forEach(System.out::println);
     }
 
     public void setHashTransitionInfo(int inputPlaceHashcode, int outputPlaceHashcode, int curTransitionHashcode){
@@ -55,17 +89,19 @@ public class hashTransitionInfo {
         this.curTransitionHashcode = curTransitionHashcode;
     }
 
-    private void test2(){
+    private List<List<String>> setCartesianProductList(ArrayList<Place> combineList){
         List<List<String>> attrValueList = new ArrayList();
-        for(int Ind =0;Ind<totalList.size();Ind++){
-            Attribute attr = totalList.get(Ind).getAttribute();
+
+        for (Place aCombineList : combineList) {
+            Attribute attr = aCombineList.getAttribute();
             List<String> attrValue = instances.getMEPAMembershipMap(false).getAttributeValue(attr);
             attrValueList.add(attrValue);
-
-            System.out.println(attr.getAttributeName());
         }
 
-        List<List<String>> cartesianProductList = Lists.cartesianProduct(attrValueList);
+        return Lists.cartesianProduct(attrValueList);
+    }
+
+    private void calcCProductListFrequency(ArrayList<Place> totalList, List<List<String>> cartesianProductList){
 
         IntStream.range(0, cartesianProductList.size())
                 .forEach(cProductListInd->{
@@ -86,53 +122,22 @@ public class hashTransitionInfo {
                         }
                     }).sum();
 
-                    System.out.println(cartesianProductList.get(cProductListInd)+" "+sum);
+                    if(sum > 0){
+                        InputOutpuFreqMap.put(cartesianProductList.get(cProductListInd), sum);
+                    }
                 });
-
-
-        /*
-        String[] str= new String[]{"T0", "T0", "Iris-virginica", "T0", "T0"};
-        List<String> a = Arrays.asList(str);
-        System.out.println(cartesianProductList.get(0).hashCode()+" "+a.hashCode());
-        */
     }
 
-    private void test(int n, StringBuilder str){
-
-        for(int i = n;i < totalList.size();i++){
-
-            if(i != n){
-                continue;
-            }
-
-            Attribute attr = totalList.get(n).getAttribute();
-
-            if(attr.equals(instances.getAttribute(TARGET_ATTRIBUTE))){
-                System.out.print(attr.getAttributeName()+" "+outputarrayList.get(i-inputarrayList.size()+1).getRootIndex()+" ");
-                continue;
-            }
-
-            ArrayList<String> attrValue = instances.getMEPAMembershipMap(false).getAttributeValue(attr);
-            for(int j = 0;j<attrValue.size();j++){
-                String ss = attr.getAttributeName()+"-"+attrValue.get(j)+" ";
-                System.out.print(" "+n + " "+i+" "+ss+" ");
-                //System.out.println(" "+n + " "+i+" "+str);
-                if(i == totalList.size() - 1){
-                    //System.out.println(" "+n + " "+i+" "+str);
-                }
-                test(n+1, str);
-            }
-            System.out.println();
-        }
-
+    private double getInputOutpuFreqMap(List<String> arr){
+        return Optional.ofNullable(InputOutpuFreqMap.get(arr)).orElse(0);
     }
 
-    private void combineSet(){
-        inputarrayList = new ArrayList(inputPlaceSet);
-        outputarrayList = new ArrayList(outputPlaceSet);
+    private ArrayList<Place> combineSet(){
+        ArrayList<Place> inputarrayList = new ArrayList<>(inputPlaceSet);
+        ArrayList<Place> outputarrayList = new ArrayList<>(outputPlaceSet);
 
         inputarrayList.addAll(outputarrayList);
 
-        totalList = new ArrayList(inputarrayList);
+        return new ArrayList<>(inputarrayList);
     }
 }

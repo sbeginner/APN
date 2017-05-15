@@ -32,6 +32,8 @@ public class Transition {
     private double confThreshold =  0.1;
     private ArrayList<Double> supThresholdSet;
 
+    private hashTransitionInfo hTransitionInfo;
+
     public Transition(int index, Instances instances){
         this.index = index;
         this.instances = instances;
@@ -48,24 +50,18 @@ public class Transition {
         hashTransitionInfo hTransitionInfo = new hashTransitionInfo(this.instances, this);
         hTransitionInfo.setHashTransitionInfo(inputPlaceSet.hashCode(), outputPlaceSet.hashCode(), this.hashCode());
 
+        createConfidence(hTransitionInfo);
+        createSupport(hTransitionInfo);
 
-        instances.getMEPAMembership(0,false).get(0).getMembership();
-        System.out.println(inputPlaceSet.hashCode());
-        inputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()+" "+i.getAttribute().getAttributeName()));
-        System.out.println(outputPlaceSet.hashCode());
-        outputPlaceSet.stream().forEach(i -> System.out.println( i.getIndex()+" "+i.getRootIndex()+" "+i.getAttribute().getAttributeName()));
-        System.out.println();
-
-        createConfidence();
-        createSupport();
+        this.hTransitionInfo = hTransitionInfo;
     }
 
-    private void createConfidence(){
-
+    private void createConfidence(hashTransitionInfo hTransitionInfo){
+        hTransitionInfo.createConfidence();
     }
 
-    private void createSupport(){
-
+    private void createSupport(hashTransitionInfo hTransitionInfo){
+        hTransitionInfo.createSupport();
     }
 
     private void setParametersConfidenceThreshold(double confThreshold){
@@ -82,13 +78,14 @@ public class Transition {
     }
 
     private void setSupport(){
-        supportSet = new ArrayList(Collections.nCopies(inputPlaceSet.size(), 0.2));
+        supportSet = new ArrayList<>(Collections.nCopies(inputPlaceSet.size(), 0.2));
         //calc support
+        hTransitionInfo.setSupport();
+
     }
 
     private void setConfidence(){
-        confidence = 0.9;
-        //calc confidence
+        confidence = hTransitionInfo.setConfidence();
     }
 
     public void setSupConf(){
