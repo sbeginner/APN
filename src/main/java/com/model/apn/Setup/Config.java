@@ -12,13 +12,13 @@ public class Config extends Setup.Config{
     public static int LEAF_PLACE = 1000;
 
 
-    public static boolean PRINT_TRACETRAVELHISTORY_BTN = false;
+    public static boolean PRINT_TRACETRAVELHISTORY_BTN = true;
     public static boolean PRINT_DETAIL_BTN = false;
     public static boolean PROBABILITY_PREDICT_BTN = true;
 
     public Config(){
         AUTO_MISSINGVALUE_BTN = false;
-        INSTANCEORDER_SHUFFLE_BTN = false;
+        INSTANCEORDER_SHUFFLE_BTN = true;
         MEPADATA_OUTPUT_BTN = false;
 
         FILEPATH = "C:/Data/test";
@@ -26,7 +26,7 @@ public class Config extends Setup.Config{
         FILETRAINNAME = "train.txt";
         FILETESTNAME = "test.txt";
 
-        DIVIDE_CONSTRAINTNUM = 2;
+        DIVIDE_CONSTRAINTNUM = 6;
         MAX_FOLDNUM = 10;
         RANDOM_SEED = 1;
     }

@@ -10,7 +10,6 @@ import static MathCalculate.Arithmetic.mul;
 import static com.model.apn.Setup.Config.NONVALUE_INTEGER;
 import static com.model.apn.Setup.Config.HALF_ATTRIBUTE_NUM;
 import static org.apache.commons.lang3.math.NumberUtils.max;
-import static org.apache.commons.lang3.math.NumberUtils.min;
 
 /**
  * Created by JACK on 2017/5/5.
@@ -118,7 +117,6 @@ public class Transition {
         //it must to check the previous one satisfies or not,
         //if not, we need to set the value to the previous one first
         //if the previous one is satisfied, then we can set the relationship degree(multiply the confidence) to the current place
-
 
         Place minPlace = inputPlaceSet.stream()
                 .filter(inputPlace -> inputPlace.getRelationshipDegree() > 0)

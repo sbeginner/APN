@@ -9,9 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static MathCalculate.Arithmetic.*;
-import static Setup.Config.ATTRIBUTEVALUE_NUM;
-import static Setup.Config.NONVALUE_INTEGER;
-import static Setup.Config.TARGET_ATTRIBUTE;
+import static Setup.Config.*;
 import static com.model.apn.Setup.Config.PROBABILITY_PREDICT_BTN;
 import static com.model.apn.Setup.Config.ROOT_PLACE;
 
@@ -170,6 +168,7 @@ public class APNOutputInstanceInfo {
         this.APNPredictDegree = maxPlace.getRelationshipDegree();
         this.totalAPNPredictDegree = setTotalAPNPredictDegree(rootPlaceMap);
         this.APNPredictDegreeNormalize = div(APNPredictDegree, totalAPNPredictDegree);
+        this.APNPredictDegreeNormalize = div(APNPredictDegree, totalAPNPredictDegree);
     }
 
     private void setAPNProbabilityPredict(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap, double maxAPNRelationshipDegree){
@@ -198,7 +197,11 @@ public class APNOutputInstanceInfo {
     }
 
     public double getAPNPredictDegreeNormalize(){
-        return new Random(1).nextDouble();
+        if(Double.isNaN(APNPredictDegreeNormalize)){
+            return MIN_DOUBLENUM;
+        }
+
+        return APNPredictDegreeNormalize;
     }
 
     public String getAPNPredict(){
@@ -215,6 +218,8 @@ public class APNOutputInstanceInfo {
     private double getMeanSquaredError(){
         return MSE;
     }
+
+
 
 
     public void print(){

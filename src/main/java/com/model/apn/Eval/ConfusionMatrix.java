@@ -47,7 +47,7 @@ public class ConfusionMatrix {
        // this.APNPredictDegreeNormalize
 
         /* For AUC*/
-        prepareAUC(APNOutputInstanceInfoList);
+        //prepareAUC(APNOutputInstanceInfoList);
 
 
         APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
@@ -88,7 +88,7 @@ public class ConfusionMatrix {
         int True = (int) sortedTrueFalseList.stream().filter(Boolean::booleanValue).count();
         int False = sortedTrueFalseList.size() - True;
         double TrueSum = IntStream.range(0, sortedTrueFalseList.size()).filter(i->sortedTrueFalseList.get(i)).mapToDouble(i->AUCRankList.get(i)).sum();
-        /*
+
         System.out.println(AUCRankList);
         System.out.println(TrueSum - div(True*(True+1), 2));
         System.out.println(True * False);
@@ -96,17 +96,15 @@ public class ConfusionMatrix {
         if(True*False != 0){
             System.out.println(div(TrueSum - div(True*(True+1), 2), True * False));
         }
-        */
-
     }
 
     private List<Double> calcAUCRank(List<Double> sortedList){
-
 
         int rank = sortedList.size()+1;
         List<Double> rankList = new ArrayList(sortedList.size());
 
         for(int i = 0;i<sortedList.size();i++){
+
             int cnt = 0;
             for(int j = i+1;j<sortedList.size();j++){
                 if(sortedList.get(i).doubleValue()==sortedList.get(j).doubleValue()){
@@ -128,7 +126,8 @@ public class ConfusionMatrix {
                     start--;
                     i++;
                 }
-                rank-=cnt;
+                i--;
+                rank -= cnt;
             }
         }
 

@@ -84,8 +84,11 @@ public class APN {
         for(int i=0;i<1000;i++){
             ArrayList<Double> arrayListtmp = setBionicsAPNNetworkStructureParameters(initRandomSeed, i);
 
-            if(min > travelBionicsAPNmodel()){
-                min = travelBionicsAPNmodel();
+            System.out.println(i);
+
+            double averageMSE = travelBionicsAPNmodel();
+            if(min > averageMSE){
+                min = averageMSE;
                 arrayList = arrayListtmp;
             }
         }

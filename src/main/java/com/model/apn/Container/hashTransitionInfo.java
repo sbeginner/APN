@@ -6,17 +6,12 @@ import com.google.common.collect.Lists;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
 
-import javax.swing.text.html.Option;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static MathCalculate.Arithmetic.div;
-import static Setup.Config.INSTANCE_NUM_TEST;
 import static Setup.Config.INSTANCE_NUM_TRAIN;
-import static Setup.Config.TARGET_ATTRIBUTE;
-import static com.model.apn.Setup.Config.THRESHOLD_NUM;
 
 /**
  * Created by JACK on 2017/5/15.
@@ -48,7 +43,6 @@ public class hashTransitionInfo {
         ArrayList<Place> totalList_Input = new ArrayList<>(inputPlaceSet);
         ArrayList<Double> supportList = new ArrayList<>();
 
-
         for(Place p:totalList_Input){
             arr = new ArrayList<>();
             arr.add(p.getTestAttributeValue());
@@ -56,7 +50,6 @@ public class hashTransitionInfo {
 
             double eachInputFreq = getInputOutpuFreqMap(arr);
             double total = INSTANCE_NUM_TRAIN;
-
 
             supportList.add(div(eachInputFreq, total));
         }

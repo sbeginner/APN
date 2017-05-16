@@ -86,6 +86,7 @@ public class APNNetwork {
                 .mapToDouble(trainInstanceInd -> {
                     double MSE;
                     setAPNNetPlaceInEachTrainInstance(placeMap, trainInstanceInd);
+                    setAPNNetSupConf(transitionMap);
                     travelProcess(transitionMap);
                     MSE = getInstanceMSE(rootPlaceMap, trainInstanceInd);
                     reset(placeMap, transitionMap);
@@ -94,7 +95,6 @@ public class APNNetwork {
     }
 
     private double getInstanceMSE(HashMap<Integer, Place> rootPlaceMap, int instanceInd){
-
         APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(instanceInd, this.instances);
         return outputInstanceInfo.getMeanSquaredErrorForBio(rootPlaceMap);
     }

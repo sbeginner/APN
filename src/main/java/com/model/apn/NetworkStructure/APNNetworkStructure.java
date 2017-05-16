@@ -89,6 +89,7 @@ public class APNNetworkStructure {
                 .mapToInt(transition -> transition.setThresholdSize())
                 .sum();
 
+        System.out.println("Init Prepared");
         return transitionMaptmp;
     }
 
@@ -120,20 +121,20 @@ public class APNNetworkStructure {
         IntStream.range(0, ALLPLACENUM)
                 .forEach(row -> Arrays.fill(networkStructure[row], -1));
 
-        networkStructure[1][0] = 0;
-        networkStructure[2][0] = 0;
-        networkStructure[3][0] = 0;
         networkStructure[4][0] = 0;
-
         networkStructure[4][1] = 1;
-        networkStructure[5][2] = 2;
+        networkStructure[4][2] = 2;
+        networkStructure[4][3] = 3;
 
-        networkStructure[4][2] = 1;
+        networkStructure[5][0] = 4;
+        networkStructure[5][1] = 5;
+        networkStructure[5][2] = 6;
+        networkStructure[5][3] = 7;
 
-        networkStructure[6][2] = 3;
-
-        networkStructure[6][3] = 4;
-        networkStructure[2][3] = 5;
+        networkStructure[6][0] = 8;
+        networkStructure[6][1] = 9;
+        networkStructure[6][2] = 10;
+        networkStructure[6][3] = 11;
 
         return networkStructure;
     }
