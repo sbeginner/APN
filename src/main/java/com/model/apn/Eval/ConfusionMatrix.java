@@ -43,7 +43,7 @@ public class ConfusionMatrix {
         int[][] confusionMatrix = new int[targetValueNum][targetValueNum];
 
         /* For AUC*/
-        prepareAUC(APNOutputInstanceInfoList);
+        //prepareAUC(APNOutputInstanceInfoList);
         //APNOutputInstanceInfoList.get(0).getRealTargetValue()
         //APNOutputInstanceInfoList.get(0).getAPNPredict()
 
