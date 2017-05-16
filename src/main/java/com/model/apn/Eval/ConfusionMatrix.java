@@ -4,7 +4,6 @@ import DataStructure.Attribute;
 import DataStructure.Instances;
 import com.model.apn.Container.APNOutputInstanceInfo;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -43,12 +42,10 @@ public class ConfusionMatrix {
     public void setConfusionMatrix(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList) {
         int[][] confusionMatrix = new int[targetValueNum][targetValueNum];
 
-
-       // this.APNPredictDegreeNormalize
-
         /* For AUC*/
-        //prepareAUC(APNOutputInstanceInfoList);
-
+        prepareAUC(APNOutputInstanceInfoList);
+        //APNOutputInstanceInfoList.get(0).getRealTargetValue()
+        //APNOutputInstanceInfoList.get(0).getAPNPredict()
 
         APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
             int predictInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getAPNPredict().toString());

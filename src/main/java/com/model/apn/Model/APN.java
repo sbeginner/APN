@@ -1,8 +1,7 @@
 package com.model.apn.Model;
 
-import Container.MEPAMembershipMap;
 import DataStructure.Instances;
-import com.model.apn.Container.APNOutputInfo;
+import com.model.apn.BionicsMethod.Bionics;
 import com.model.apn.NetworkStructure.APNNetwork;
 import com.model.apn.NetworkStructure.APNNetworkStructure;
 
@@ -49,7 +48,7 @@ public class APN {
     }
 
     public void setAPNNetworkStructureParameters(){
-        ArrayList<Double> list = new ArrayList(Collections.nCopies(THRESHOLD_NUM, 0.01));
+        ArrayList<Double> list = new ArrayList<>(Collections.nCopies(THRESHOLD_NUM, 0.01));
         APNNet.setParameters(list);
     }
 
@@ -100,8 +99,8 @@ public class APN {
        return APNNet.getTotalAverageMSE();
     }
 
-    public void travelAPNmodel(){
-        APNNet.travel();
+    public void travelAPNmodel(int curfoldInd){
+        APNNet.travel(curfoldInd);
     }
 
     public void getEachOutput(){

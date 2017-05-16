@@ -5,7 +5,6 @@ import FileIO.DataInput;
 import Preprocess.Filter;
 import Preprocess.MEPA;
 import com.model.apn.Eval.Evaluation;
-import com.model.apn.Model.ABC;
 import com.model.apn.Model.APN;
 import com.model.apn.Setup.Config;
 
@@ -18,19 +17,22 @@ public class Starton {
 
     public static void main(String str[]) throws IOException {
         setConfig();
-        forTrainTesttset();
-        /*
+        //forTrainTesttset();
+
         if(true)
         crossValidation();
         else
-        forTrainTest();*/
+        forTrainTest();
     }
 
     private static void crossValidation() throws IOException {
         DataInput dt =new DataInput();
         dt.forKfoldValidationInstance();
+
         //dt.completeData();
         Instances instances = dt.getInstances();    //get data
+        //instances.setRandSeed(1);
+        //instances.autoShuffleInstanceOrder();
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
         eval.crossValidateModel(new APN(), instances, 10);
@@ -47,7 +49,7 @@ public class Starton {
     }
 
 
-    
+
 
     private static void forTrainTesttset() throws IOException {
         DataInput dt =new DataInput();

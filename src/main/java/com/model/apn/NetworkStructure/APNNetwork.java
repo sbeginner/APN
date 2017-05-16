@@ -41,7 +41,7 @@ public class APNNetwork {
         APNNetStruct.setParameters(thresholdList);
     }
 
-    public void travel(){
+    public void travel(int curfoldInd){
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
         HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
         HashMap<Integer, Place> rootPlaceMap = new HashMap(getRootPlaceMap(placeMap));
@@ -64,7 +64,7 @@ public class APNNetwork {
             reset(placeMap, transitionMap);
         });
 
-        APNOutputInfoCenter.setAPNOutputInstanceInfo(APNOutputInstanceInfoList);
+        APNOutputInfoCenter.setAPNOutputInstanceInfo(APNOutputInstanceInfoList, curfoldInd);
     }
 
     private  void setAPNNetSupConf(HashMap<Integer, Transition> transitionMap){

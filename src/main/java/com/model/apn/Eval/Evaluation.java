@@ -1,26 +1,21 @@
 package com.model.apn.Eval;
 
-import Container.MEPAMembership;
 import Container.MEPAMembershipMap;
 import Container.PriorProbabilityAttr;
 import DataStructure.Attribute;
 import DataStructure.Instances;
 import Preprocess.Filter;
 import Preprocess.MEPA;
-import Setup.Config;
-import com.model.apn.Model.ABC;
 import com.model.apn.Model.APN;
-import com.model.apn.Model.Bionics;
+import com.model.apn.BionicsMethod.Bionics;
 
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 
 import static Setup.Config.ATTRIBUTE_NUM;
 import static Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.MAX_FOLDNUM;
-import static com.model.apn.Setup.Config.INSTANCE_NUM_TEST;
 import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
 
 /**
@@ -85,8 +80,12 @@ public class Evaluation {
         if(!Objects.isNull(bionics)){
             APNmodel.setBionicsAPNnetworkStructure(curfoldInd, bionics);
         }
-        APNmodel.travelAPNmodel();
+        APNmodel.travelAPNmodel(curfoldInd);
         APNmodel.getEachOutput();
+    }
+
+    public void evalAPNProcesstest(APN APNmodel, Instances mepaInstances, int curfoldInd, Bionics bionics){
+        evalAPNProcess(APNmodel, mepaInstances, curfoldInd, bionics);
     }
 
     public void toMatrixString(APN APNmodel){

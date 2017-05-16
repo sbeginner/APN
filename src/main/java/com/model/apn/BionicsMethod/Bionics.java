@@ -1,4 +1,4 @@
-package com.model.apn.Model;
+package com.model.apn.BionicsMethod;
 
 /**
  * Created by JACK on 2017/5/14.

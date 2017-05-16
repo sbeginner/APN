@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 
 import static MathCalculate.Arithmetic.div;
 import static Setup.Config.*;
+import static com.model.apn.Setup.Config.KEEP_TOTALRESULT_BY_EACH_FOLD;
 
 /**
  * Created by JACK on 2017/5/12.
@@ -31,11 +32,15 @@ public class APNOutputInfo {
         return div(totalMSE, INSTANCE_NUM_TRAIN);
     }
 
-    public void setAPNOutputInstanceInfo(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList) {
+    public void setAPNOutputInstanceInfo(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList, int curfoldInd) {
         ConfusionMatrix confusionMatrix = new ConfusionMatrix(instances);
         confusionMatrix.setConfusionMatrix(APNOutputInstanceInfoList);
 
-        confusionMatrixMap.put(autoIncreaseIndex(), confusionMatrix);
+        if(KEEP_TOTALRESULT_BY_EACH_FOLD){
+            confusionMatrixMap.put(curfoldInd, confusionMatrix);
+        }else {
+            confusionMatrixMap.put(autoIncreaseIndex(), confusionMatrix);
+        }
     }
 
     public HashMap<Integer, ConfusionMatrix> getConfusionMatrixMap(){
@@ -43,6 +48,7 @@ public class APNOutputInfo {
     }
 
     public void combineConfusionMatrix(){
+
         int newConfusionMatrix[][] = new int[targetValueNum][targetValueNum];
         this.getConfusionMatrixMap()
                 .values()

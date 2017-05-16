@@ -3,6 +3,8 @@ package com.model.apn.NetworkStructure;
 import DataStructure.Instances;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
+import com.model.apn.NetworkStructureTemplate.IrisSampleTempl;
+import com.model.apn.NetworkStructureTemplate.brainwekaRSSampleTempl;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -94,10 +96,26 @@ public class APNNetworkStructure {
     }
 
     public void createNetworkStructure(){
-        this.networkStructure = netStructureExample();
+        this.networkStructure = netStructureExample("brainwekaRS");
 
         this.placeMap = createPlace(this.networkStructure);
         this.transitionMap = createTransition(this.networkStructure, this.placeMap);
+    }
+
+    private int[][] netStructureExample(String teaplateName){
+
+        int[][] networkStructure = initNetworkStructure();
+
+        switch (teaplateName){
+            case "Iris":
+                networkStructure = new IrisSampleTempl(networkStructure).template1();
+                break;
+            case "brainwekaRS":
+                networkStructure = new brainwekaRSSampleTempl(networkStructure).template1();
+                break;
+        }
+
+        return networkStructure;
     }
 
     public void setParameters(ArrayList<Double> thresholdList){
@@ -115,26 +133,10 @@ public class APNNetworkStructure {
         }
     }
 
-    private int[][] netStructureExample(){
+    private int[][] initNetworkStructure(){
         int[][] networkStructure = new int[ALLPLACENUM][FEATUREPLACENUM];
-
         IntStream.range(0, ALLPLACENUM)
                 .forEach(row -> Arrays.fill(networkStructure[row], -1));
-
-        networkStructure[4][0] = 0;
-        networkStructure[4][1] = 1;
-        networkStructure[4][2] = 2;
-        networkStructure[4][3] = 3;
-
-        networkStructure[5][0] = 4;
-        networkStructure[5][1] = 5;
-        networkStructure[5][2] = 6;
-        networkStructure[5][3] = 7;
-
-        networkStructure[6][0] = 8;
-        networkStructure[6][1] = 9;
-        networkStructure[6][2] = 10;
-        networkStructure[6][3] = 11;
 
         return networkStructure;
     }
