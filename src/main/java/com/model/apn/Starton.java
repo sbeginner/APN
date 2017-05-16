@@ -1,6 +1,5 @@
 package com.model.apn;
 
-import Container.MEPAMembershipMap;
 import DataStructure.Instances;
 import FileIO.DataInput;
 import Preprocess.Filter;
@@ -12,20 +11,19 @@ import com.model.apn.Setup.Config;
 
 import java.io.IOException;
 
-import static Setup.Config.ATTRIBUTE_NUM;
-import static Setup.Config.TARGET_ATTRIBUTE;
-import static com.model.apn.Setup.Config.RANDOM_SEED;
 /**
  * Created by jack on 2017/3/20.
  */
 public class Starton {
 
     public static void main(String str[]) throws IOException {
-        resetConfig();
+        setConfig();
+        forTrainTesttset();
+        /*
         if(true)
         crossValidation();
         else
-        forTrainTest();
+        forTrainTest();*/
     }
 
     private static void crossValidation() throws IOException {
@@ -35,7 +33,7 @@ public class Starton {
         Instances instances = dt.getInstances();    //get data
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
-        eval.crossValidateModel(new APN(), instances, 5);
+        eval.crossValidateModel(new APN(), instances, 10);
     }
 
     private static void forTrainTest() throws IOException {
@@ -48,9 +46,57 @@ public class Starton {
         eval.evalTrainTestModel(new APN(), instances);
     }
 
-    private static void resetConfig(){
-        new Config();
+
+    
+
+    private static void forTrainTesttset() throws IOException {
+        DataInput dt =new DataInput();
+        dt.forTrainTestInstance();
+        //dt.completeData();
+        Instances instances = dt.getInstances();    //get data
+        ///////////////////////////////////////////////////////////////////
+        Evaluation eval = new Evaluation(instances);
+        APN apn = new APN();
+        MEPA mp = new MEPA();
+        Instances mepaInstances = Filter.useFilter(instances, mp);
+        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
+        eval.toMatrixString(apn);
+
+
+        dt.forTestInstance("C:/Data/test/test_USED.txt");
+        instances = dt.getInstances();    //get data
+        mepaInstances = Filter.useFilter(instances, mp);
+        //model do something
+        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
+        //result
+        eval.toMatrixString(apn);
+
+        dt.forTestInstance("C:/Data/test/test_USED.txt");
+        instances = dt.getInstances();    //get data
+        mepaInstances = Filter.useFilter(instances, mp);
+        //model do something
+        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
+        //result
+        eval.toMatrixString(apn);
+
+        dt.forTestInstance("C:/Data/test/test_USED.txt");
+        instances = dt.getInstances();    //get data
+        mepaInstances = Filter.useFilter(instances, mp);
+        //model do something
+        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
+        //result
+        eval.toMatrixString(apn);
+
+        dt.forTestInstance("C:/Data/test/test_USED.txt");
+        instances = dt.getInstances();    //get data
+        mepaInstances = Filter.useFilter(instances, mp);
+        //model do something
+        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
+        //result
+        eval.toMatrixString(apn);
     }
 
-
+    private static void setConfig(){
+        new Config();
+    }
 }
