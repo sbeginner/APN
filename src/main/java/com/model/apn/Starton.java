@@ -4,6 +4,7 @@ import DataStructure.Instances;
 import FileIO.DataInput;
 import Preprocess.Filter;
 import Preprocess.MEPA;
+import com.model.apn.BionicsMethod.ABC;
 import com.model.apn.Eval.Evaluation;
 import com.model.apn.Model.APN;
 import com.model.apn.Setup.Config;
@@ -35,7 +36,7 @@ public class Starton {
         //instances.autoShuffleInstanceOrder();
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
-        eval.crossValidateModel(new APN(), instances, 10);
+        eval.crossValidateModel(new APN(), instances, 10, new ABC());
     }
 
     private static void forTrainTest() throws IOException {

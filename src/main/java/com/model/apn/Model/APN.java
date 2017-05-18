@@ -1,12 +1,15 @@
 package com.model.apn.Model;
 
 import DataStructure.Instances;
+import com.model.apn.BionicsContainer.Population;
+import com.model.apn.BionicsMethod.ABC;
 import com.model.apn.BionicsMethod.Bionics;
 import com.model.apn.NetworkStructure.APNNetwork;
 import com.model.apn.NetworkStructure.APNNetworkStructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -56,14 +59,20 @@ public class APN {
         APNNet.setParameters(list);
     }
 
+    public void setBionicsParameters(ArrayList<Double> thresholdList){
+        APNNet.setParameters(thresholdList);
+    }
+
+    public ArrayList<Double> setBionicsParameters(int initRandomSeed, int randomSeed){
+        return setBionicsAPNNetworkStructureParameters(initRandomSeed, randomSeed);
+    }
+
     private ArrayList<Double> setBionicsAPNNetworkStructureParameters(int initRandomSeed, int randomSeed){
         initRandomSeed += randomSeed;
-
         Random rnd = new Random(initRandomSeed);
 
-        ArrayList<Double> thresholdList = new ArrayList(THRESHOLD_NUM);
+        ArrayList<Double> thresholdList = new ArrayList<>(THRESHOLD_NUM);
         IntStream.range(0, THRESHOLD_NUM).forEach(thresholdInd -> thresholdList.add(randomFunc(rnd)));
-
         Collections.shuffle(thresholdList, rnd);
 
         APNNet.setParameters(thresholdList);
@@ -76,23 +85,27 @@ public class APN {
     }
 
     public void setBionicsAPNnetworkStructure(int curfoldInd, Bionics bionics){
-        int initRandomSeed = (int)(RANDOM_SEED * MAX_FOLDNUM * INSTANCE_NUM * (0.87)) & (curfoldInd + 1);
+        int iterative = 1000;
+        Population bestPopulation = null;
+        ArrayList<Population> employBeeList = new ArrayList<>();
 
-        double min = 9999;
-        ArrayList<Double> arrayList = new ArrayList();
-        for(int i=0;i<1000;i++){
-            ArrayList<Double> arrayListtmp = setBionicsAPNNetworkStructureParameters(initRandomSeed, i);
+        //Iterative
+        int iterativeInd=0;
+        while (iterativeInd < iterative) {
 
-            System.out.println(i);
+            //bionics algorithm do something
+            employBeeList = bionics.bionicsMethod(this, curfoldInd, employBeeList);
+            Population curBestPopulation = bionics.getCurrentGlobalBestParameters(employBeeList);
 
-            double averageMSE = travelBionicsAPNmodel();
-            if(min > averageMSE){
-                min = averageMSE;
-                arrayList = arrayListtmp;
+            if (Objects.isNull(bestPopulation) || curBestPopulation.getFitnessValue() > bestPopulation.getFitnessValue()) {
+                bestPopulation = curBestPopulation;
             }
+
+            iterativeInd++;
         }
 
-        setAPNNetworkStructureParameters(arrayList);
+        System.out.println(bestPopulation.getParameterList()+" "+bestPopulation.getFitnessValue());
+        setAPNNetworkStructureParameters(bestPopulation.getParameterList());
     }
 
     public double travelBionicsAPNmodel(){
