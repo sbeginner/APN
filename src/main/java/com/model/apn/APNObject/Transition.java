@@ -78,10 +78,12 @@ public class Transition {
 
     private void setSupport(){
         supportSet = hTransitionInfo.setSupport();
+        System.out.println(supportSet);
     }
 
     private void setConfidence(){
         confidence = hTransitionInfo.setConfidence();
+        System.out.println(confidence);
     }
 
     public void setSupConf(){

@@ -27,7 +27,8 @@ public class hashTransitionInfo {
     private HashSet<Place> outputPlaceSet;
     private int mixHashcode;
 
-    private HashMap<List<String>, Integer> InputOutpuFreqMap;
+    private HashMap<List<String>, Integer> ConfInputOutpuFreqMap;
+    private HashMap<List<String>, Integer> SupInputOutpuFreqMap;
 
 
     public hashTransitionInfo(Instances instances, Transition transition){
@@ -35,7 +36,8 @@ public class hashTransitionInfo {
         this.transition = transition;
         this.inputPlaceSet = transition.getInputPlaceSet();
         this.outputPlaceSet = transition.getOutputPlaceSet();
-        this.InputOutpuFreqMap = new HashMap();
+        this.ConfInputOutpuFreqMap = new HashMap();
+        this.SupInputOutpuFreqMap = new HashMap();
     }
 
     public ArrayList<Double> setSupport(){
@@ -48,7 +50,7 @@ public class hashTransitionInfo {
             arr.add(p.getTestAttributeValue());
             arr.addAll(this.outputPlaceSet.stream().map(Place::getTestAttributeValue).collect(Collectors.toList()));
 
-            double eachInputFreq = getInputOutpuFreqMap(arr);
+            double eachInputFreq = getInputOutpuFreqMap(arr, false);
             double total = INSTANCE_NUM_TRAIN;
 
             supportList.add(div(eachInputFreq, total));
@@ -60,19 +62,23 @@ public class hashTransitionInfo {
     public double setConfidence(){
         List<String> arr = new ArrayList<>();
         this.inputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
-        double inputFreq = getInputOutpuFreqMap(arr);
-        this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
-        double inputUnionOputFreq = getInputOutpuFreqMap(arr);
+        double inputFreq = getInputOutpuFreqMap(arr, true);
 
-        return div(inputUnionOputFreq,inputFreq);
+        this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
+        double inputUnionOputFreq = getInputOutpuFreqMap(arr, true);
+
+
+        return div(inputUnionOputFreq, inputFreq);
     }
 
     public void createConfidence(){
-        ArrayList<Place> combineList = combineSet();
-        calcCProductListFrequency(combineList, setCartesianProductList(combineList));
+        ArrayList<Place> combineList;
 
         combineList = new ArrayList<>(inputPlaceSet);
-        calcCProductListFrequency(combineList, setCartesianProductList(combineList));
+        calcCProductListFrequency(combineList, setCartesianProductList(combineList), true);
+
+        combineList = combineSet();
+        calcCProductListFrequency(combineList, setCartesianProductList(combineList), true);
     }
 
     public void createSupport(){
@@ -83,7 +89,7 @@ public class hashTransitionInfo {
             ArrayList<Place> totalList_output = new ArrayList<>(outputPlaceSet);
             p1.addAll(totalList_output);
 
-            calcCProductListFrequency(p1, setCartesianProductList(p1));
+            calcCProductListFrequency(p1, setCartesianProductList(p1), false);
         }
     }
 
@@ -105,35 +111,42 @@ public class hashTransitionInfo {
         return Lists.cartesianProduct(attrValueList);
     }
 
-    private void calcCProductListFrequency(ArrayList<Place> totalList, List<List<String>> cartesianProductList){
+    private void calcCProductListFrequency(ArrayList<Place> totalList, List<List<String>> cartesianProductList, boolean isConf){
 
         IntStream.range(0, cartesianProductList.size())
                 .forEach(cProductListInd->{
-                    int sum = IntStream.range(0, INSTANCE_NUM_TRAIN).map(instanceInd->{
+                    List<String> cartesianProduct = cartesianProductList.get(cProductListInd);
 
-                        boolean isNoMatch = IntStream.range(0, totalList.size()).filter(curAttributeInd->{
+                    int sum = IntStream.range(0, INSTANCE_NUM_TRAIN).filter(instanceInd -> {
+                        boolean isNoMatch = IntStream.range(0, cartesianProduct.size()).filter(curAttributeInd->{
                             Attribute attr = totalList.get(curAttributeInd).getAttribute();
-                            String cValue = cartesianProductList.get(cProductListInd).get(curAttributeInd);
+                            String cValue = cartesianProduct.get(curAttributeInd);
                             String cInstanceValue = instances.getMEPAMembership(attr, false).get(instanceInd).getMembership();
 
                             return !cValue.equals(cInstanceValue);
-                        }).findAny().isPresent();
+                        }).findFirst().isPresent();
 
-                        if(isNoMatch){
-                            return 0;
-                        }else {
-                            return 1;
-                        }
-                    }).sum();
+                        return !isNoMatch;
+                    }).map(instanceInd -> 1).sum();
+
+
 
                     if(sum > 0){
-                        InputOutpuFreqMap.put(cartesianProductList.get(cProductListInd), sum);
+                        if(isConf){
+                            ConfInputOutpuFreqMap.put(cartesianProduct, sum);
+                        }else {
+                            SupInputOutpuFreqMap.put(cartesianProduct, sum);
+                        }
                     }
+
                 });
     }
 
-    private double getInputOutpuFreqMap(List<String> arr){
-        return Optional.ofNullable(InputOutpuFreqMap.get(arr)).orElse(0);
+    private double getInputOutpuFreqMap(List<String> arr, boolean isConf){
+        if(isConf){
+            return Optional.ofNullable(ConfInputOutpuFreqMap.get(arr)).orElse(0);
+        }
+        return Optional.ofNullable(SupInputOutpuFreqMap.get(arr)).orElse(0);
     }
 
     private ArrayList<Place> combineSet(){

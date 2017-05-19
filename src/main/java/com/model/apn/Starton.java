@@ -23,9 +23,9 @@ public class Starton {
         //forTrainTesttset();
 
         if(true){
-            if(false)
-                crossValidation();
             if(true)
+                crossValidation();
+            else
                 bioCrossValidation();
         }
         else
@@ -56,8 +56,8 @@ public class Starton {
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
 
-        ABC abc = new ABC(100, 100, false);
-        abc.setDifferentBeePercent(0.2, 0.3, 0.5);
+        ABC abc = new ABC(1000, 100, false);
+        abc.setDifferentBeePercent(0.3, 0.4, 0.5);
 
         eval.crossValidateModel(new APN(), instances, 10, abc);
     }

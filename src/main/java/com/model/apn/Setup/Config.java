@@ -19,7 +19,7 @@ public class Config extends Setup.Config{
     static {
         PROBABILITY_PREDICT_BTN = true;
         PRINT_DETAIL_BTN = false;
-        PRINT_TRACETRAVELHISTORY_BTN = false;
+        PRINT_TRACETRAVELHISTORY_BTN = true;
 
         KEEP_TOTALRESULT_BY_EACH_FOLD = true;
 

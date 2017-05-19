@@ -156,9 +156,7 @@ public class ABC implements Bionics{
     }
 
     private ArrayList<Population> scoutBeeFlyingProcess(ArrayList<Population> employBeeList, int totalPopulation, int onlookerBeeNum){
-        int scoutBeeNum = totalPopulation - employBeeList.size() - onlookerBeeNum;
-
-        int scoutBeeInd = scoutBeeNum;
+        int scoutBeeInd = totalPopulation - employBeeList.size() - onlookerBeeNum;
         while (scoutBeeInd > 0) {
             ArrayList<Double> parameterListtmp = this.apn.setBionicsParameters(this.initRandomSeed , scoutBeeInd);
             double averageMSE = this.apn.travelBionicsAPNmodel();

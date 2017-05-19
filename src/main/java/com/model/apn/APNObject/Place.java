@@ -80,6 +80,7 @@ public class Place {
                 .forEach(inputTransition -> inputTransition.calcInputPlaceRelationshipDegree());
 
         Transition maxTransition = inputTransitionSet.stream()
+                .filter(inputTransition -> inputTransition.getRDSelectedInputDegree() > 0)
                 .max(Comparator.comparingDouble(inputTransition -> inputTransition.getRDSelectedInputDegree()))
                 .orElse(null);
 
