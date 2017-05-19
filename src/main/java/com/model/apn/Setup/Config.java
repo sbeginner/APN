@@ -24,7 +24,7 @@ public class Config extends Setup.Config{
         KEEP_TOTALRESULT_BY_EACH_FOLD = true;
 
         MAX_FOLDNUM = 10;
-        RANDOM_SEED = 1;
+        RANDOM_SEED = 2;
     }
 
     //For MEPA and data processing relative config

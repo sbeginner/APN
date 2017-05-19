@@ -10,6 +10,8 @@ import com.model.apn.Model.APN;
 import com.model.apn.Setup.Config;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jack on 2017/3/20.
@@ -20,8 +22,12 @@ public class Starton {
         setConfig();
         //forTrainTesttset();
 
-        if(true)
-        crossValidation();
+        if(true){
+            if(false)
+                crossValidation();
+            if(true)
+                bioCrossValidation();
+        }
         else
         forTrainTest();
     }
@@ -36,7 +42,24 @@ public class Starton {
         //instances.autoShuffleInstanceOrder();
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
-        eval.crossValidateModel(new APN(), instances, 10, new ABC());
+        eval.crossValidateModel(new APN(), instances, 10);
+    }
+
+    private static void bioCrossValidation() throws IOException {
+        DataInput dt =new DataInput();
+        dt.forKfoldValidationInstance();
+
+        //dt.completeData();
+        Instances instances = dt.getInstances();    //get data
+        //instances.setRandSeed(1);
+        //instances.autoShuffleInstanceOrder();
+        ///////////////////////////////////////////////////////////////////
+        Evaluation eval = new Evaluation(instances);
+
+        ABC abc = new ABC(100, 100, false);
+        abc.setDifferentBeePercent(0.2, 0.3, 0.5);
+
+        eval.crossValidateModel(new APN(), instances, 10, abc);
     }
 
     private static void forTrainTest() throws IOException {

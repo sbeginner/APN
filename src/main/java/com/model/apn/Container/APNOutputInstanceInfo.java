@@ -141,7 +141,7 @@ public class APNOutputInstanceInfo {
                     }
                 }).sum();
 
-        return round(MSE);
+        return round(div(MSE, placeMap.size()));
     }
 
 

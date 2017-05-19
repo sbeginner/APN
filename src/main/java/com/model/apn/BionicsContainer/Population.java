@@ -11,8 +11,8 @@ public class Population {
     double fitnessValue;
     double localBestAverageMSE;
 
-    int aliveTime = 50;
-    int maxAliveTime = 50;
+    int aliveTime = 25;
+    int maxAliveTime = 25;
 
     public Population(ArrayList<Double> parameterList, double fitnessValue){
         this.parameterList = parameterList;

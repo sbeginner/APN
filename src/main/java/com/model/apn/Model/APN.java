@@ -14,9 +14,6 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 import static MathCalculate.Arithmetic.div;
-import static Setup.Config.INSTANCE_NUM;
-import static Setup.Config.MAX_FOLDNUM;
-import static Setup.Config.RANDOM_SEED;
 import static com.model.apn.Setup.Config.THRESHOLD_NUM;
 
 /**
@@ -68,12 +65,11 @@ public class APN {
     }
 
     private ArrayList<Double> setBionicsAPNNetworkStructureParameters(int initRandomSeed, int randomSeed){
-        initRandomSeed += randomSeed;
+        initRandomSeed += randomSeed % Double.MAX_VALUE;
         Random rnd = new Random(initRandomSeed);
 
         ArrayList<Double> thresholdList = new ArrayList<>(THRESHOLD_NUM);
         IntStream.range(0, THRESHOLD_NUM).forEach(thresholdInd -> thresholdList.add(randomFunc(rnd)));
-        Collections.shuffle(thresholdList, rnd);
 
         APNNet.setParameters(thresholdList);
 
@@ -81,11 +77,12 @@ public class APN {
     }
 
     private double randomFunc(Random rnd){
-        return div(rnd.nextInt(10000), 10000);
+        double randomParameter = div(rnd.nextInt(10000), 10000);
+        return randomParameter == 0 ? 0.0001 : randomParameter;
     }
 
     public void setBionicsAPNnetworkStructure(int curfoldInd, Bionics bionics){
-        int iterative = 1000;
+        int iterative = bionics.getIterative();
         Population bestPopulation = null;
         ArrayList<Population> employBeeList = new ArrayList<>();
 
@@ -94,12 +91,14 @@ public class APN {
         while (iterativeInd < iterative) {
 
             //bionics algorithm do something
-            employBeeList = bionics.bionicsMethod(this, curfoldInd, employBeeList);
+            employBeeList = bionics.bionicsMethod(this, (iterativeInd - curfoldInd + 1), employBeeList);
             Population curBestPopulation = bionics.getCurrentGlobalBestParameters(employBeeList);
 
             if (Objects.isNull(bestPopulation) || curBestPopulation.getFitnessValue() > bestPopulation.getFitnessValue()) {
                 bestPopulation = curBestPopulation;
             }
+
+            System.out.println(curfoldInd+" "+iterativeInd+" "+bestPopulation.getFitnessValue()+" "+bestPopulation.getParameterList());
 
             iterativeInd++;
         }
