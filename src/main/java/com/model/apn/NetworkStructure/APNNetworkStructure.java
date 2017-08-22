@@ -1,5 +1,6 @@
 package com.model.apn.NetworkStructure;
 
+import DataStructure.Attribute;
 import DataStructure.Instances;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
@@ -28,11 +29,11 @@ public class APNNetworkStructure {
         init();
     }
 
-    public HashMap<Integer, Transition> getTransitionMap(){
+    HashMap<Integer, Transition> getTransitionMap(){
         return transitionMap;
     }
 
-    public HashMap<Integer, Place> getPlaceMap(){
+    HashMap<Integer, Place> getPlaceMap(){
         return placeMap;
     }
 
@@ -96,7 +97,7 @@ public class APNNetworkStructure {
     }
 
     public void createNetworkStructure(){
-        this.networkStructure = netStructureExample("brainwekaRS");
+        this.networkStructure = netStructureExample("Iris");
 
         this.placeMap = createPlace(this.networkStructure);
         this.transitionMap = createTransition(this.networkStructure, this.placeMap);
@@ -104,8 +105,12 @@ public class APNNetworkStructure {
 
     private int[][] netStructureExample(String teaplateName){
 
+        System.out.println(instances.getTrainInstanceMap().get(0).getInstanceDigitalValue(0));
         int[][] networkStructure = initNetworkStructure();
 
+        networkStructure = new IrisSampleTempl(networkStructure, instances).template1();
+
+        /*
         switch (teaplateName){
             case "Iris":
                 networkStructure = new IrisSampleTempl(networkStructure).template1();
@@ -114,6 +119,7 @@ public class APNNetworkStructure {
                 networkStructure = new brainwekaRSSampleTempl(networkStructure).template1();
                 break;
         }
+        */
 
         return networkStructure;
     }

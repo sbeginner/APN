@@ -131,6 +131,7 @@ public class APNNetwork {
         printTestInstanceInd(testInstanceInd);
         MEPAMembershipMap testEPAMembershipMap = instances.getMEPAMembershipMap(true);
 
+
         placeMap.values()
                 .stream()
                 .peek(place -> place.setTestAttributeValue(testEPAMembershipMap.getAllInstanceByAttr(place.getAttribute()).get(testInstanceInd).getMembership()))
