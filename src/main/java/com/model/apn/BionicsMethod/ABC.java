@@ -93,14 +93,14 @@ public class ABC implements Bionics{
             return employBeeList;
         }
 
-        employBeeList.stream().forEach(employBee -> {
+        employBeeList.forEach(employBee -> {
 
             ArrayList<Double> parameterListtmp = employBee.getParameterList();
 
             List<Double> newParameterListtmp = parameterListtmp.stream()
                     .map(parameter -> ABCConditonalRandomPosition(parameter, initRandomSeed))
                     .collect(Collectors.toList());
-            ArrayList newParameterList = new ArrayList<>(newParameterListtmp);
+            ArrayList<Double> newParameterList = new ArrayList<>(newParameterListtmp);
 
             this.apn.setBionicsParameters(newParameterList);
             double averageMSE = this.apn.travelBionicsAPNmodel();
@@ -158,7 +158,7 @@ public class ABC implements Bionics{
     private ArrayList<Population> scoutBeeFlyingProcess(ArrayList<Population> employBeeList, int totalPopulation, int onlookerBeeNum){
         int scoutBeeInd = totalPopulation - employBeeList.size() - onlookerBeeNum;
         while (scoutBeeInd > 0) {
-            ArrayList<Double> parameterListtmp = this.apn.setBionicsParameters(this.initRandomSeed , scoutBeeInd);
+            ArrayList<Double> parameterListtmp = this.apn.setBionicsParameters();
             double averageMSE = this.apn.travelBionicsAPNmodel();
 
             if(!accuracyMode){
@@ -221,7 +221,7 @@ public class ABC implements Bionics{
         ArrayList<Population> employBeeList = new ArrayList<>();
 
         IntStream.range(0, employBeeNum).forEach(employBeeInd -> {
-            ArrayList<Double> arrayListtmp = this.apn.setBionicsParameters(this.initRandomSeed , employBeeInd);
+            ArrayList<Double> arrayListtmp = this.apn.setBionicsParameters();
             double averageMSE = this.apn.travelBionicsAPNmodel();
 
             double abcFitness = fitnessFunc(averageMSE);

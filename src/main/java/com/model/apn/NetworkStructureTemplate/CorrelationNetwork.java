@@ -51,38 +51,20 @@ class Attribute{
     }
 }
 
-public class IrisSampleTempl {
+public class CorrelationNetwork {
     private int FEATUREPLACENUM, ALLPLACENUM;
     private int[][] networkStructure;
     private Instances instances;
 
-    public IrisSampleTempl(int[][] networkStructure, Instances instances){
+    public CorrelationNetwork(int[][] networkStructure, Instances instances){
         this.networkStructure = networkStructure;
         this.instances = instances;
         init();
     }
 
     public int[][] template1(){
-        /*
-        networkStructure[2][0] = 0;
-        networkStructure[2][1] = 100;
-
-        networkStructure[3][0] = 10;
-        networkStructure[3][1] = 1;
-
-        networkStructure[4][2] = 2;
-        networkStructure[4][3] = 3;
-
-        networkStructure[5][2] = 4;
-        networkStructure[5][2] = 5;
-
-        networkStructure[6][2] = 6;
-        networkStructure[6][2] = 7;
-        */
-
         return main();
     }
-
 
     private int[][] main(){
 
@@ -197,23 +179,6 @@ public class IrisSampleTempl {
         dataset.forEach((key, value) -> all_dat.add(new Attribute(key, value)));
 
         return all_dat;
-    }
-
-    private void printStructureValue(int[][] networkStructure){
-
-        System.out.format("%6s", " ");
-        for (int i=0;i<networkStructure[0].length;i++)
-            System.out.format("%6s","P."+i);
-        System.out.println();
-
-        for (int i=0;i<networkStructure.length;i++){
-            System.out.format("%6s","P."+i);
-            for (int j=0;j<networkStructure[i].length;j++){
-                System.out.format("%6d", networkStructure[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println();
     }
 
     private double getPearson(List<Double> list1, List<Double> list2){

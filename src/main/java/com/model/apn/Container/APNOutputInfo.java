@@ -1,7 +1,6 @@
 package com.model.apn.Container;
 
 
-import DataStructure.Attribute;
 import DataStructure.Instances;
 import com.model.apn.Eval.ConfusionMatrix;
 
@@ -24,7 +23,7 @@ public class APNOutputInfo {
 
     public APNOutputInfo(Instances instances) {
         this.instances = instances;
-        confusionMatrixMap = new HashMap(MAX_FOLDNUM);
+        confusionMatrixMap = new HashMap<>(MAX_FOLDNUM);
         targetValueNum = instances.getAttribute(TARGET_ATTRIBUTE).getAllValue().size();
     }
 
@@ -43,11 +42,11 @@ public class APNOutputInfo {
         }
     }
 
-    public HashMap<Integer, ConfusionMatrix> getConfusionMatrixMap(){
+    private HashMap<Integer, ConfusionMatrix> getConfusionMatrixMap(){
         return confusionMatrixMap;
     }
 
-    public void combineConfusionMatrix(){
+    private void combineConfusionMatrix(){
 
         int newConfusionMatrix[][] = new int[targetValueNum][targetValueNum];
         this.getConfusionMatrixMap()
@@ -65,4 +64,13 @@ public class APNOutputInfo {
         return confusionMatrixMap.size();
     }
 
+    public void getEachConfusionMatrixOutput(){
+        this.getConfusionMatrixMap()
+                .values()
+                .forEach(ConfusionMatrix::printConfusionMatrixInfo);
+    }
+
+    public void getTotalConfusionMatrixOutput(){
+        this.combineConfusionMatrix();
+    }
 }

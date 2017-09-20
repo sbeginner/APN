@@ -22,14 +22,8 @@ public class Starton {
     public static void main(String str[]) throws IOException {
         setConfig();
         //forTrainTesttset();
-
-        if(true){
-            if(true)
-                crossValidation();
-            else
-                bioCrossValidation();
-        }
-        else
+        crossValidation();
+        bioCrossValidation();
         forTrainTest();
     }
 
@@ -43,14 +37,13 @@ public class Starton {
         //instances.autoShuffleInstanceOrder();
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
-        eval.crossValidateModel(new APN(), instances, 10);
+        eval.crossValidateModel(new APN(), 10);
     }
 
     private static void bioCrossValidation() throws IOException {
         DataInput dt =new DataInput();
         dt.forKfoldValidationInstance();
 
-        //dt.completeData();
         Instances instances = dt.getInstances();    //get data
         //instances.setRandSeed(1);
         //instances.autoShuffleInstanceOrder();
@@ -60,7 +53,7 @@ public class Starton {
         ABC abc = new ABC(1000, 100, false);
         abc.setDifferentBeePercent(0.3, 0.4, 0.5);
 
-        eval.crossValidateModel(new APN(), instances, 10, abc);
+        eval.crossValidateModel(new APN(), 10, abc);
     }
 
     private static void forTrainTest() throws IOException {
@@ -70,7 +63,7 @@ public class Starton {
         Instances instances = dt.getInstances();    //get data
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
-        eval.evalTrainTestModel(new APN(), instances);
+        eval.evalTrainTestModel(new APN());
 
     }
 

@@ -4,6 +4,7 @@ import DataStructure.Instances;
 import com.model.apn.BionicsContainer.Population;
 import com.model.apn.BionicsMethod.ABC;
 import com.model.apn.BionicsMethod.Bionics;
+import com.model.apn.Container.APNOutputInfo;
 import com.model.apn.NetworkStructure.APNNetwork;
 import com.model.apn.NetworkStructure.APNNetworkStructure;
 
@@ -22,63 +23,42 @@ import static com.model.apn.Setup.Config.THRESHOLD_NUM;
 public class APN {
     private Instances instances;
     private APNNetwork APNNet;
-    private APNNetworkStructure APNNetStructure;
     private boolean isAPNNetSet = false;
-
-    public APN(){
-
-    }
+    private APNNetworkStructure APNNetStructure;
 
     public void setInstances(Instances instances){
         this.instances = instances;
     }
 
+    /*
+    * Original APN process
+    * */
     public void setAPNNetworkStructure(boolean isFixed){
         if(this.isAPNNetSet){
             return;
         }
 
         isAPNNetSet = isFixed;
-        this.APNNetStructure = new APNNetworkStructure(instances);
-        this.APNNetStructure.createNetworkStructure();
-        this.APNNet = new APNNetwork(this.APNNetStructure, this.instances);
-        this.APNNet.setInstances(instances);
+        APNNetworkStructure APNNetStructure = new APNNetworkStructure(instances).createNetworkStructure();
+        this.APNNetStructure = APNNetStructure;
 
-        APNNetStructure.printStructureValue();
+        this.APNNet = new APNNetwork(this.instances);
+        this.APNNet.setAPNNetStruct(APNNetStructure);
     }
 
     public void setAPNNetworkStructureParameters(){
-        ArrayList<Double> list = new ArrayList<>(Collections.nCopies(THRESHOLD_NUM, 0.01));
+        APNNet.setParameters(new ArrayList<>(Collections.nCopies(THRESHOLD_NUM, 0.01)));
+    }
+
+    public void travelAPNmodel(int curfoldInd){
+        APNNet.travel(curfoldInd);
+    }
+
+    /*
+    * Extra-Bionics process
+    * */
+    private void setAPNNetworkStructureParameters(ArrayList<Double> list){
         APNNet.setParameters(list);
-    }
-
-    public void setAPNNetworkStructureParameters(ArrayList<Double> list){
-        APNNet.setParameters(list);
-    }
-
-    public void setBionicsParameters(ArrayList<Double> thresholdList){
-        APNNet.setParameters(thresholdList);
-    }
-
-    public ArrayList<Double> setBionicsParameters(int initRandomSeed, int randomSeed){
-        return setBionicsAPNNetworkStructureParameters(initRandomSeed, randomSeed);
-    }
-
-    private ArrayList<Double> setBionicsAPNNetworkStructureParameters(int initRandomSeed, int randomSeed){
-        initRandomSeed += randomSeed % Double.MAX_VALUE;
-        Random rnd = new Random(initRandomSeed);
-
-        ArrayList<Double> thresholdList = new ArrayList<>(THRESHOLD_NUM);
-        IntStream.range(0, THRESHOLD_NUM).forEach(thresholdInd -> thresholdList.add(randomFunc(rnd)));
-
-        APNNet.setParameters(thresholdList);
-
-        return thresholdList;
-    }
-
-    private double randomFunc(Random rnd){
-        double randomParameter = div(rnd.nextInt(10000), 10000);
-        return randomParameter == 0 ? 0.0001 : randomParameter;
     }
 
     public void setBionicsAPNnetworkStructure(int curfoldInd, Bionics bionics){
@@ -107,20 +87,39 @@ public class APN {
         setAPNNetworkStructureParameters(bestPopulation.getParameterList());
     }
 
+    public ArrayList<Double> setBionicsParameters(){
+        ArrayList<Double> thresholdList = new ArrayList<>(THRESHOLD_NUM);
+
+        IntStream.range(0, THRESHOLD_NUM)
+                .forEach(thresholdInd -> thresholdList.add(randomFunc()));
+
+        APNNet.setParameters(thresholdList);
+
+        return thresholdList;
+    }
+
+    public void setBionicsParameters(ArrayList<Double> thresholdList){
+        APNNet.setParameters(thresholdList);
+    }
+
     public double travelBionicsAPNmodel(){
        return APNNet.getTotalAverageMSE();
     }
 
-    public void travelAPNmodel(int curfoldInd){
-        APNNet.travel(curfoldInd);
+    private double randomFunc(){
+        Random rnd = new Random();
+        double randomParameter = div(rnd.nextInt(1000), 1000);
+        return randomParameter == 0 ? 0.0001 : randomParameter;
     }
 
-    public void getEachOutput(){
-        APNNet.getEachConfusionMatrixOutput();
+    /*
+    * Get output info
+    * */
+    public APNOutputInfo getAPNOutputInfo(){
+        return APNNet.getAPNOutputInfo();
     }
 
-    public void getTotalOutput(){
-        APNNet.getTotalConfusionMatrixOutput();
+    public void printNetworkStructure(){
+        APNNetStructure.printStructureValue();
     }
-
 }

@@ -22,25 +22,30 @@ import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
  * Created by jack on 2017/3/29.
  */
 public class Evaluation {
-    Instances instances;
+    private Instances instances;
+
     public Evaluation(Instances instances){
         this.instances = instances;
     }
 
-    public void setRandomSeed(int randseed){
-        instances.setRandSeed(randseed);//Optional
+    /*
+    * Cross validation
+    * */
+    public void crossValidateModel(APN APNmodel, int maxfoldnum){
+        crossValidateModel(APNmodel, maxfoldnum, null);
     }
 
-    public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum, Bionics bionics){
+    public void crossValidateModel(APN APNmodel, int maxfoldnum, Bionics bionics){
 
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
         instances.setMaxFoldNum(maxfoldnum);
 
         IntStream.range(0, MAX_FOLDNUM).forEach(curfoldInd -> {
 
-            System.out.println("[ Fold: "+curfoldInd+" ]");
             instances.autoCVInKFold(curfoldInd);
             Instances mepaInstances = Filter.useFilter(instances, new MEPA());
+
+            System.out.println("[ Fold: "+curfoldInd+" ]");
             printInfo(mepaInstances);
 
             //model do something;
@@ -49,52 +54,51 @@ public class Evaluation {
         });
 
         //result
-        toMatrixString(APNmodel);
+        toTotalMatrixString(APNmodel);
     }
 
-    public void crossValidateModel(APN APNmodel, Instances instances, int maxfoldnum){
-        crossValidateModel(APNmodel,instances, maxfoldnum, null);
+    /*
+    * Train & Test
+    * */
+    public void evalTrainTestModel(APN APNmodel){
+        evalTrainTestModel(APNmodel, null);
     }
 
-    public void evalTrainTestModel(APN APNmodel, Instances instances, Bionics bionics){
+    public void evalTrainTestModel(APN APNmodel, Bionics bionics){
 
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
         Instances mepaInstances = Filter.useFilter(instances, new MEPA());
+
         printInfo(mepaInstances);
 
         //model do something
         evalAPNProcess(APNmodel, mepaInstances, 0, bionics);
 
         //result
-        toMatrixString(APNmodel);
+        toTotalMatrixString(APNmodel);
     }
 
-    public void evalTrainTestModel(APN APNmodel, Instances instances){
-        evalTrainTestModel(APNmodel,instances, null);
-    }
-
+    /*
+    * General APN process
+    * */
     private void evalAPNProcess(APN APNmodel, Instances mepaInstances, int curfoldInd, Bionics bionics){
         APNmodel.setInstances(mepaInstances);
         APNmodel.setAPNNetworkStructure(true);
         APNmodel.setAPNNetworkStructureParameters();
+
         if(!Objects.isNull(bionics)){
             APNmodel.setBionicsAPNnetworkStructure(curfoldInd, bionics);
         }
+
         APNmodel.travelAPNmodel(curfoldInd);
-        APNmodel.getEachOutput();
+
+        toEachMatrixString(APNmodel);
     }
 
-    public void evalAPNProcesstest(APN APNmodel, Instances mepaInstances, int curfoldInd, Bionics bionics){
-        evalAPNProcess(APNmodel, mepaInstances, curfoldInd, bionics);
-    }
-
-    public void toMatrixString(APN APNmodel){
-        System.out.println();
-        System.out.println("|- - - - - [ Total Result ] - - - - -|");
-        APNmodel.getTotalOutput();
-    }
-
-    public void printInfo(Instances instances){
+    /*
+    * Print something...
+    * */
+    private void printInfo(Instances instances){
         attributeInfo(instances);
     }
 
@@ -131,6 +135,19 @@ public class Evaluation {
             System.out.print("target = "+targetInstaceValue+") ");
             System.out.println(pp.getProbabilityByAttributeValue(nInstaceValue, targetInstaceValue));
         }
+    }
+
+    private void toTotalMatrixString(APN APNmodel){
+        APNmodel.printNetworkStructure();
+        System.out.println();
+        System.out.println("|- - - - - [ Total Result ] - - - - -|");
+        APNmodel.getAPNOutputInfo().getTotalConfusionMatrixOutput();
+    }
+
+    private void toEachMatrixString(APN APNmodel){
+        System.out.println();
+        System.out.println("|- - - - - [ Each Result ] - - - - -|");
+        APNmodel.getAPNOutputInfo().getEachConfusionMatrixOutput();
     }
 }
 

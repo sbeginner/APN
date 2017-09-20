@@ -22,56 +22,63 @@ import static com.model.apn.Setup.Config.*;
  * Created by JACK on 2017/5/7.
  */
 public class APNNetwork {
-    APNNetworkStructure APNNetStruct;
-    Instances instances;
-    APNOutputInfo APNOutputInfoCenter;
+    private APNNetworkStructure APNNetStruct;
+    private Instances instances;
+    private APNOutputInfo APNOutputInfoCenter;
 
-    public APNNetwork(APNNetworkStructure APNNetStruct, Instances instances){
-        this.APNNetStruct = APNNetStruct;
+    public APNNetwork(Instances instances){
         this.instances = instances;
-
         this.APNOutputInfoCenter = new APNOutputInfo(instances);
     }
 
-    public void setInstances(Instances instances){
-        this.instances = instances;
+    public void setAPNNetStruct(APNNetworkStructure APNNetStruct){
+        this.APNNetStruct = APNNetStruct;
+    }
+
+    private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
+        placeMap.values().forEach(Place::reset);
+        transitionMap.values().forEach(Transition::reset);
     }
 
     public void setParameters(ArrayList<Double> thresholdList){
         APNNetStruct.setParameters(thresholdList);
     }
 
+    /*
+    * Original APN travel
+    * */
     public void travel(int curfoldInd){
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
         HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
-        HashMap<Integer, Place> rootPlaceMap = new HashMap(getRootPlaceMap(placeMap));
+        HashMap<Integer, Place> rootPlaceMap = new HashMap<>(getRootPlaceMap(placeMap));
 
-        ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList = new ArrayList(INSTANCE_NUM_TEST);
+        ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList = new ArrayList<>(INSTANCE_NUM_TEST);
 
         IntStream.range(0, INSTANCE_NUM_TEST).forEach(testInstanceInd -> {
+
+            reset(placeMap, transitionMap);
 
             setAPNNetPlaceInEachTestInstance(placeMap, testInstanceInd);
             setAPNNetSupConf(transitionMap);
 
-//            printTracebackTitle();
             travelProcess(transitionMap);
 
-            APNOutputInstanceInfo outputInstanceInfo = getOutputResult(rootPlaceMap, placeMap, testInstanceInd);
-            APNOutputInstanceInfoList.add(outputInstanceInfo);
+            APNOutputInstanceInfoList.add(new APNOutputInstanceInfo(testInstanceInd, this.instances)
+                    .create(rootPlaceMap, placeMap));
 
             printTravelResultInfo();
-
-            reset(placeMap, transitionMap);
         });
 
         APNOutputInfoCenter.setAPNOutputInstanceInfo(APNOutputInstanceInfoList, curfoldInd);
     }
 
     private  void setAPNNetSupConf(HashMap<Integer, Transition> transitionMap){
-        transitionMap.values()
-                .forEach(Transition::setSupConf);
+        transitionMap.values().forEach(Transition::setSupConf);
     }
 
+    /*
+    * Bio-APN travel used (speed up)
+    * */
     public double getTotalAverageMSE(){
         return APNOutputInfoCenter.calcAverageMSE(getTotalMSE());
     }
@@ -79,34 +86,32 @@ public class APNNetwork {
     private double getTotalMSE(){
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
         HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
-        HashMap<Integer, Place> rootPlaceMap = new HashMap(getRootPlaceMap(placeMap));
+        HashMap<Integer, Place> rootPlaceMap = new HashMap<>(getRootPlaceMap(placeMap));
 
+        //travel
         return IntStream.range(0, INSTANCE_NUM_TRAIN)
                 .mapToDouble(trainInstanceInd -> {
-                    double MSE;
+                    reset(placeMap, transitionMap);
+
                     setAPNNetPlaceInEachTrainInstance(placeMap, trainInstanceInd);
                     setAPNNetSupConf(transitionMap);
+
                     travelProcess(transitionMap);
-                    MSE = getInstanceMSE(rootPlaceMap, trainInstanceInd);
-                    reset(placeMap, transitionMap);
-                    return MSE;
+
+                    return getInstanceMSE(rootPlaceMap, trainInstanceInd);
                 }).sum();
     }
 
     private double getInstanceMSE(HashMap<Integer, Place> rootPlaceMap, int instanceInd){
-        APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(instanceInd, this.instances);
-        return outputInstanceInfo.getMeanSquaredErrorForBio(rootPlaceMap);
+        return new APNOutputInstanceInfo(instanceInd, this.instances).getMeanSquaredErrorForBio(rootPlaceMap);
     }
 
     private  Map<Integer, Place> getRootPlaceMap(HashMap<Integer, Place> placeMap){
-        Map<Integer, Place> rootPlaceMap = placeMap.entrySet()
+        // rootPlaceMap
+        return placeMap.entrySet()
                 .stream()
                 .filter(placeMapItem -> placeMapItem.getValue().getTypeValue() == ROOT_PLACE)
-                .collect(Collectors.toMap(
-                        placeMapItem -> placeMapItem.getKey(),
-                        placeMapItem -> placeMapItem.getValue()
-                ));
-        return rootPlaceMap;
+                .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
     }
 
     private void setAPNNetPlaceInEachTrainInstance(HashMap<Integer, Place> placeMap, int trainInstanceInd){
@@ -145,34 +150,19 @@ public class APNNetwork {
                 .forEach(Transition::calcInputPlaceRelationshipDegree);
     }
 
-    private APNOutputInstanceInfo getOutputResult(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap, int testInstanceInd){
-        APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(testInstanceInd, this.instances);
-        outputInstanceInfo.create(rootPlaceMap, placeMap);
+    public APNOutputInfo getAPNOutputInfo(){return this.APNOutputInfoCenter;}
 
-        return outputInstanceInfo;
-    }
-
-    private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
-        placeMap.values()
-                .forEach(Place::reset);
-
-        transitionMap.values()
-                .forEach(Transition::reset);
-    }
-
+    /*
+    * print some process info
+    * */
     private void printTravelResultInfo(){
-        printTransitionMap();
-        printOutputResult();
-        printPlaceMap();
-    }
-
-    private void printTestInstanceInd(int testInstanceInd){
-        if(!PRINT_TRACETRAVELHISTORY_BTN){
+        if(!PRINT_DETAIL_BTN){
             return;
         }
 
-        System.out.println();
-        System.out.println("- - - - [ "+testInstanceInd+"'th test instance ] - - - -");
+        printTransitionMap();
+        printOutputResult();
+        printPlaceMap();
     }
 
     private void printOutputResult(){
@@ -186,39 +176,7 @@ public class APNNetwork {
                 .forEach(place -> System.out.println("class["+place.getRootIndex()+"] "+place.getTestAttributeValue()+" => "+place.getRelationshipDegree()));
     }
 
-    private void printTracebackTitle(){
-        if(!PRINT_TRACETRAVELHISTORY_BTN){
-            return;
-        }
-
-        System.out.println();
-        System.out.println("<---- APN travel traceback ---->");
-    }
-
-    private void printPlaceInitInfo(HashMap<Integer, Place> placeMap){
-        if(!PRINT_DETAIL_BTN){
-            return;
-        }
-
-        System.out.println();
-        System.out.println("<---- Places init Info ---->");
-        placeMap.values()
-                .stream()
-                .forEach(place -> {
-                    System.out.print("Member degree = "+place.getRelationshipDegree());
-                    if(place.getTypeValue() == ROOT_PLACE){
-                        System.out.println(", place"+place.getIndex()+" ("+place.getRootIndex()+") = "+place.getTestAttributeValue());
-                    }else {
-                        System.out.println(", place"+place.getIndex()+" = "+place.getTestAttributeValue());
-                    }
-                });
-    }
-
     private void printTransitionMap(){
-        if(!PRINT_DETAIL_BTN){
-            return;
-        }
-
         HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
 
         System.out.println();
@@ -238,11 +196,8 @@ public class APNNetwork {
         });
     }
 
-    public void printPlaceMap(){
+    private void printPlaceMap(){
         //Print the route, for explain used
-        if(!PRINT_DETAIL_BTN){
-            return;
-        }
 
         System.out.println();
         System.out.println("<---- APN travel result: route ---->");
@@ -266,15 +221,4 @@ public class APNNetwork {
                 });
     }
 
-
-    public void getEachConfusionMatrixOutput(){
-        APNOutputInfoCenter.getConfusionMatrixMap()
-                .values()
-                .stream()
-                .forEach(confusionMatrix -> confusionMatrix.printConfusionMatrixInfo());
-    }
-
-    public void getTotalConfusionMatrixOutput(){
-        APNOutputInfoCenter.combineConfusionMatrix();
-    }
 }

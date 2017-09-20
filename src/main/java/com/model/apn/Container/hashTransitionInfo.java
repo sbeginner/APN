@@ -18,26 +18,17 @@ import static Setup.Config.INSTANCE_NUM_TRAIN;
  */
 public class hashTransitionInfo {
     private Instances instances;
-
-    private Transition transition;
-    private int inputPlaceHashcode;
-    private int outputPlaceHashcode;
-    private int curTransitionHashcode;
     private HashSet<Place> inputPlaceSet;
     private HashSet<Place> outputPlaceSet;
-    private int mixHashcode;
-
     private HashMap<List<String>, Integer> ConfInputOutpuFreqMap;
     private HashMap<List<String>, Integer> SupInputOutpuFreqMap;
 
-
     public hashTransitionInfo(Instances instances, Transition transition){
         this.instances = instances;
-        this.transition = transition;
         this.inputPlaceSet = transition.getInputPlaceSet();
         this.outputPlaceSet = transition.getOutputPlaceSet();
-        this.ConfInputOutpuFreqMap = new HashMap();
-        this.SupInputOutpuFreqMap = new HashMap();
+        this.ConfInputOutpuFreqMap = new HashMap<>();
+        this.SupInputOutpuFreqMap = new HashMap<>();
     }
 
     public ArrayList<Double> setSupport(){
@@ -92,14 +83,8 @@ public class hashTransitionInfo {
         }
     }
 
-    public void setHashTransitionInfo(int inputPlaceHashcode, int outputPlaceHashcode, int curTransitionHashcode){
-        this.inputPlaceHashcode = inputPlaceHashcode;
-        this.outputPlaceHashcode = outputPlaceHashcode;
-        this.curTransitionHashcode = curTransitionHashcode;
-    }
-
     private List<List<String>> setCartesianProductList(ArrayList<Place> combineList){
-        List<List<String>> attrValueList = new ArrayList();
+        List<List<String>> attrValueList = new ArrayList<>();
 
         for (Place aCombineList : combineList) {
             Attribute attr = aCombineList.getAttribute();
@@ -127,8 +112,6 @@ public class hashTransitionInfo {
 
                         return !isNoMatch;
                     }).map(instanceInd -> 1).sum();
-
-
 
                     if(sum > 0){
                         if(isConf){

@@ -1,15 +1,11 @@
 package com.model.apn.NetworkStructure;
 
-import DataStructure.Attribute;
 import DataStructure.Instances;
 import com.model.apn.APNObject.Place;
 import com.model.apn.APNObject.Transition;
-import com.model.apn.NetworkStructureTemplate.IrisSampleTempl;
-import com.model.apn.NetworkStructureTemplate.brainwekaRSSampleTempl;
-
+import com.model.apn.NetworkStructureTemplate.CorrelationNetwork;
 import java.util.*;
 import java.util.stream.IntStream;
-
 import static MathCalculate.Arithmetic.sub;
 import static com.model.apn.Setup.Config.ATTRIBUTE_NUM;
 import static com.model.apn.Setup.Config.TARGET_ATTRIBUTE;
@@ -88,38 +84,30 @@ public class APNNetworkStructure {
 
         THRESHOLD_NUM = transitionMaptmp.values()
                 .stream()
-                .peek(transition -> transition.createRelationship())
-                .mapToInt(transition -> transition.setThresholdSize())
+                .peek(Transition::createRelationship)
+                .peek(Transition::setThresholdSize)
+                .mapToInt(Transition::getThresholdSize)
                 .sum();
 
         System.out.println("Init Prepared");
         return transitionMaptmp;
     }
 
-    public void createNetworkStructure(){
-        this.networkStructure = netStructureExample("Iris");
+    public APNNetworkStructure createNetworkStructure(){
+        this.networkStructure = createNetworkStructureProcess();
 
         this.placeMap = createPlace(this.networkStructure);
         this.transitionMap = createTransition(this.networkStructure, this.placeMap);
+
+        return this;
     }
 
-    private int[][] netStructureExample(String teaplateName){
+    private int[][] createNetworkStructureProcess(){
 
         System.out.println(instances.getTrainInstanceMap().get(0).getInstanceDigitalValue(0));
         int[][] networkStructure = initNetworkStructure();
 
-        networkStructure = new IrisSampleTempl(networkStructure, instances).template1();
-
-        /*
-        switch (teaplateName){
-            case "Iris":
-                networkStructure = new IrisSampleTempl(networkStructure).template1();
-                break;
-            case "brainwekaRS":
-                networkStructure = new brainwekaRSSampleTempl(networkStructure).template1();
-                break;
-        }
-        */
+        networkStructure = new CorrelationNetwork(networkStructure, instances).template1();
 
         return networkStructure;
     }
@@ -128,13 +116,12 @@ public class APNNetworkStructure {
         int offset, start = 0, end;
 
         Transition curTrasition;
-        Iterator itTrasition = transitionMap.entrySet().iterator();
-        while (itTrasition.hasNext()) {
-            Map.Entry pair = (Map.Entry)itTrasition.next();
-            curTrasition = (Transition)pair.getValue();
+        for (Object o : transitionMap.entrySet()) {
+            Map.Entry pair = (Map.Entry) o;
+            curTrasition = (Transition) pair.getValue();
             offset = curTrasition.getThresholdSize();
             end = start + offset;
-            curTrasition.setParameters(new ArrayList(thresholdList.subList(start, end)));
+            curTrasition.setThresholdParameters(new ArrayList<>(thresholdList.subList(start, end)));
             start = end;
         }
     }
@@ -151,7 +138,7 @@ public class APNNetworkStructure {
         printStructureValue(this.networkStructure);
     }
 
-    public void printStructureValue(int[][] networkStructure){
+    private void printStructureValue(int[][] networkStructure){
         System.out.println();
         System.out.println("<---- APN network structure [ Input: "+FEATUREPLACENUM+", Output: "+ALLPLACENUM+" ] ---->");
         System.out.println();

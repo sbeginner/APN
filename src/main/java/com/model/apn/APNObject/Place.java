@@ -16,20 +16,12 @@ public class Place {
     private int index = NONVALUE_INTEGER;
     private int rootIndex = NONVALUE_INTEGER;
     private double relationshipDegree = NONVALUE_INTEGER;
-    private Transition maxRDInputTransition;
     private Place maxRDSelectedInputPlace;
     private HashSet<Transition> inputTransitionSet;
-    private HashSet<Transition> outputTransitionSet;
     private Attribute currentAttr;
     private boolean isRoot = false;
     private boolean isLeaf = false;
-
     private String testAttributeValue = "";
-
-    public void reset(){
-        relationshipDegree = NONVALUE_INTEGER;
-        testAttributeValue = "";
-    }
 
     public Place(Attribute currentAttr){
         init(currentAttr);
@@ -44,8 +36,38 @@ public class Place {
         this.index = currentAttr.getIndex();
         this.currentAttr = currentAttr;
 
-        inputTransitionSet = new HashSet(HALF_ATTRIBUTE_NUM);
-        outputTransitionSet = new HashSet(HALF_ATTRIBUTE_NUM);
+        inputTransitionSet = new HashSet<>(HALF_ATTRIBUTE_NUM);
+    }
+
+    /*
+    *   Main process for traveling (setMaxRelationshipDegree)
+    *   choose the max relationship for this current place from input transitions
+    */
+    void setMaxRelationshipDegree(){
+        //To ensure the input transitions are already held the value
+        inputTransitionSet.stream()
+                .filter(inputTransition -> !inputTransition.checkIsTransitionMinRelationshipDegreeSet())
+                .forEach(Transition::calcInputPlaceRelationshipDegree);
+
+        //Choose the max-value transition, and hold the value in this place
+        Transition maxTransition = inputTransitionSet.stream()
+                .filter(inputTransition -> inputTransition.getRDSelectedInputDegree() > 0)
+                .max(Comparator.comparingDouble(Transition::getRDSelectedInputDegree))
+                .orElse(null);
+
+        if(Objects.isNull(maxTransition)){
+            //Can't find the satisfied max membership degree from input transitions
+            maxRDSelectedInputPlace = null;
+            setRelationshipDegree(0.0);
+        }else{
+            maxRDSelectedInputPlace = maxTransition.getRDSelectedInputPlace();
+            setRelationshipDegree(maxTransition.getTriggerInputDegree());
+        }
+    }
+
+    public void reset(){
+        relationshipDegree = NONVALUE_INTEGER;
+        testAttributeValue = "";
     }
 
     public void isRootPlace(){
@@ -65,76 +87,30 @@ public class Place {
         this.testAttributeValue = testAttributeValue;
     }
 
-    public String getTestAttributeValue(){
-        return this.testAttributeValue;
-    }
-
     public void setRelationshipDegree(double relationshipDegree){
         this.relationshipDegree = relationshipDegree;
     }
 
-    public void setMaxRelationshipDegree(){
-
-        inputTransitionSet.stream()
-                .filter(inputTransition -> !inputTransition.checkIsTransitionMinRelationshipDegreeSet())
-                .forEach(Transition::calcInputPlaceRelationshipDegree);
-
-        System.out.println();
-        inputTransitionSet.forEach(item -> System.out.println(item.getConfidence()));
-        Transition maxTransition = inputTransitionSet.stream()
-                .filter(inputTransition -> inputTransition.getRDSelectedInputDegree() > 0)
-                .max(Comparator.comparingDouble(Transition::getRDSelectedInputDegree))
-                .orElse(null);
-
-        if(Objects.isNull(maxTransition)){
-            //Can't find the satisfied max membership degree from input transitions
-            maxRDInputTransition = null;
-            maxRDSelectedInputPlace = null;
-            setRelationshipDegree(0.0);
-        }else{
-            maxRDInputTransition = maxTransition;
-            maxRDSelectedInputPlace = maxTransition.getRDSelectedInputPlace();
-            setRelationshipDegree(maxRDInputTransition.getInputDegree());
-        }
-
-        System.out.println(ATTRIBUTE_NUM+", "+currentAttr.getAttributeName().toString()+' '+this.relationshipDegree);
-    }
-
-    private int checkType(){
+    public int getTypeValue(){
         if(isLeaf){
-            //Leaf
             return LEAF_PLACE;
         }else if(isRoot){
-            //Root
             return ROOT_PLACE;
         }else {
-            //branch
             return BRANCH_PLACE;
         }
     }
 
-    public int getTypeValue(){
-        return checkType();
-    }
-
-    public void addInputTransitionMap(Transition transition){
-        inputTransitionSet.add(transition);
-    }
-
-    public void addOutputTransitionMap(Transition transition){
-        outputTransitionSet.add(transition);
+    public int getRootIndex(){
+        return this.rootIndex;
     }
 
     public double getRelationshipDegree(){
-        return relationshipDegree;
+        return this.relationshipDegree;
     }
 
-    public int getIndex(){
-        return index;
-    }
-
-    public int getRootIndex(){
-        return rootIndex;
+    public String getTestAttributeValue(){
+        return this.testAttributeValue;
     }
 
     public Attribute getAttribute(){
@@ -142,7 +118,10 @@ public class Place {
     }
 
     public Place getMaxRDSelectedInputPlace(){
-        return maxRDSelectedInputPlace;
+        return this.maxRDSelectedInputPlace;
     }
 
+    void addInputTransitionMap(Transition transition){
+        this.inputTransitionSet.add(transition);
+    }
 }
