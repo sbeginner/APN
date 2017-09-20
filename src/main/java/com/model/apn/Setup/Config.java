@@ -33,12 +33,12 @@ public class Config extends Setup.Config{
         INSTANCEORDER_SHUFFLE_BTN = false;
         MEPADATA_OUTPUT_BTN = false;
 
-        FILEPATH = "C:/Data/test/brainwekaRS";
+        FILEPATH = "C:/Data/test/Iris";
         FILENAME = "origin.txt";
         FILETRAINNAME = "train.txt";
         FILETESTNAME = "test.txt";
 
-        DIVIDE_CONSTRAINTNUM = 3;
+        DIVIDE_CONSTRAINTNUM = 5;
     }
 
 

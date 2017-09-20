@@ -107,7 +107,7 @@ public class APNNetworkStructure {
         System.out.println(instances.getTrainInstanceMap().get(0).getInstanceDigitalValue(0));
         int[][] networkStructure = initNetworkStructure();
 
-        networkStructure = new CorrelationNetwork(networkStructure, instances).template1();
+        networkStructure = new CorrelationNetwork(networkStructure, instances).template();
 
         return networkStructure;
     }
@@ -134,6 +134,9 @@ public class APNNetworkStructure {
         return networkStructure;
     }
 
+    /*
+    * print something...
+    * */
     public void printStructureValue(){
         printStructureValue(this.networkStructure);
     }

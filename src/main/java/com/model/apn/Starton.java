@@ -22,9 +22,9 @@ public class Starton {
     public static void main(String str[]) throws IOException {
         setConfig();
         //forTrainTesttset();
-        crossValidation();
+        //crossValidation();
         bioCrossValidation();
-        forTrainTest();
+        //forTrainTest();
     }
 
     private static void crossValidation() throws IOException {

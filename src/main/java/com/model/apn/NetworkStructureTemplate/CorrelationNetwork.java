@@ -59,15 +59,11 @@ public class CorrelationNetwork {
     public CorrelationNetwork(int[][] networkStructure, Instances instances){
         this.networkStructure = networkStructure;
         this.instances = instances;
-        init();
+        FEATUREPLACENUM = ATTRIBUTE_NUM - 1;
+        ALLPLACENUM = FEATUREPLACENUM + instances.getAttribute(TARGET_ATTRIBUTE).getAllValue().size();
     }
 
-    public int[][] template1(){
-        return main();
-    }
-
-    private int[][] main(){
-
+    public int[][] template(){
         List<Attribute> all_dat = data();
         Attribute target = all_dat.get(all_dat.size()-1);
 
@@ -136,21 +132,18 @@ public class CorrelationNetwork {
             arr[item.getFatherId()][item.getId()] = cnt++;
         }
 
-        for(int i = FEATUREPLACENUM + 1; i < ALLPLACENUM; i++){
+        for(int i = FEATUREPLACENUM ; i < ALLPLACENUM; i++){
             for(int j=0;j<arr[i].length;j++){
                 if(arr[history_member.size()][j]!=-1){
-                    arr[i][j] = cnt++;
+                    arr[i][j] = cnt;
                 }
             }
+            cnt++;
         }
 
         return arr;
     }
 
-    private void init(){
-        FEATUREPLACENUM = ATTRIBUTE_NUM - 1;
-        ALLPLACENUM = FEATUREPLACENUM + instances.getAttribute(TARGET_ATTRIBUTE).getAllValue().size();
-    }
 
     private List<Attribute> data(){
 
@@ -181,11 +174,8 @@ public class CorrelationNetwork {
         return all_dat;
     }
 
-    private double getPearson(List<Double> list1, List<Double> list2){
-        PearsonsCorrelation correlation = new PearsonsCorrelation();
-        double c = correlation.correlation(getArray(list1),getArray(list2));
-
-        return c;
+    private double getPearson(List<Double> variablelist, List<Double> targetlist){
+        return  new PearsonsCorrelation().correlation(getArray(variablelist),getArray(targetlist));
     }
 
     private double[] getArray(List<Double> list){
