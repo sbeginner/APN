@@ -74,56 +74,6 @@ public class Starton {
 
     }
 
-
-
-
-    private static void forTrainTesttset() throws IOException {
-        DataInput dt =new DataInput();
-        dt.forTrainTestInstance();
-        //dt.completeData();
-        Instances instances = dt.getInstances();    //get data
-        ///////////////////////////////////////////////////////////////////
-        Evaluation eval = new Evaluation(instances);
-        APN apn = new APN();
-        MEPA mp = new MEPA();
-        Instances mepaInstances = Filter.useFilter(instances, mp);
-        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
-        eval.toMatrixString(apn);
-
-
-        dt.forTestInstance("C:/Data/test/test_USED.txt");
-        instances = dt.getInstances();    //get data
-        mepaInstances = Filter.useFilter(instances, mp);
-        //model do something
-        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
-        //result
-        eval.toMatrixString(apn);
-
-        dt.forTestInstance("C:/Data/test/test_USED.txt");
-        instances = dt.getInstances();    //get data
-        mepaInstances = Filter.useFilter(instances, mp);
-        //model do something
-        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
-        //result
-        eval.toMatrixString(apn);
-
-        dt.forTestInstance("C:/Data/test/test_USED.txt");
-        instances = dt.getInstances();    //get data
-        mepaInstances = Filter.useFilter(instances, mp);
-        //model do something
-        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
-        //result
-        eval.toMatrixString(apn);
-
-        dt.forTestInstance("C:/Data/test/test_USED.txt");
-        instances = dt.getInstances();    //get data
-        mepaInstances = Filter.useFilter(instances, mp);
-        //model do something
-        eval.evalAPNProcesstest(apn, mepaInstances, 0, null);
-        //result
-        eval.toMatrixString(apn);
-    }
-
     private static void setConfig(){
         new Config();
     }

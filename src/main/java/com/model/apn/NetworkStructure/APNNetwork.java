@@ -53,7 +53,7 @@ public class APNNetwork {
             setAPNNetPlaceInEachTestInstance(placeMap, testInstanceInd);
             setAPNNetSupConf(transitionMap);
 
-            printTracebackTitle();
+//            printTracebackTitle();
             travelProcess(transitionMap);
 
             APNOutputInstanceInfo outputInstanceInfo = getOutputResult(rootPlaceMap, placeMap, testInstanceInd);
@@ -69,7 +69,6 @@ public class APNNetwork {
 
     private  void setAPNNetSupConf(HashMap<Integer, Transition> transitionMap){
         transitionMap.values()
-                .stream()
                 .forEach(Transition::setSupConf);
     }
 
@@ -122,15 +121,11 @@ public class APNNetwork {
                     double relationshipDegree = trainEPAMembershipMap.getAllInstanceByAttr(place.getAttribute()).get(trainInstanceInd).getMembershipDegree();
                     place.setRelationshipDegree(relationshipDegree);
                 });
-
-        printPlaceInitInfo(placeMap);
     }
 
     private void setAPNNetPlaceInEachTestInstance(HashMap<Integer, Place> placeMap, int testInstanceInd){
 
-        printTestInstanceInd(testInstanceInd);
         MEPAMembershipMap testEPAMembershipMap = instances.getMEPAMembershipMap(true);
-
 
         placeMap.values()
                 .stream()
@@ -141,7 +136,6 @@ public class APNNetwork {
                     place.setRelationshipDegree(relationshipDegree);
                 });
 
-        printPlaceInitInfo(placeMap);
     }
 
     private void travelProcess(HashMap<Integer, Transition> transitionMap){
@@ -150,7 +144,6 @@ public class APNNetwork {
                 .sorted((transitionInd, transition) -> transition.getTravelPriority())
                 .forEach(Transition::calcInputPlaceRelationshipDegree);
     }
-
 
     private APNOutputInstanceInfo getOutputResult(HashMap<Integer, Place> rootPlaceMap, HashMap<Integer, Place> placeMap, int testInstanceInd){
         APNOutputInstanceInfo outputInstanceInfo = new APNOutputInstanceInfo(testInstanceInd, this.instances);
@@ -161,19 +154,13 @@ public class APNNetwork {
 
     private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
         placeMap.values()
-                .stream()
-                .forEach(place -> place.reset());
+                .forEach(Place::reset);
 
         transitionMap.values()
-                .stream()
-                .forEach(transition-> transition.reset());
+                .forEach(Transition::reset);
     }
 
     private void printTravelResultInfo(){
-        if(!PRINT_DETAIL_BTN){
-            return;
-        }
-
         printTransitionMap();
         printOutputResult();
         printPlaceMap();

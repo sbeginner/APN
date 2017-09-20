@@ -2,6 +2,7 @@ package com.model.apn.APNObject;
 
 import DataStructure.Instances;
 import com.model.apn.Container.hashTransitionInfo;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.*;
 
@@ -78,12 +79,10 @@ public class Transition {
 
     private void setSupport(){
         supportSet = hTransitionInfo.setSupport();
-        System.out.println("Support => "+supportSet);
     }
 
     private void setConfidence(){
         confidence = hTransitionInfo.setConfidence();
-        System.out.println("Confidence => "+confidence);
     }
 
     public void setSupConf(){
@@ -120,6 +119,10 @@ public class Transition {
         //if not, we need to set the value to the previous one first
         //if the previous one is satisfied, then we can set the relationship degree(multiply the confidence) to the current place
 
+        inputPlaceSet.stream()
+                .filter(inputPlace -> inputPlace.getRelationshipDegree() < 0)
+                .forEach(Place::setMaxRelationshipDegree);
+
         Place minPlace = inputPlaceSet.stream()
                 .filter(inputPlace -> inputPlace.getRelationshipDegree() > 0)
                 .filter(this::checkOverSupportThreshold)
@@ -131,16 +134,12 @@ public class Transition {
             //Can't find the satisfied min place
             minRDSelectedInputPlace = null;
             minRDSelectedInputDegree = 0.0;
-            outputPlaceSet.stream()
-                    .forEach(Place::setMaxRelationshipDegree);
-
-            return;
+            outputPlaceSet.forEach(Place::setMaxRelationshipDegree);
+        }else {
+            minRDSelectedInputPlace = minPlace;
+            minRDSelectedInputDegree = minPlace.getRelationshipDegree();
+            outputPlaceSet.forEach(Place::setMaxRelationshipDegree);
         }
-
-        minRDSelectedInputPlace = minPlace;
-        minRDSelectedInputDegree = minPlace.getRelationshipDegree();
-        outputPlaceSet.stream()
-                .forEach(outputPlace -> outputPlace.setMaxRelationshipDegree());
     }
 
     private boolean checkOverSupportThreshold(Place inputPlace){

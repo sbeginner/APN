@@ -77,11 +77,13 @@ public class Place {
 
         inputTransitionSet.stream()
                 .filter(inputTransition -> !inputTransition.checkIsTransitionMinRelationshipDegreeSet())
-                .forEach(inputTransition -> inputTransition.calcInputPlaceRelationshipDegree());
+                .forEach(Transition::calcInputPlaceRelationshipDegree);
 
+        System.out.println();
+        inputTransitionSet.forEach(item -> System.out.println(item.getConfidence()));
         Transition maxTransition = inputTransitionSet.stream()
                 .filter(inputTransition -> inputTransition.getRDSelectedInputDegree() > 0)
-                .max(Comparator.comparingDouble(inputTransition -> inputTransition.getRDSelectedInputDegree()))
+                .max(Comparator.comparingDouble(Transition::getRDSelectedInputDegree))
                 .orElse(null);
 
         if(Objects.isNull(maxTransition)){
@@ -89,27 +91,13 @@ public class Place {
             maxRDInputTransition = null;
             maxRDSelectedInputPlace = null;
             setRelationshipDegree(0.0);
-
-            return;
+        }else{
+            maxRDInputTransition = maxTransition;
+            maxRDSelectedInputPlace = maxTransition.getRDSelectedInputPlace();
+            setRelationshipDegree(maxRDInputTransition.getInputDegree());
         }
 
-        maxRDInputTransition = maxTransition;
-        maxRDSelectedInputPlace = maxTransition.getRDSelectedInputPlace();
-        setRelationshipDegree(maxRDInputTransition.getInputDegree());
-
-        printTraceTravel();
-    }
-
-    private void printTraceTravel(){
-        if(!PRINT_TRACETRAVELHISTORY_BTN){
-            return;
-        }
-
-        if(isRoot){
-            System.out.println(":traceback: "+getTypeName()+" "+currentAttr.getAttributeName()+"["+index+", "+rootIndex+"]"+" => "+relationshipDegree);
-        }else {
-            System.out.println(":traceback: "+getTypeName()+" "+currentAttr.getAttributeName()+"["+index+"]"+" => "+relationshipDegree);
-        }
+        System.out.println(ATTRIBUTE_NUM+", "+currentAttr.getAttributeName().toString()+' '+this.relationshipDegree);
     }
 
     private int checkType(){
@@ -129,29 +117,12 @@ public class Place {
         return checkType();
     }
 
-    public String getTypeName(){
-        if(checkType() == LEAF_PLACE){
-            //Leaf
-            return "LEAF_PLACE";
-        }else if(checkType() == ROOT_PLACE){
-            //Root
-            return "ROOT_PLACE";
-        }else {
-            //branch
-            return "BRANCH_PLACE";
-        }
-    }
-
     public void addInputTransitionMap(Transition transition){
         inputTransitionSet.add(transition);
     }
 
     public void addOutputTransitionMap(Transition transition){
         outputTransitionSet.add(transition);
-    }
-
-    public boolean checkIsRelationshipDegreeSet(){
-        return relationshipDegree >= 0;
     }
 
     public double getRelationshipDegree(){
@@ -172,31 +143,6 @@ public class Place {
 
     public Place getMaxRDSelectedInputPlace(){
         return maxRDSelectedInputPlace;
-    }
-
-    public HashSet<Transition> getInputTransitionSet(){
-        return inputTransitionSet;
-    }
-
-    public HashSet<Transition> getOutputTransitionSet(){
-        return outputTransitionSet;
-    }
-
-    public void test(){
-        System.out.println("-------");
-        System.out.println("TYPE "+checkType());
-        System.out.println("PLACE NAME "+currentAttr.getAttributeName());
-        System.out.println("PLACE INDEX "+index+" , "+rootIndex);
-        if(rootIndex>=0){
-            System.out.println(currentAttr.getAllValue().get(rootIndex));
-        }
-        System.out.println(inputTransitionSet);
-        System.out.println("=>");
-        getInputTransitionSet();
-        System.out.println(outputTransitionSet);
-        System.out.println("=>");
-        getOutputTransitionSet();
-        System.out.println("-------");
     }
 
 }

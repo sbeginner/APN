@@ -38,7 +38,7 @@ public class Config extends Setup.Config{
         FILETRAINNAME = "train.txt";
         FILETESTNAME = "test.txt";
 
-        DIVIDE_CONSTRAINTNUM = 4;
+        DIVIDE_CONSTRAINTNUM = 3;
     }
 
 

@@ -155,13 +155,11 @@ public class IrisSampleTempl {
         }
 
         for(int i = FEATUREPLACENUM + 1; i < ALLPLACENUM; i++){
-            /*
-            for(int j=0; j < arr[i].length; j++){
-                if(arr[history_member.size()][j] != -1){
+            for(int j=0;j<arr[i].length;j++){
+                if(arr[history_member.size()][j]!=-1){
                     arr[i][j] = cnt++;
                 }
-            }*/
-            arr[i] = arr[history_member.size()];
+            }
         }
 
         return arr;

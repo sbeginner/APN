@@ -67,7 +67,6 @@ public class hashTransitionInfo {
         this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
         double inputUnionOputFreq = getInputOutpuFreqMap(arr, true);
 
-
         return div(inputUnionOputFreq, inputFreq);
     }
 
