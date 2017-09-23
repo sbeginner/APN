@@ -47,8 +47,8 @@ public class ConfusionMatrix {
         //APNOutputInstanceInfoList.get(0).getRealTargetValue()
         //APNOutputInstanceInfoList.get(0).getAPNPredict()
 
-        APNOutputInstanceInfoList.stream().forEach(outputInstanceInfo -> {
-            int predictInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getAPNPredict().toString());
+        APNOutputInstanceInfoList.forEach(outputInstanceInfo -> {
+            int predictInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getAPNPredict());
             int realInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getRealTargetValue());
             confusionMatrix[predictInd][realInd] += 1;
         });
@@ -204,13 +204,8 @@ public class ConfusionMatrix {
     }
 
 
-    private double[] calcAccuracy(int[] TruePositive, int[] TrueNegative, int testInstanceNum){
-        double[] accuracy = new double[targetValueNum];
-        IntStream.range(0, targetValueNum).forEach(nCol -> {
-            accuracy[nCol] = div(add(TruePositive[nCol],  TrueNegative[nCol]), testInstanceNum);
-        });
-
-        return accuracy;
+    private double calcAccuracy(int[] TruePositive, int testInstanceNum){
+        return div(IntStream.of(TruePositive).sum(), testInstanceNum);
     }
 
     private double[] calcSensitivity(int[] TruePositive, int[] FalseNegative){
@@ -273,7 +268,7 @@ public class ConfusionMatrix {
     private void printIndicators(int[] TruePositive, int[] FalsePositive, int[] TrueNegative, int[] FalseNegative, int testInstanceNum){
         System.out.println();
         System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interesTargetValueInd)+" ]");
-        System.out.println("[ Accuracy ] => " + calcAccuracy(TruePositive, TrueNegative, testInstanceNum)[interesTargetValueInd]);
+        System.out.println("[ Accuracy ] => " + calcAccuracy(TruePositive, testInstanceNum));
         System.out.println("[ Sensitivity ] => " + calcSensitivity(TruePositive, FalseNegative)[interesTargetValueInd]);
         System.out.println("[ Specificity ] => " + calcSpecificity(TruePositive, FalseNegative)[interesTargetValueInd]);
         System.out.println("[ Precision ] => " + calcPrecision(TruePositive, FalsePositive)[interesTargetValueInd]);
