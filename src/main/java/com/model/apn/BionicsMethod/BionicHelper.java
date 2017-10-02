@@ -15,6 +15,7 @@ public class BionicHelper {
     int iterative;
     int totalPopulation;
     boolean accuracyMode = false;
+    private Population globalBestParameters;
 
     public void setAPN(APN apn){
         this.apn = apn;
@@ -24,6 +25,14 @@ public class BionicHelper {
         return PopulationList.stream()
                 .max(Comparator.comparing(Population::getFitnessValue))
                 .orElse(setPopulation(1).get(0));
+    }
+
+    Population getGlobalBestParameters() {
+        return this.globalBestParameters;
+    }
+
+    public void setGlobalBestParameters(Population globalBestParameters) {
+        this.globalBestParameters = globalBestParameters;
     }
 
     ArrayList<Population> setPopulation(int population_num){
@@ -55,7 +64,7 @@ public class BionicHelper {
     double getFitness(ArrayList<Double> new_param){
         this.apn.setBionicsParameters(new_param);
         double averageMSE = this.apn.travelBionicsAPNmodel();
-        return  fitnessFunc(averageMSE);
+        return fitnessFunc(averageMSE);
     }
 
     void checkIsAlive(double fitness, Population population, ArrayList<Double> newParameterList){

@@ -7,6 +7,7 @@ import Preprocess.Filter;
 import Preprocess.MEPA;
 import com.model.apn.BionicsMethod.ABC;
 import com.model.apn.BionicsMethod.ACO;
+import com.model.apn.BionicsMethod.PSO;
 import com.model.apn.Eval.Evaluation;
 import com.model.apn.Model.APN;
 import com.model.apn.Setup.Config;
@@ -50,9 +51,10 @@ public class Starton {
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
 
-        ABC abc = new ABC(10, 10, false);
-        abc.setDifferentBeePercent(0.3, 0.4, 0.5);
+//        ABC abc = new ABC(10, 10, false);
+//        abc.setDifferentBeePercent(0.3, 0.4, 0.5);
 //        ACO abc = new ACO(10, 10, false);
+        PSO abc = new PSO(10, 100, false);
         eval.crossValidateModel(new APN(), 10, abc);
     }
 

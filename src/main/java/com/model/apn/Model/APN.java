@@ -71,14 +71,15 @@ public class APN {
         while (iterativeInd < iterative) {
 
             //bionics algorithm do something
-            PopulationList = bionics.bionicsMethod(this, (iterativeInd - curfoldInd + 1), PopulationList);
+            PopulationList = bionics.bionicsMethod(this, iterativeInd, PopulationList);
             Population curBestPopulation = bionics.getCurrentGlobalBestParameters(PopulationList);
 
             if (Objects.isNull(bestPopulation) || curBestPopulation.getFitnessValue() > bestPopulation.getFitnessValue()) {
                 bestPopulation = curBestPopulation;
+                bionics.setGlobalBestParameters(bestPopulation);
             }
 
-            System.out.println(curfoldInd+" "+iterativeInd+" "+bestPopulation.getFitnessValue()+" "+bestPopulation.getParameterList());
+//            System.out.println(curfoldInd+" "+iterativeInd+" "+bestPopulation.getFitnessValue()+" "+bestPopulation.getParameterList());
 
             iterativeInd++;
         }

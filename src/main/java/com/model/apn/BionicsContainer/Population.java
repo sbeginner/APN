@@ -6,21 +6,36 @@ import java.util.ArrayList;
  * Created by JACK on 2017/5/18.
  */
 public class Population {
-    ArrayList<Double> parameterList;
-    ArrayList<Double> localBestParameterList;    //In one iteration
-    double fitnessValue;
-    double localBestAverageMSE;
+    private ArrayList<Double> parameterList;
+    private ArrayList<Double> localBestParameterList;    //In one iteration
+    private double fitnessValue;
+    private double localBestFitness = -1;
+    private ArrayList<Double> speed;
 
-    int aliveTime = 25;
-    int maxAliveTime = 25;
+    private int aliveTime = 25;
+    private int maxAliveTime = 25;
 
     public Population(ArrayList<Double> parameterList, double fitnessValue){
         this.parameterList = parameterList;
         this.fitnessValue = fitnessValue;
     }
+
     public void setAllParameter(ArrayList<Double> parameterList, double fitnessValue) {
         setParameterList(parameterList);
         setFitnessValue(fitnessValue);
+    }
+
+    public void setSpeedList(ArrayList<Double> speed){
+        this.speed = speed;
+    }
+
+    public  ArrayList<Double> getSpeedList(){
+        return this.speed;
+    }
+
+
+    public void setLocalBestParameters() {
+        setLocalBestParameterList();
     }
 
     private void setFitnessValue(double fitnessValue) {
@@ -31,12 +46,23 @@ public class Population {
         this.parameterList = parameterList;
     }
 
+    private void setLocalBestParameterList() {
+        if(fitnessValue >= localBestFitness){
+            localBestParameterList = parameterList;
+            localBestFitness = fitnessValue;
+        }
+    }
+
     public double getFitnessValue() {
         return fitnessValue;
     }
 
     public ArrayList<Double> getParameterList() {
         return parameterList;
+    }
+
+    public ArrayList<Double> getLocalBestParameterList() {
+        return localBestParameterList;
     }
 
     public boolean isAlive() {

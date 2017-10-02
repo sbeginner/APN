@@ -17,4 +17,6 @@ public interface Bionics {
     int getIterative();
 
     Population getCurrentGlobalBestParameters(ArrayList<Population> populationList);
+
+    void setGlobalBestParameters(Population bestPopulation);
 }
