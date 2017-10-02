@@ -2,35 +2,22 @@ package com.model.apn.BionicsMethod;
 
 import com.model.apn.BionicsContainer.Population;
 import com.model.apn.Model.APN;
-import com.sun.jmx.snmp.Enumerated;
 import org.apache.commons.math3.util.Pair;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import static MathCalculate.Arithmetic.div;
 import static MathCalculate.Arithmetic.mul;
 import static MathCalculate.Arithmetic.round;
-import static Setup.Config.INSTANCE_NUM;
-import static Setup.Config.MAX_FOLDNUM;
-import static Setup.Config.RANDOM_SEED;
 
 /**
  * Created by JACK on 2017/5/14.
  */
-public class ABC implements Bionics{
-    private int initRandomSeed;
-    private APN apn;
-    private int iterative;
-
-    private int totalPopulation;
+public class ABC extends BionicHelper implements Bionics{
     private double employBeePercent = 0.1;
     private double onlookerBeePercent = 0.4;
     private double scoutBeePercent = 1 - (employBeePercent + onlookerBeePercent);
-
-    private boolean accuracyMode = false;
 
     public ABC(int iterative, int totalPopulation, boolean accuracyMode){
         //Scout bee can be calculated
@@ -54,39 +41,34 @@ public class ABC implements Bionics{
         this.scoutBeePercent = scoutBeePercent;
     }
 
-    public int getIterative(){
-        return iterative;
-    }
-
     @Override
-    public Population getCurrentGlobalBestParameters(ArrayList<Population> employBeeList) {
-        return employBeeList.stream()
-                .max(Comparator.comparing(Population::getFitnessValue))
-                .orElse(setEmployBee(1).get(0));
-    }
+    public ArrayList<Population> bionicsMethod(APN apn, int randseed, ArrayList<Population> PopulationList) {
+        setAPN(apn);
 
-    @Override
-    public ArrayList<Population> bionicsMethod(APN apn, int randseed, ArrayList<Population> employBeeList) {
-        this.initRandomSeed = RANDOM_SEED + (randseed + 1);
-        System.out.println(initRandomSeed);
-        this.apn = apn;
+        PopulationList =  updateParametersPolicy(PopulationList);
 
-        int employBeeNum = (int) mul(totalPopulation, employBeePercent);
-        int onlookerBeeNum = (int) mul(totalPopulation, onlookerBeePercent);
-
-        if(employBeeList.isEmpty()){
-            employBeeList = setEmployBee(employBeeNum);
-        }
-
-        employBeeList = employBeeFlyingProcess(employBeeList);
-        employBeeList = onlookerBeeFlyingProcess(employBeeList, onlookerBeeNum);
-        employBeeList = scoutBeeFlyingProcess(employBeeList, totalPopulation, onlookerBeeNum);
-
-        return new ArrayList<>(employBeeList.stream()
+        return new ArrayList<>(PopulationList.stream()
                 .filter(Population::isAlive)
                 .collect(Collectors.toList()));
     }
 
+    @Override
+    public ArrayList<Population> updateParametersPolicy(ArrayList<Population>  PopulationList){
+        int employBeeNum = (int) mul(totalPopulation, employBeePercent);
+        int onlookerBeeNum = (int) mul(totalPopulation, onlookerBeePercent);
+
+        if(PopulationList.isEmpty()){
+            PopulationList = setPopulation(employBeeNum);
+        }
+
+        PopulationList = employBeeFlyingProcess(PopulationList);
+        PopulationList = onlookerBeeFlyingProcess(PopulationList, onlookerBeeNum);
+        PopulationList = scoutBeeFlyingProcess(PopulationList, totalPopulation, onlookerBeeNum);
+
+        return PopulationList;
+    }
+
+    // the constraint bee
     private ArrayList<Population> employBeeFlyingProcess(ArrayList<Population> employBeeList){
 
         if(!accuracyMode){
@@ -94,118 +76,51 @@ public class ABC implements Bionics{
         }
 
         employBeeList.forEach(employBee -> {
+            ArrayList<Double> old_param = employBee.getParameterList();
+            ArrayList<Double> new_param = new ArrayList<>();
 
-            ArrayList<Double> parameterListtmp = employBee.getParameterList();
-
-            List<Double> newParameterListtmp = parameterListtmp.stream()
-                    .map(parameter -> ABCConditonalRandomPosition(parameter, initRandomSeed))
+            List<Double> newParameterListtmp = old_param.stream()
+                    .map(this::updateFormula)
                     .collect(Collectors.toList());
-            ArrayList<Double> newParameterList = new ArrayList<>(newParameterListtmp);
+            new_param.addAll(newParameterListtmp);
 
-            this.apn.setBionicsParameters(newParameterList);
-            double averageMSE = this.apn.travelBionicsAPNmodel();
-
-            if(fitnessFunc(averageMSE) > employBee.getFitnessValue()){
-                employBee.setAllParameter(newParameterList, fitnessFunc(averageMSE));
-                employBee.resetAliveTime();
-            }else {
-                employBee.decreaseAliveTime();
-            }
+            double fitness =  getFitness(new_param);
+            checkIsAlive(fitness, employBee, new_param);
         });
 
         return employBeeList;
     }
 
+    // onlooker bee help employee bee, first they'll find out follow the higher fitness value
     private ArrayList<Population> onlookerBeeFlyingProcess(ArrayList<Population> employBeeList, int onlookerBeeNum){
         HashMap<Population, Double> selectEmployBeeProbabilityMap = setSelectEmployBeeProbability(employBeeList);
 
         List<Pair<Population, Double>> distributionList = new ArrayList<>();
         selectEmployBeeProbabilityMap.forEach((population, fitnessValue) -> distributionList.add(Pair.create(population, fitnessValue)));
         EnumeratedDistribution em = new EnumeratedDistribution<>(distributionList);
-        em.reseedRandomGenerator(initRandomSeed);
-
 
         int onlookerBeeInd = 0;
         while (onlookerBeeInd < onlookerBeeNum) {
             Population onlookerBee = (Population)em.sample(); //Onlooker bee init (from the one of employ bees)
-            ArrayList<Double> parameterListtmp = onlookerBee.getParameterList();
 
-            List<Double> newParameterListtmp = parameterListtmp.stream()
-                    .map(parameter -> ABCConditonalRandomPosition(parameter, initRandomSeed))
+            ArrayList<Double> old_param = onlookerBee.getParameterList();
+            ArrayList<Double> new_param = new ArrayList<>();
+
+            List<Double> newParameterListtmp = old_param.stream()
+                    .map(this::updateFormula)
                     .collect(Collectors.toList());
+            new_param.addAll(newParameterListtmp);
 
-            ArrayList<Double> newParameterList = new ArrayList<>(newParameterListtmp);
+            double fitness =  getFitness(new_param);
+            checkIsAlive(fitness, onlookerBee, new_param);
 
-            this.apn.setBionicsParameters(newParameterList);
-            double averageMSE = this.apn.travelBionicsAPNmodel();
             Population p = employBeeList.get(employBeeList.indexOf(onlookerBee));
-
-            if(fitnessFunc(averageMSE) > onlookerBee.getFitnessValue()){
-                p.setAllParameter(newParameterList, fitnessFunc(averageMSE));
-                p.resetAliveTime();
-            }else {
-                p.decreaseAliveTime();
-            }
-
             employBeeList.set(employBeeList.indexOf(onlookerBee), p);
 
             onlookerBeeInd++;
         }
 
         return employBeeList;
-    }
-
-    private ArrayList<Population> scoutBeeFlyingProcess(ArrayList<Population> employBeeList, int totalPopulation, int onlookerBeeNum){
-        int scoutBeeInd = totalPopulation - employBeeList.size() - onlookerBeeNum;
-        while (scoutBeeInd > 0) {
-            ArrayList<Double> parameterListtmp = this.apn.setBionicsParameters();
-            double averageMSE = this.apn.travelBionicsAPNmodel();
-
-            if(!accuracyMode){
-                Population minP = employBeeList.stream()
-                        .min(Comparator.comparing(Population::getFitnessValue))
-                        .orElse(null);
-
-                if(!Objects.isNull(minP)){
-                    employBeeList.get(employBeeList.indexOf(minP)).setAllParameter(parameterListtmp, fitnessFunc(averageMSE));
-                }
-
-                scoutBeeInd--;
-                continue;
-            }
-
-            if(employBeeList.size() < div(totalPopulation * scoutBeePercent, 10)){
-                employBeeList.add(new Population(parameterListtmp, fitnessFunc(averageMSE)));
-            }else {
-                Population minP = employBeeList.stream()
-                        .min(Comparator.comparing(Population::getFitnessValue))
-                        .orElse(null);
-
-                if(!Objects.isNull(minP)){
-                    employBeeList.get(employBeeList.indexOf(minP)).setAllParameter(parameterListtmp, fitnessFunc(averageMSE));
-                }
-            }
-
-            scoutBeeInd--;
-        }
-
-        return employBeeList;
-    }
-
-    private double ABCConditonalRandomPosition(double parameter, int randomSeed){
-        double r = div(new Random(randomSeed).nextInt(1000), 1000);
-        double parameterRnd = div(new Random(randomSeed+(int)parameter).nextInt(1000), 1000);
-
-        double parameterResult = (parameter + mul(r, (parameter - parameterRnd)));
-
-        return parameterResult > 0 ? (round(parameterResult) <= 1 ? round(parameterResult) : 1) : 0.0001 ;
-    }
-
-    private double calcEmployBeeFitnessSum(ArrayList<Population> employBeeList){
-        //Fitness value sum
-        return employBeeList.stream()
-                .mapToDouble(Population::getFitnessValue)
-                .sum();
     }
 
     private HashMap<Population, Double> setSelectEmployBeeProbability(ArrayList<Population> employBeeList){
@@ -217,23 +132,56 @@ public class ABC implements Bionics{
         return  new HashMap<>(probabilityMap);
     }
 
-    private ArrayList<Population> setEmployBee(int employBeeNum){
-        ArrayList<Population> employBeeList = new ArrayList<>();
+    private double calcEmployBeeFitnessSum(ArrayList<Population> employBeeList){
+        //Fitness value sum
+        return employBeeList.stream()
+                .mapToDouble(Population::getFitnessValue)
+                .sum();
+    }
 
-        IntStream.range(0, employBeeNum).forEach(employBeeInd -> {
-            ArrayList<Double> arrayListtmp = this.apn.setBionicsParameters();
-            double averageMSE = this.apn.travelBionicsAPNmodel();
+    // fully random bee
+    private ArrayList<Population> scoutBeeFlyingProcess(ArrayList<Population> employBeeList, int totalPopulation, int onlookerBeeNum){
+        int scoutBeeInd = totalPopulation - employBeeList.size() - onlookerBeeNum;
+        while (scoutBeeInd > 0) {
+            ArrayList<Double> param = getRandomParameters();
+            double fitness =  getFitness(param);
 
-            double abcFitness = fitnessFunc(averageMSE);
-            employBeeList.add(new Population(arrayListtmp, abcFitness));
-        });
+            if(!accuracyMode){
+                Population minP = employBeeList.stream()
+                        .min(Comparator.comparing(Population::getFitnessValue))
+                        .orElse(null);
+
+                if(!Objects.isNull(minP)){
+                    employBeeList.get(employBeeList.indexOf(minP)).setAllParameter(param, fitness);
+                }
+
+                scoutBeeInd--;
+                continue;
+            }
+
+            if(employBeeList.size() < div(totalPopulation * scoutBeePercent, 10)){
+                employBeeList.add(new Population(param, fitness));
+            }else {
+                Population minP = employBeeList.stream()
+                        .min(Comparator.comparing(Population::getFitnessValue))
+                        .orElse(null);
+
+                if(!Objects.isNull(minP)){
+                    employBeeList.get(employBeeList.indexOf(minP)).setAllParameter(param, fitness);
+                }
+            }
+
+            scoutBeeInd--;
+        }
 
         return employBeeList;
     }
 
-    @Override
-    public double fitnessFunc(double fitnessValue) {
-        return div(1, fitnessValue + 1);
-    }
+    private double updateFormula(double old_value){
+        double alpha = div(new Random().nextInt(1000), 1000);
+        double parameterRnd = div(new Random().nextInt(1000), 1000);
 
+        double parameterResult = (old_value + mul(alpha, (old_value - parameterRnd)));
+        return parameterResult > 0 ? (round(parameterResult) <= 1 ? round(parameterResult) : 1) : 0.0001 ;
+    }
 }

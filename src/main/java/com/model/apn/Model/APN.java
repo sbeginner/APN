@@ -64,15 +64,15 @@ public class APN {
     public void setBionicsAPNnetworkStructure(int curfoldInd, Bionics bionics){
         int iterative = bionics.getIterative();
         Population bestPopulation = null;
-        ArrayList<Population> employBeeList = new ArrayList<>();
+        ArrayList<Population> PopulationList = new ArrayList<>();
 
         //Iterative
         int iterativeInd=0;
         while (iterativeInd < iterative) {
 
             //bionics algorithm do something
-            employBeeList = bionics.bionicsMethod(this, (iterativeInd - curfoldInd + 1), employBeeList);
-            Population curBestPopulation = bionics.getCurrentGlobalBestParameters(employBeeList);
+            PopulationList = bionics.bionicsMethod(this, (iterativeInd - curfoldInd + 1), PopulationList);
+            Population curBestPopulation = bionics.getCurrentGlobalBestParameters(PopulationList);
 
             if (Objects.isNull(bestPopulation) || curBestPopulation.getFitnessValue() > bestPopulation.getFitnessValue()) {
                 bestPopulation = curBestPopulation;
@@ -83,7 +83,6 @@ public class APN {
             iterativeInd++;
         }
 
-        System.out.println(bestPopulation.getParameterList()+" "+bestPopulation.getFitnessValue());
         setAPNNetworkStructureParameters(bestPopulation.getParameterList());
     }
 

@@ -29,11 +29,10 @@ public class Config extends Setup.Config{
 
     //For MEPA and data processing relative config
     static {
-        AUTO_MISSINGVALUE_BTN = false;
         INSTANCEORDER_SHUFFLE_BTN = false;
         MEPADATA_OUTPUT_BTN = false;
 
-        FILEPATH = "C:/Data/test/Iris";
+        FILEPATH = "C:/Data/test/Wine";
         FILENAME = "origin.txt";
         FILETRAINNAME = "train.txt";
         FILETESTNAME = "test.txt";

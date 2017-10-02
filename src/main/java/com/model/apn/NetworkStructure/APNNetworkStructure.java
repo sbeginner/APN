@@ -109,6 +109,7 @@ public class APNNetworkStructure {
 
         networkStructure = new CorrelationNetwork(networkStructure, instances).template();
 
+//        printStructureValue(networkStructure);
         return networkStructure;
     }
 

@@ -21,7 +21,7 @@ public class ConfusionMatrix {
     private int targetValueNum = NONVALUE_INTEGER;
     private int maxTargetValueStingLen = NONVALUE_INTEGER;
     private Attribute targetAttribute;
-    private int interesTargetValueInd = 0;
+    private int interestTargetValueInd = 0;
     private int[][] confusionMatrix;
 
     public ConfusionMatrix(Instances instances){
@@ -29,7 +29,7 @@ public class ConfusionMatrix {
         init();
     }
 
-    public void init(){
+    private void init(){
         targetValueNum = instances.getAttribute(TARGET_ATTRIBUTE).getAllValue().size();
         this.targetAttribute = instances.getAttribute(TARGET_ATTRIBUTE);
         this.maxTargetValueStingLen = targetAttribute.getAllValue()
@@ -42,11 +42,6 @@ public class ConfusionMatrix {
     public void setConfusionMatrix(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList) {
         int[][] confusionMatrix = new int[targetValueNum][targetValueNum];
 
-        /* For AUC*/
-        //prepareAUC(APNOutputInstanceInfoList);
-        //APNOutputInstanceInfoList.get(0).getRealTargetValue()
-        //APNOutputInstanceInfoList.get(0).getAPNPredict()
-
         APNOutputInstanceInfoList.forEach(outputInstanceInfo -> {
             int predictInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getAPNPredict());
             int realInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getRealTargetValue());
@@ -58,87 +53,12 @@ public class ConfusionMatrix {
         printConfusionMatrixInfo(confusionMatrix);
     }
 
-
-    private void prepareAUC(ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList){
-        List<APNOutputInstanceInfo> sortedList = APNOutputInstanceInfoList.stream()
-                .sorted(Comparator.comparing(APNOutputInstanceInfo::getAPNPredictDegreeNormalize).reversed())
-                .collect(Collectors.toList());
-
-        List<Double> sortedProbabilityList= sortedList.stream()
-                .mapToDouble(APNOutputInstanceInfo::getAPNPredictDegreeNormalize)
-                .boxed()
-                .collect(Collectors.toList());
-
-        List<Double> AUCRankList = calcAUCRank(sortedProbabilityList);
-        int cur = 0;
-
-        List<Boolean> sortedTrueFalseList = new ArrayList<>();
-        sortedList.stream().forEach(outputInstanceInfo->{
-            int realInd = targetAttribute.getAttrValueIndByString(outputInstanceInfo.getRealTargetValue());
-            if(realInd == cur){
-                sortedTrueFalseList.add(true);
-            }else {
-                sortedTrueFalseList.add(false);
-            }
-        });
-
-        int True = (int) sortedTrueFalseList.stream().filter(Boolean::booleanValue).count();
-        int False = sortedTrueFalseList.size() - True;
-        double TrueSum = IntStream.range(0, sortedTrueFalseList.size()).filter(i->sortedTrueFalseList.get(i)).mapToDouble(i->AUCRankList.get(i)).sum();
-
-        System.out.println(AUCRankList);
-        System.out.println(TrueSum - div(True*(True+1), 2));
-        System.out.println(True * False);
-
-        if(True*False != 0){
-            System.out.println(div(TrueSum - div(True*(True+1), 2), True * False));
-        }
-    }
-
-    private List<Double> calcAUCRank(List<Double> sortedList){
-
-        int rank = sortedList.size()+1;
-        List<Double> rankList = new ArrayList(sortedList.size());
-
-        for(int i = 0;i<sortedList.size();i++){
-
-            int cnt = 0;
-            for(int j = i+1;j<sortedList.size();j++){
-                if(sortedList.get(i).doubleValue()==sortedList.get(j).doubleValue()){
-                    cnt++;
-                    continue;
-                }
-
-                break;
-            }
-
-            rank--;
-
-            if(cnt == 0){
-                rankList.add((double)rank);
-            }else {
-                int start = cnt;
-                while (start >= 0){
-                    rankList.add(div((rank + rank - cnt)*cnt, 2*cnt));
-                    start--;
-                    i++;
-                }
-                i--;
-                rank -= cnt;
-            }
-        }
-
-        return rankList;
-    }
-
-
-
     public void printConfusionMatrixInfo(){
         int[][] confusionMatrix = this.confusionMatrix;
         printConfusionMatrixInfo(confusionMatrix);
     }
 
-    public void printConfusionMatrixInfo(int[][] confusionMatrix){
+    private void printConfusionMatrixInfo(int[][] confusionMatrix){
         if(!PRINT_DETAIL_BTN){
             return;
         }
@@ -200,7 +120,7 @@ public class ConfusionMatrix {
                     TrueNegative[nCol] += testInstanceNum - FalseNegative[nCol] - FalsePositive[nCol] - TruePositive[nCol];
                 });
 
-        printIndicators(TruePositive, FalsePositive, TrueNegative, FalseNegative, testInstanceNum);
+        printIndicators(TruePositive, FalsePositive, FalseNegative, testInstanceNum);
     }
 
 
@@ -265,16 +185,16 @@ public class ConfusionMatrix {
         return Gmean;
     }
 
-    private void printIndicators(int[] TruePositive, int[] FalsePositive, int[] TrueNegative, int[] FalseNegative, int testInstanceNum){
+    private void printIndicators(int[] TruePositive, int[] FalsePositive, int[] FalseNegative, int testInstanceNum){
         System.out.println();
-        System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interesTargetValueInd)+" ]");
+        System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interestTargetValueInd)+" ]");
         System.out.println("[ Accuracy ] => " + calcAccuracy(TruePositive, testInstanceNum));
-        System.out.println("[ Sensitivity ] => " + calcSensitivity(TruePositive, FalseNegative)[interesTargetValueInd]);
-        System.out.println("[ Specificity ] => " + calcSpecificity(TruePositive, FalseNegative)[interesTargetValueInd]);
-        System.out.println("[ Precision ] => " + calcPrecision(TruePositive, FalsePositive)[interesTargetValueInd]);
-        System.out.println("[ Recall ] => " + calcRecall(TruePositive, FalseNegative)[interesTargetValueInd]);
-        System.out.println("[ F1-measure ] => " + calcF1score(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interesTargetValueInd]);
-        System.out.println("[ G-mean ] => " + calcGmean(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interesTargetValueInd]);
+        System.out.println("[ Sensitivity ] => " + calcSensitivity(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ Specificity ] => " + calcSpecificity(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ Precision ] => " + calcPrecision(TruePositive, FalsePositive)[interestTargetValueInd]);
+        System.out.println("[ Recall ] => " + calcRecall(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ F1-measure ] => " + calcF1score(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interestTargetValueInd]);
+        System.out.println("[ G-mean ] => " + calcGmean(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interestTargetValueInd]);
         System.out.println();
     }
 

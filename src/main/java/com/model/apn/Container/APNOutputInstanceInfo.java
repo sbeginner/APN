@@ -98,19 +98,17 @@ public class APNOutputInstanceInfo {
     }
 
     private boolean checkAPNOutputMultipleSameDegreeIsExist(HashMap<Integer, Place> placeMap, double maxAPNRelationshipDegree){
-        boolean MultipleSameDegree = placeMap.values()
+        return placeMap.values()
                 .stream()
                 .filter(place -> place.getRelationshipDegree() == maxAPNRelationshipDegree)
                 .count() > 1;
-        return MultipleSameDegree;
     }
 
     private Place getAPNMaxRelationshipTarget(HashMap<Integer, Place> placeMap){
-        Place maxPlace = placeMap.values()
+        return placeMap.values()
                 .stream()
                 .max(Comparator.comparing(Place::getRelationshipDegree))
                 .orElse(null);
-        return maxPlace;
     }
 
     private String getCurrentInstanceRealTarget(int testInstanceInd, boolean isTest){
