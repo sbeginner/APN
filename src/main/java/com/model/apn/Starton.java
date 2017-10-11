@@ -24,7 +24,7 @@ public class Starton {
     public static void main(String str[]) throws IOException {
         setConfig();
         //crossValidation();
-        bioCrossValidation();
+        //bioCrossValidation();
         //forTrainTest();
     }
 
@@ -51,10 +51,10 @@ public class Starton {
         ///////////////////////////////////////////////////////////////////
         Evaluation eval = new Evaluation(instances);
 
-//        ABC abc = new ABC(10, 10, false);
-//        abc.setDifferentBeePercent(0.3, 0.4, 0.5);
+        ABC abc = new ABC(10, 10, false);
+        abc.setDifferentBeePercent(0.3, 0.4, 0.5);
 //        ACO abc = new ACO(10, 10, false);
-        PSO abc = new PSO(10, 100, false);
+//        PSO abc = new PSO(10, 10, false);
         eval.crossValidateModel(new APN(), 10, abc);
     }
 
