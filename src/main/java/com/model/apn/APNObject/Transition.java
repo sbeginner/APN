@@ -55,6 +55,9 @@ public class Transition {
     public void setSupConf(){
         confidence = hTransitionInfo.setConfidence();
         supportSet = hTransitionInfo.setSupport();
+//        inputPlaceSet.forEach(i-> System.out.print( "P"+i.getAttribute().getIndex() +" "));
+//        System.out.print(" "+index+" "+confidence+" "+supportSet);
+//        System.out.println();
     }
 
     /*
