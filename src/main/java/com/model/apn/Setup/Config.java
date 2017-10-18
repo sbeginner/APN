@@ -23,12 +23,12 @@ public class Config extends Setup.Config{
         DIVIDE_CONSTRAINTNUM = Integer.valueOf(args[4]);
     }
 
-    public Config(String[] args, int MEPA_dnum){
+    public Config(){
         FILEPATH = "C:/Data/test/Wine";
         FILETRAINNAME = "train.txt";
         FILETESTNAME = "test.txt";
 
-        DIVIDE_CONSTRAINTNUM = MEPA_dnum;
+        DIVIDE_CONSTRAINTNUM = 3;
     }
 
     static {

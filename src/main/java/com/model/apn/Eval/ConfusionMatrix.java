@@ -21,7 +21,6 @@ public class ConfusionMatrix {
     private int targetValueNum = NONVALUE_INTEGER;
     private int maxTargetValueStingLen = NONVALUE_INTEGER;
     private Attribute targetAttribute;
-    private int interestTargetValueInd = 0;
     private int[][] confusionMatrix;
 
     public ConfusionMatrix(Instances instances){
@@ -90,12 +89,9 @@ public class ConfusionMatrix {
     }
 
     private void printIndicators(int[][] confusionMatrix){
-
         int testInstanceNum;
-
         int[] MatrixColumn = new int[targetValueNum];
         int[] MatrixRow = new int[targetValueNum];
-
         int[] TruePositive = new int[targetValueNum];
         int[] FalsePositive = new int[targetValueNum];
         int[] TrueNegative = new int[targetValueNum];
@@ -120,9 +116,21 @@ public class ConfusionMatrix {
                     TrueNegative[nCol] += testInstanceNum - FalseNegative[nCol] - FalsePositive[nCol] - TruePositive[nCol];
                 });
 
-        printIndicators(TruePositive, FalsePositive, FalseNegative, testInstanceNum);
+        printIndicatorsValue(TruePositive, TrueNegative, FalsePositive, FalseNegative, testInstanceNum, 0);
     }
 
+    private void printIndicatorsValue(int[] TruePositive, int[] TrueNegative, int[] FalsePositive, int[] FalseNegative, int testInstanceNum, int interestTargetValueInd){
+        System.out.println();
+        System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interestTargetValueInd)+" ]");
+        System.out.println("[ Accuracy ] => " + calcAccuracy(TruePositive, testInstanceNum));
+        System.out.println("[ Sensitivity ] => " + calcSensitivity(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ Specificity ] => " + calcSpecificity(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ Precision ] => " + calcPrecision(TruePositive, FalsePositive)[interestTargetValueInd]);
+        System.out.println("[ Recall ] => " + calcRecall(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ F1-measure ] => " + calcF1score(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interestTargetValueInd]);
+        System.out.println("[ G-mean ] => " + calcGmean(TruePositive, TrueNegative, FalsePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println();
+    }
 
     private double calcAccuracy(int[] TruePositive, int testInstanceNum){
         return div(IntStream.of(TruePositive).sum(), testInstanceNum);
@@ -175,27 +183,16 @@ public class ConfusionMatrix {
         return F1score;
     }
 
-    private double[] calcGmean(double[] precision, double[] recall){
+    private double[] calcGmean(int[] TruePositive, int[] TrueNegative, int[] FalsePositive, int[] FalseNegative){
 
         double[] Gmean = new double[targetValueNum];
         IntStream.range(0, targetValueNum).forEach(nCol -> {
-            Gmean[nCol] = sqrt(mul(precision[nCol], recall[nCol]));
+            double Gmean_l = div(TrueNegative[nCol], (TrueNegative[nCol]+FalsePositive[nCol]));
+            double Gmean_r = div(TruePositive[nCol], (TruePositive[nCol]+FalseNegative[nCol]));
+            Gmean[nCol] = sqrt(Gmean_l * Gmean_r);
         });
 
         return Gmean;
-    }
-
-    private void printIndicators(int[] TruePositive, int[] FalsePositive, int[] FalseNegative, int testInstanceNum){
-        System.out.println();
-        System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interestTargetValueInd)+" ]");
-        System.out.println("[ Accuracy ] => " + calcAccuracy(TruePositive, testInstanceNum));
-        System.out.println("[ Sensitivity ] => " + calcSensitivity(TruePositive, FalseNegative)[interestTargetValueInd]);
-        System.out.println("[ Specificity ] => " + calcSpecificity(TruePositive, FalseNegative)[interestTargetValueInd]);
-        System.out.println("[ Precision ] => " + calcPrecision(TruePositive, FalsePositive)[interestTargetValueInd]);
-        System.out.println("[ Recall ] => " + calcRecall(TruePositive, FalseNegative)[interestTargetValueInd]);
-        System.out.println("[ F1-measure ] => " + calcF1score(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interestTargetValueInd]);
-        System.out.println("[ G-mean ] => " + calcGmean(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interestTargetValueInd]);
-        System.out.println();
     }
 
     public int[][] getConfusionMatrix(){
