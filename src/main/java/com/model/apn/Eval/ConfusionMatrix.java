@@ -76,7 +76,7 @@ public class ConfusionMatrix {
         System.out.println("<---- Confusion Matrix ---->");
         System.out.println();
         System.out.format("%-"+maxTargetValueStingLen+"s","");
-        targetAttribute.getAllValue().stream().forEach(targetValue -> System.out.format("%"+maxTargetValueStingLen+"s ",targetValue.toString()));
+        targetAttribute.getAllValue().forEach(targetValue -> System.out.format("%"+maxTargetValueStingLen+"s ",targetValue.toString()));
         System.out.println();
 
         IntStream.range(0, confusionMatrix.length)

@@ -46,18 +46,18 @@ public class APNOutputInfo {
         return confusionMatrixMap;
     }
 
-    private void combineConfusionMatrix(){
+    private int[][] combineConfusionMatrix(){
 
         int newConfusionMatrix[][] = new int[targetValueNum][targetValueNum];
         this.getConfusionMatrixMap()
                 .values()
-                .stream()
                 .forEach(confusionMatrix -> IntStream.range(0, targetValueNum)
                         .forEach(nRow -> IntStream.range(0, targetValueNum)
                                 .forEach(nCol -> newConfusionMatrix[nRow][nCol] += confusionMatrix.getConfusionMatrix()[nRow][nCol])));
 
         ConfusionMatrix confusionMatrix = new ConfusionMatrix(instances);
         confusionMatrix.printConfusionMatrixInfoForce(newConfusionMatrix);
+        return newConfusionMatrix;
     }
 
     private int autoIncreaseIndex(){
@@ -70,7 +70,7 @@ public class APNOutputInfo {
                 .forEach(ConfusionMatrix::printConfusionMatrixInfo);
     }
 
-    public void getTotalConfusionMatrixOutput(){
-        this.combineConfusionMatrix();
+    public int[][] getTotalConfusionMatrixOutput(){
+        return this.combineConfusionMatrix();
     }
 }

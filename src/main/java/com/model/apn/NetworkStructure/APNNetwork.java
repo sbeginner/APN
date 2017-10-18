@@ -181,7 +181,7 @@ public class APNNetwork {
 
         System.out.println();
         System.out.println("<---- Transition Info ---->");
-        transitionMap.values().stream().forEach(transition -> {
+        transitionMap.values().forEach(transition -> {
             int index = transition.getIndex();
             int priority = transition.getTravelPriority();
             double confidence = transition.getConfidence();
