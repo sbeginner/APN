@@ -91,7 +91,7 @@ public class CorrelationNetwork {
                 int initMember = head_member.size();
 
                 for(Attribute item : temp_member){
-                    if(item.getCorrelation()>0.9){
+                    if(item.getCorrelation() > 0.9){
                         temp_member_t.remove(item);
                         head_member.offer(item);
                         history_member.offer(item);
@@ -128,7 +128,6 @@ public class CorrelationNetwork {
         int[][] arr = networkStructure;
         int cnt = 0;
         for(Attribute item: history_member){
-            System.out.println(item.getFatherId()+" "+item.getId());
             arr[item.getFatherId()][item.getId()] = cnt++;
         }
 

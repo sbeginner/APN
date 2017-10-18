@@ -16,35 +16,35 @@ public class Config extends Setup.Config{
     public static boolean PROBABILITY_PREDICT_BTN;
     public static boolean KEEP_TOTALRESULT_BY_EACH_FOLD;
 
-    static {
-        PROBABILITY_PREDICT_BTN = true;
-        PRINT_DETAIL_BTN = false;
-        PRINT_TRACETRAVELHISTORY_BTN = true;
-
-        KEEP_TOTALRESULT_BY_EACH_FOLD = true;
-
-        MAX_FOLDNUM = 10;
-        RANDOM_SEED = 2;
+    public Config(String[] args){
+        FILEPATH = args[1];
+        FILENAME = args[2];
+        MAX_FOLDNUM = Integer.valueOf(args[3]);
+        DIVIDE_CONSTRAINTNUM = Integer.valueOf(args[4]);
     }
 
-    //For MEPA and data processing relative config
-    static {
-        INSTANCEORDER_SHUFFLE_BTN = false;
-        MEPADATA_OUTPUT_BTN = false;
-
+    public Config(String[] args, int MEPA_dnum){
         FILEPATH = "C:/Data/test/Wine";
-        FILENAME = "origin.txt";
         FILETRAINNAME = "train.txt";
         FILETESTNAME = "test.txt";
 
-        DIVIDE_CONSTRAINTNUM = 5;
+        DIVIDE_CONSTRAINTNUM = MEPA_dnum;
     }
 
+    static {
+        PROBABILITY_PREDICT_BTN = true;
+        PRINT_DETAIL_BTN = false;
+        PRINT_TRACETRAVELHISTORY_BTN = false;
+        KEEP_TOTALRESULT_BY_EACH_FOLD = true;
+
+        //For MEPA and data processing relative config
+        INSTANCEORDER_SHUFFLE_BTN = false;
+        MEPADATA_OUTPUT_BTN = false;
+    }
 
     //For Init
     static {
         THRESHOLD_NUM = 1000;
-
         ROOT_PLACE = 0;
         BRANCH_PLACE = 100;
         LEAF_PLACE = 1000;

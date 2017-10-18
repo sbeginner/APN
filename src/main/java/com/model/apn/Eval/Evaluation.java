@@ -36,7 +36,6 @@ public class Evaluation {
     }
 
     public void crossValidateModel(APN APNmodel, int maxfoldnum, Bionics bionics){
-
         instances.autoShuffleInstanceOrder();    //Optional, shuffle the instance item
         instances.setMaxFoldNum(maxfoldnum);
 
@@ -50,7 +49,6 @@ public class Evaluation {
 
             //model do something;
             evalAPNProcess(APNmodel, mepaInstances, curfoldInd, bionics);
-
         });
 
         //result

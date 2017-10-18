@@ -79,8 +79,6 @@ public class APN {
                 bionics.setGlobalBestParameters(bestPopulation);
             }
 
-//            System.out.println(curfoldInd+" "+iterativeInd+" "+bestPopulation.getFitnessValue()+" "+bestPopulation.getParameterList());
-
             iterativeInd++;
         }
 

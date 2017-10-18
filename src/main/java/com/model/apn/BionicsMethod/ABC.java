@@ -17,7 +17,7 @@ import static MathCalculate.Arithmetic.round;
 public class ABC extends BionicHelper implements Bionics{
     private double employBeePercent = 0.1;
     private double onlookerBeePercent = 0.4;
-    private double scoutBeePercent = 1 - (employBeePercent + onlookerBeePercent);
+    private double scoutBeePercent = 0.5;
 
     public ABC(int iterative, int totalPopulation, boolean accuracyMode){
         //Scout bee can be calculated
