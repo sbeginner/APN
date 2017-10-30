@@ -117,7 +117,7 @@ public class APN {
         return APNNet.getAPNOutputInfo();
     }
 
-    public void printNetworkStructure(){
-        APNNetStructure.printStructureValue();
+    public int[][] printNetworkStructure(){
+        return APNNetStructure.printStructureValue();
     }
 }

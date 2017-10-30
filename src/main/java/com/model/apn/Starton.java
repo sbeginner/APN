@@ -1,26 +1,13 @@
 package com.model.apn;
 
-import DataStructure.Instances;
-import FileIO.DataInput;
-import com.model.apn.BionicsMethod.ABC;
-import com.model.apn.BionicsMethod.ACO;
-import com.model.apn.BionicsMethod.PSO;
-import com.model.apn.Eval.Evaluation;
-import com.model.apn.Model.APN;
-import com.model.apn.Setup.Config;
-
 import java.io.IOException;
-import java.util.Objects;
-
-import static Setup.Config.MAX_FOLDNUM;
-
 /**
  * Created by jack on 2017/3/20.
  */
 public class Starton {
     /*
-    IF [CV]
-        args[0]: is CV
+    IF [CrossValidation]
+        args[0]: -CV
         args[1]: dir_path
         args[2]: file_name
         args[3]: max_fold
@@ -39,11 +26,11 @@ public class Starton {
     END IF
 
     -----------------------------------------------------------------------------------------
-    IF [CV]
-        args[0]: is CV
+    IF [TrainTest]
+        args[0]: -TT
         args[1]: dir_path
-        args[2]: file_name
-        args[3]: max_fold
+        args[2]: train_file_name
+        args[3]: test_file_name
         args[4]: MEPA_divide_num
         args[5]: BIO => (-ABC, -ACO, -PSO)
         args[6]: Iteration
@@ -52,27 +39,24 @@ public class Starton {
 
         args[?]: correlationNet:min_branch:min_correlation
 
-        ex. "java -jar Test.jar -CV C:/Data/test/Wine origin.txt 10 5"
-            "java -jar Test.jar -CV C:/Data/test/Wine origin.txt 10 5 -ABC 10 10 0.1:0.4:0.5"
-            "java -jar Test.jar -CV C:/Data/test/Wine origin.txt 10 5 -ACO 10 10"
-            "java -jar Test.jar -CV C:/Data/test/Wine origin.txt 10 5 -PSO 10 10"
+        ex. "java -jar Test.jar -TT C:/Data/test/Wine train.txt test.txt 5"
+            "java -jar Test.jar -TT C:/Data/test/Wine train.txt test.txt 5 -ABC 10 10 0.1:0.4:0.5"
+            "java -jar Test.jar -TT C:/Data/test/Wine train.txt test.txt 5 -ACO 10 10"
+            "java -jar Test.jar -TT C:/Data/test/Wine train.txt test.txt 5 -PSO 10 10"
     END IF
      */
     public static void main(String[] args) throws IOException {
 //        new Cmd(args);
-
-//        crossValidation();
-        TT();
+        crossValidation_example();
     }
 
-    private static void crossValidation() throws IOException {
-        String[] command = "-CV C:/Data/Biotset/Wine origin.txt 10 5".split("\\s+");
+    private static void crossValidation_example() throws IOException {
+        String[] command = "-CV C:/Data/Biotset/Iris origin.txt 10 5".split("\\s+"); //fake command
         new Cmd(command);
     }
 
-    private static void TT() throws IOException {
-        String[] command = "-TT C:/Data/test/Wine train.txt test.txt 5".split("\\s+");
-        command = "-TT C:/Data/test/Wine train.txt test.txt 5 -ABC 10 10 0.1:0.4:0.5".split("\\s+");
+    private static void forTrainTest_example() throws IOException {
+        String[] command = "-TT C:/Data/test/Wine train.txt test.txt 5".split("\\s+"); //fake command
         new Cmd(command);
     }
 

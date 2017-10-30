@@ -94,7 +94,6 @@ class Cmd {
     }
 
 
-
     private static void crossValidationAdaptor(String[] args) throws IOException {
         if (!"-CV".equals(args[0])){
             return;

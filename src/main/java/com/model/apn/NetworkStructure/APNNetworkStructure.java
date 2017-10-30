@@ -133,8 +133,9 @@ public class APNNetworkStructure {
     /*
     * print something...
     * */
-    public void printStructureValue(){
+    public int[][] printStructureValue(){
         printStructureValue(this.networkStructure);
+        return this.networkStructure;
     }
 
     private void printStructureValue(int[][] networkStructure){
