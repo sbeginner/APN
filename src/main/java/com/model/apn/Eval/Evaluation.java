@@ -9,6 +9,7 @@ import Preprocess.MEPA;
 import com.model.apn.Model.APN;
 import com.model.apn.BionicsMethod.Bionics;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -136,17 +137,17 @@ public class Evaluation {
         }
     }
 
-    private void toTotalMatrixString(APN APNmodel){
-        APNmodel.printNetworkStructure();
-        System.out.println();
-        System.out.println("|- - - - - [ Total Result ] - - - - -|");
-        int[][] cMatrix = APNmodel.getAPNOutputInfo().getTotalConfusionMatrixOutput();
-    }
-
     private void toEachMatrixString(APN APNmodel){
         System.out.println();
         System.out.println("|- - - - - [ Each Result ] - - - - -|");
         APNmodel.getAPNOutputInfo().getEachConfusionMatrixOutput();
+    }
+
+    private void toTotalMatrixString(APN APNmodel){
+        int[][] cStructure = APNmodel.printNetworkStructure();
+        System.out.println();
+        System.out.println("|- - - - - [ Total Result ] - - - - -|");
+        int[][] cMatrix = APNmodel.getAPNOutputInfo().getTotalConfusionMatrixOutput();
     }
 }
 
