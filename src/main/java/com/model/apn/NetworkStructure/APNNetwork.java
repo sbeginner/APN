@@ -22,7 +22,7 @@ import static com.model.apn.Setup.Config.*;
  * Created by JACK on 2017/5/7.
  */
 public class APNNetwork {
-    private APNNetworkStructure APNNetStruct;
+    private APNNetworkStructure APNNetStructure;
     private Instances instances;
     private APNOutputInfo APNOutputInfoCenter;
 
@@ -31,8 +31,8 @@ public class APNNetwork {
         this.APNOutputInfoCenter = new APNOutputInfo(instances);
     }
 
-    public void setAPNNetStruct(APNNetworkStructure APNNetStruct){
-        this.APNNetStruct = APNNetStruct;
+    public void setAPNNetStruct(APNNetworkStructure APNNetStructure){
+        this.APNNetStructure = APNNetStructure;
     }
 
     private void reset(HashMap<Integer, Place> placeMap, HashMap<Integer, Transition> transitionMap){
@@ -41,15 +41,15 @@ public class APNNetwork {
     }
 
     public void setParameters(ArrayList<Double> thresholdList){
-        APNNetStruct.setParameters(thresholdList);
+        APNNetStructure.setParameters(thresholdList);
     }
 
     /*
     * Original APN travel
     * */
     public void travel(int curfoldInd){
-        HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
-        HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+        HashMap<Integer, Transition> transitionMap = APNNetStructure.getTransitionMap();
+        HashMap<Integer, Place> placeMap = APNNetStructure.getPlaceMap();
         HashMap<Integer, Place> rootPlaceMap = new HashMap<>(getRootPlaceMap(placeMap));
 
         ArrayList<APNOutputInstanceInfo> APNOutputInstanceInfoList = new ArrayList<>(INSTANCE_NUM_TEST);
@@ -84,8 +84,8 @@ public class APNNetwork {
     }
 
     private double getTotalMSE(){
-        HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
-        HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+        HashMap<Integer, Transition> transitionMap = APNNetStructure.getTransitionMap();
+        HashMap<Integer, Place> placeMap = APNNetStructure.getPlaceMap();
         HashMap<Integer, Place> rootPlaceMap = new HashMap<>(getRootPlaceMap(placeMap));
 
         //travel
@@ -166,7 +166,7 @@ public class APNNetwork {
     }
 
     private void printOutputResult(){
-        HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+        HashMap<Integer, Place> placeMap = APNNetStructure.getPlaceMap();
 
         System.out.println();
         System.out.println("<---- output result  ---->");
@@ -177,7 +177,7 @@ public class APNNetwork {
     }
 
     private void printTransitionMap(){
-        HashMap<Integer, Transition> transitionMap = APNNetStruct.getTransitionMap();
+        HashMap<Integer, Transition> transitionMap = APNNetStructure.getTransitionMap();
 
         System.out.println();
         System.out.println("<---- Transition Info ---->");
@@ -201,7 +201,7 @@ public class APNNetwork {
 
         System.out.println();
         System.out.println("<---- APN travel result: route ---->");
-        HashMap<Integer, Place> placeMap = APNNetStruct.getPlaceMap();
+        HashMap<Integer, Place> placeMap = APNNetStructure.getPlaceMap();
 
         placeMap.values()
                 .stream()

@@ -6,16 +6,26 @@ import DataStructure.Attribute;
 import DataStructure.Instances;
 import Preprocess.Filter;
 import Preprocess.MEPA;
+import com.model.apn.APNObject.Place;
 import com.model.apn.Model.APN;
 import com.model.apn.BionicsMethod.Bionics;
+import com.model.apn.NetworkStructure.APNNetworkStructure;
+import com.model.apn.Setup.Config;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
 
 import static Setup.Config.ATTRIBUTE_NUM;
+import static Setup.Config.FILEPATH;
 import static Setup.Config.TARGET_ATTRIBUTE;
 import static com.model.apn.Setup.Config.MAX_FOLDNUM;
 import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
@@ -23,7 +33,8 @@ import static com.model.apn.Setup.Config.PRINT_DETAIL_BTN;
 /**
  * Created by jack on 2017/3/29.
  */
-public class Evaluation {
+public class Evaluation extends EvaluationOutputFiles{
+
     private Instances instances;
 
     public Evaluation(Instances instances){
@@ -87,7 +98,7 @@ public class Evaluation {
         APNmodel.setAPNNetworkStructureParameters();
 
         if(!Objects.isNull(bionics)){
-            APNmodel.setBionicsAPNnetworkStructure(curfoldInd, bionics);
+            APNmodel.setBionicsAPNnetworkStructure(bionics);
         }
 
         APNmodel.travelAPNmodel(curfoldInd);
@@ -144,10 +155,12 @@ public class Evaluation {
     }
 
     private void toTotalMatrixString(APN APNmodel){
-        int[][] cStructure = APNmodel.printNetworkStructure();
         System.out.println();
         System.out.println("|- - - - - [ Total Result ] - - - - -|");
+        int[][] cNetStructure = APNmodel.printNetworkStructure();
         int[][] cMatrix = APNmodel.getAPNOutputInfo().getTotalConfusionMatrixOutput();
+
+        evaluationOutput(instances, APNmodel,  cNetStructure, cMatrix);
     }
 }
 

@@ -61,7 +61,7 @@ public class APN {
         APNNet.setParameters(list);
     }
 
-    public void setBionicsAPNnetworkStructure(int curfoldInd, Bionics bionics){
+    public void setBionicsAPNnetworkStructure(Bionics bionics){
         int iterative = bionics.getIterative();
         Population bestPopulation = null;
         ArrayList<Population> PopulationList = new ArrayList<>();
@@ -119,5 +119,9 @@ public class APN {
 
     public int[][] printNetworkStructure(){
         return APNNetStructure.printStructureValue();
+    }
+
+    public APNNetworkStructure getAPNNetStructure(){
+       return this.APNNetStructure;
     }
 }

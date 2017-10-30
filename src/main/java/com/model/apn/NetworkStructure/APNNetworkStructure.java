@@ -25,11 +25,11 @@ public class APNNetworkStructure {
         init();
     }
 
-    HashMap<Integer, Transition> getTransitionMap(){
+    public HashMap<Integer, Transition> getTransitionMap(){
         return transitionMap;
     }
 
-    HashMap<Integer, Place> getPlaceMap(){
+    public HashMap<Integer, Place> getPlaceMap(){
         return placeMap;
     }
 
@@ -40,7 +40,7 @@ public class APNNetworkStructure {
 
     private HashMap<Integer, Place> createPlace(int[][] networkStructure){
         //To create the places (all attributes)
-        HashMap<Integer, Place> placeMaptmp = new HashMap(ALLPLACENUM);
+        HashMap<Integer, Place> placeMaptmp = new HashMap<>(ALLPLACENUM);
         IntStream.range(0, networkStructure.length)
                 .forEach(nRow -> {
                     Place pp;
