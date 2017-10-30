@@ -5,7 +5,7 @@ Download APNtest.zip
 
 Usage example
 =
-- Please **notice that** the target attribute must be the last column in your **input data**
+- Please **notice that** the target attribute must be the **last column** in your **input data**
 - Some command usage examples
 
 Cross Validation
