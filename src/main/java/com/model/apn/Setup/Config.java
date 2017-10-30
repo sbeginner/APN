@@ -16,20 +16,18 @@ public class Config extends Setup.Config{
     public static boolean PROBABILITY_PREDICT_BTN;
     public static boolean KEEP_TOTALRESULT_BY_EACH_FOLD;
 
-    public Config(String[] args){
+    public Config(String[] args, boolean isCV){
         FILEPATH = args[1];
-        FILENAME = args[2];
-        MAX_FOLDNUM = Integer.valueOf(args[3]);
+        if(isCV){
+            FILENAME = args[2];
+            MAX_FOLDNUM = Integer.valueOf(args[3]);
+        }else {
+            FILETRAINNAME = args[2];
+            FILETESTNAME = args[3];
+        }
         DIVIDE_CONSTRAINTNUM = Integer.valueOf(args[4]);
     }
 
-    public Config(){
-        FILEPATH = "C:/Data/test/Wine";
-        FILETRAINNAME = "train.txt";
-        FILETESTNAME = "test.txt";
-
-        DIVIDE_CONSTRAINTNUM = 3;
-    }
 
     static {
         PROBABILITY_PREDICT_BTN = true;
