@@ -116,10 +116,10 @@ public class CorrelationNetwork {
 
             }else {
                 for(Attribute item : temp_member){
-                    temp_member_t.remove(item);
-                    head_member.offer(item);
                     history_member.offer(item);
                 }
+                temp_member_t.clear();
+                head_member.clear();
             }
             temp_member = temp_member_t;
         }
