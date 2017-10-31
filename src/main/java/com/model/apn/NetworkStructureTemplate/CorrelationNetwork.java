@@ -124,13 +124,13 @@ public class CorrelationNetwork {
             temp_member = temp_member_t;
         }
 
-
         int[][] arr = networkStructure;
         int cnt = 0;
         for(Attribute item: history_member){
             arr[item.getFatherId()][item.getId()] = cnt++;
         }
 
+        //Replace the target place into each target value
         for(int i = FEATUREPLACENUM ; i < ALLPLACENUM; i++){
             for(int j=0;j<arr[i].length;j++){
                 if(arr[history_member.size()][j]!=-1){
@@ -140,7 +140,7 @@ public class CorrelationNetwork {
             cnt++;
         }
 
-        return arr;
+        return  regularConstructureMatrix(arr);
     }
 
 
@@ -185,5 +185,33 @@ public class CorrelationNetwork {
             array[index++] = d;
 
         return array;
+    }
+
+    private int[][] regularConstructureMatrix(int[][] arr){
+
+        //Find current min transition index
+        int min = Integer.MAX_VALUE;
+        for(int i = 0;i<arr.length;i++){
+            for (int j=0;j<arr[i].length;j++){
+                if(arr[i][j] == -1){
+                    continue;
+                }
+
+                if(min >= arr[i][j]){
+                    min = arr[i][j];
+                }
+            }
+        }
+
+        //Regular the matrix, starting from index 0
+        for(int i = 0;i<arr.length;i++){
+            for (int j=0;j<arr[i].length;j++){
+                if(arr[i][j] != -1){
+                    arr[i][j] = arr[i][j] - min;
+                }
+            }
+        }
+
+        return arr;
     }
 }
