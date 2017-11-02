@@ -103,6 +103,7 @@ public class APNNetworkStructure {
         this.placeMap = createPlace(this.networkStructure);
         this.transitionMap = createTransition(this.networkStructure, this.placeMap);
     }
+
     private int[][] createNetworkStructureProcess(){
         int[][] networkStructure = initNetworkStructure();
         networkStructure = new CorrelationNetwork(networkStructure, instances).template();
