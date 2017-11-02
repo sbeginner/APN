@@ -95,13 +95,14 @@ public class APNNetworkStructure {
 
     public APNNetworkStructure createNetworkStructure(){
         this.networkStructure = createNetworkStructureProcess();
-
-        this.placeMap = createPlace(this.networkStructure);
-        this.transitionMap = createTransition(this.networkStructure, this.placeMap);
-
+        initAPNObject();
         return this;
     }
 
+    public void initAPNObject(){
+        this.placeMap = createPlace(this.networkStructure);
+        this.transitionMap = createTransition(this.networkStructure, this.placeMap);
+    }
     private int[][] createNetworkStructureProcess(){
         int[][] networkStructure = initNetworkStructure();
         networkStructure = new CorrelationNetwork(networkStructure, instances).template();

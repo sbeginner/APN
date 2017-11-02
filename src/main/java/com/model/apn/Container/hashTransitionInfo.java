@@ -58,7 +58,13 @@ public class hashTransitionInfo {
         this.outputPlaceSet.forEach(i-> arr.add(i.getTestAttributeValue()));
         double inputUnionOputFreq = getInputOutpuFreqMap(arr, true);
 
-        return div(inputUnionOputFreq, inputFreq);
+        double result;
+        result = div(inputUnionOputFreq, inputFreq);
+        if(Double.isNaN(result)){
+            result = 1e-10;
+        }
+
+        return result;
     }
 
     public void createConfidence(){

@@ -35,15 +35,15 @@ public class APN {
     * */
     public void setAPNNetworkStructure(boolean isFixed){
         if(this.isAPNNetSet){
+            this.APNNetStructure.initAPNObject();
             return;
         }
 
         isAPNNetSet = isFixed;
-        APNNetworkStructure APNNetStructure = new APNNetworkStructure(instances).createNetworkStructure();
-        this.APNNetStructure = APNNetStructure;
+        this.APNNetStructure = new APNNetworkStructure(instances).createNetworkStructure();
 
         this.APNNet = new APNNetwork(this.instances);
-        this.APNNet.setAPNNetStruct(APNNetStructure);
+        this.APNNet.setAPNNetStruct(this.APNNetStructure);
     }
 
     public void setAPNNetworkStructureParameters(){

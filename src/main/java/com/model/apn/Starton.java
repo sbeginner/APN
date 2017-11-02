@@ -51,7 +51,8 @@ public class Starton {
     }
 
     private static void crossValidation_example() throws IOException {
-        String[] command = "-CV C:/Data/Biotset/pima origin.txt 10 5".split("\\s+"); //fake command
+        String[] command = "-CV C:/Data/Biotset/Iris origin.txt 10 5".split("\\s+"); //fake command
+        command = "-CV C:/Data/Biotset/Iris origin.txt 10 5 -ABC 10 10 0.1:0.2:0.7".split("\\s+"); //fake command
         new Cmd(command);
     }
 
