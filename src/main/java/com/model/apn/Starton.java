@@ -47,17 +47,18 @@ public class Starton {
      */
     public static void main(String[] args) throws IOException {
 //        new Cmd(args);
-        crossValidation_example();
+//        crossValidation_example();
+        forTrainTest_example();
     }
 
     private static void crossValidation_example() throws IOException {
-        String[] command = "-CV C:/Data/Biotset/Iris origin.txt 10 5".split("\\s+"); //fake command
-        command = "-CV C:/Data/Biotset/Iris origin.txt 10 5 -ABC 10 10 0.1:0.2:0.7".split("\\s+"); //fake command
+        String[] command = "-CV C:/Data/Biotset origin.txt 10 6".split("\\s+"); //fake command
+//        command = "-CV C:/Data/Biotset origin.txt 10 6 -ABC 10 10 0.1:0.2:0.7".split("\\s+"); //fake command
         new Cmd(command);
     }
 
     private static void forTrainTest_example() throws IOException {
-        String[] command = "-TT C:/Data/test/Wine train.txt test.txt 5".split("\\s+"); //fake command
+        String[] command = "-TT C:/Data/R/Test weka_train.csv weka_test.csv 5".split("\\s+"); //fake command
         new Cmd(command);
     }
 

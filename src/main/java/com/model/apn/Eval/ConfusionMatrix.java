@@ -77,7 +77,7 @@ public class ConfusionMatrix {
         System.out.println();
         System.out.format("%-"+maxTargetValueStingLen+"s","");
         targetAttribute.getAllValue().forEach(targetValue -> System.out.format("%"+maxTargetValueStingLen+"s ",targetValue.toString()));
-        System.out.println();
+        System.out.println(" "+"<- [real]");
 
         IntStream.range(0, confusionMatrix.length)
                 .forEach(nRow -> {
@@ -111,8 +111,8 @@ public class ConfusionMatrix {
 
         IntStream.range(0, targetValueNum)
                 .forEach(nCol -> {
-                    FalseNegative[nCol] += MatrixRow[nCol] - TruePositive[nCol];
-                    FalsePositive[nCol] += MatrixColumn[nCol] - TruePositive[nCol];
+                    FalsePositive[nCol] += MatrixRow[nCol] - TruePositive[nCol];
+                    FalseNegative[nCol] += MatrixColumn[nCol] - TruePositive[nCol];
                     TrueNegative[nCol] += testInstanceNum - FalseNegative[nCol] - FalsePositive[nCol] - TruePositive[nCol];
                 });
 
@@ -122,9 +122,13 @@ public class ConfusionMatrix {
     private void printIndicatorsValue(int[] TruePositive, int[] TrueNegative, int[] FalsePositive, int[] FalseNegative, int testInstanceNum, int interestTargetValueInd){
         System.out.println();
         System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interestTargetValueInd)+" ]");
+        System.out.println("TP: "+TruePositive[interestTargetValueInd]+
+                " TN: "+TrueNegative[interestTargetValueInd]+
+                " FP: "+FalsePositive[interestTargetValueInd]+
+                " FN: "+FalseNegative[interestTargetValueInd]);
         System.out.println("[ Accuracy ] => " + calcAccuracy(TruePositive, testInstanceNum));
         System.out.println("[ Sensitivity ] => " + calcSensitivity(TruePositive, FalseNegative)[interestTargetValueInd]);
-        System.out.println("[ Specificity ] => " + calcSpecificity(TruePositive, FalseNegative)[interestTargetValueInd]);
+        System.out.println("[ Specificity ] => " + calcSpecificity(TrueNegative, FalsePositive)[interestTargetValueInd]);
         System.out.println("[ Precision ] => " + calcPrecision(TruePositive, FalsePositive)[interestTargetValueInd]);
         System.out.println("[ Recall ] => " + calcRecall(TruePositive, FalseNegative)[interestTargetValueInd]);
         System.out.println("[ F1-measure ] => " + calcF1score(calcPrecision(TruePositive, FalsePositive), calcRecall(TruePositive, FalseNegative))[interestTargetValueInd]);
