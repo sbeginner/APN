@@ -46,12 +46,12 @@ public class Starton {
     END IF
      */
     public static void main(String[] args) throws IOException {
-        new Cmd(args);
+//        new Cmd(args);
+        crossValidation_example();
     }
 
     private static void crossValidation_example() throws IOException {
-        String[] command = "-CV C:/Data/Biotset origin.txt 10 6".split("\\s+"); //fake command
-//        command = "-CV C:/Data/Biotset origin.txt 10 6 -ABC 10 10 0.1:0.2:0.7".split("\\s+"); //fake command
+        String[] command = "-CV C:/Data/Biotset/Iris origin.txt 10 6".split("\\s+"); //fake command
         new Cmd(command);
     }
 
