@@ -46,9 +46,7 @@ public class Starton {
     END IF
      */
     public static void main(String[] args) throws IOException {
-//        new Cmd(args);
-//        crossValidation_example();
-        forTrainTest_example();
+        new Cmd(args);
     }
 
     private static void crossValidation_example() throws IOException {

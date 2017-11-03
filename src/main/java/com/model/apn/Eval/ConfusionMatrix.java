@@ -121,7 +121,7 @@ public class ConfusionMatrix {
 
     private void printIndicatorsValue(int[] TruePositive, int[] TrueNegative, int[] FalsePositive, int[] FalseNegative, int testInstanceNum, int interestTargetValueInd){
         System.out.println();
-        System.out.println(">> Target [ "+targetAttribute.getAttrValueStrByIndex(interestTargetValueInd)+" ]");
+        System.out.println(">> Target Value[ "+targetAttribute.getAttrValueStrByIndex(interestTargetValueInd)+" ]");
         System.out.println("TP: "+TruePositive[interestTargetValueInd]+
                 " TN: "+TrueNegative[interestTargetValueInd]+
                 " FP: "+FalsePositive[interestTargetValueInd]+
