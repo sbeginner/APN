@@ -56,6 +56,7 @@ public class PSO extends BionicHelper implements Bionics{
 
         if(PopulationList.isEmpty()){
             PopulationList = setPopulation(totalPopulation);
+            PopulationList = updateParametersPolicyInit(PopulationList);
         }
 
         ArrayList<Double> best_G  = getGlobalBestParameters().getParameterList();
