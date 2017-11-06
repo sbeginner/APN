@@ -47,12 +47,36 @@ public class Starton {
      */
     public static void main(String[] args) throws IOException {
 //        new Cmd(args);
-        crossValidation_example();
+
+        testDivide(2);
+//        crossValidation_example(1);
     }
 
-    private static void crossValidation_example() throws IOException {
-        String[] command = "-CV C:/Data/Biotset/Iris origin.txt 10 6".split("\\s+"); //fake command
+    private static String URL = "C:/Data/Biotset/breast";
+
+    private static void testDivide(int num) throws IOException{
+        String[] command = ("-CV "+URL+" origin.txt 10 "+num).split("\\s+"); //fake command
         new Cmd(command);
+        System.out.println("Original APN");
+    }
+
+    private static void crossValidation_example(int div) throws IOException {
+
+        String[] command = ("-CV "+URL+" origin.txt 10 "+div).split("\\s+"); //fake command
+//        new Cmd(command);
+//        System.out.println("Original APN");
+
+        command = ("-CV "+URL+" origin.txt 10 "+div+" -ABC 10 100 0.1:0.4:0.5").split("\\s+"); //fake command
+        new Cmd(command);
+        System.out.println("ABC APN");
+
+        command = ("-CV "+URL+" origin.txt 10 "+div+" -ACO 10 100").split("\\s+"); //fake command
+        new Cmd(command);
+        System.out.println("ACO APN");
+
+        command = ("-CV "+URL+" origin.txt 10 "+div+" -PSO 10 100").split("\\s+"); //fake command
+        new Cmd(command);
+        System.out.println("PSO APN");
     }
 
     private static void forTrainTest_example() throws IOException {

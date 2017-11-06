@@ -2,7 +2,6 @@ package com.model.apn.Model;
 
 import DataStructure.Instances;
 import com.model.apn.BionicsContainer.Population;
-import com.model.apn.BionicsMethod.ABC;
 import com.model.apn.BionicsMethod.Bionics;
 import com.model.apn.Container.APNOutputInfo;
 import com.model.apn.NetworkStructure.APNNetwork;

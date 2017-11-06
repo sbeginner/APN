@@ -2,12 +2,12 @@ package com.model.apn.NetworkStructureTemplate;
 
 import DataStructure.Instance;
 import DataStructure.Instances;
-import com.model.apn.Setup.Config;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
+import org.apache.commons.math3.stat.correlation.KendallsCorrelation;
+
 
 import static com.model.apn.Setup.Config.ATTRIBUTE_NUM;
 import static com.model.apn.Setup.Config.TARGET_ATTRIBUTE;
-import static com.model.apn.Setup.Config.THRESHOLD_NUM;
 
 import java.util.*;
 
@@ -55,6 +55,8 @@ public class CorrelationNetwork {
     private int FEATUREPLACENUM, ALLPLACENUM;
     private int[][] networkStructure;
     private Instances instances;
+    private int MaxBranch = 5;
+    private double MaxCorrelation = 0.9;
 
     public CorrelationNetwork(int[][] networkStructure, Instances instances){
         this.networkStructure = networkStructure;
@@ -84,14 +86,14 @@ public class CorrelationNetwork {
             head_member.poll();
             temp_member.sort(Comparator.comparing(Attribute::getCorrelation).reversed());
 
-            int Max = 2;
+            int Max = MaxBranch;
             List<Attribute> temp_member_t = new ArrayList<>(temp_member);
             if(temp_member.size() >= Max){
 
                 int initMember = head_member.size();
 
                 for(Attribute item : temp_member){
-                    if(item.getCorrelation() > 0.9){
+                    if(item.getCorrelation() > MaxCorrelation){
                         temp_member_t.remove(item);
                         head_member.offer(item);
                         history_member.offer(item);

@@ -11,7 +11,9 @@ import com.model.apn.Setup.Config;
 
 import java.io.IOException;
 
+import static Setup.Config.INSTANCEORDER_SHUFFLE_BTN;
 import static Setup.Config.MAX_FOLDNUM;
+import static Setup.Config.TARGET_ATTRIBUTE;
 
 /**
  * Created by jack on 2017/3/20.
@@ -120,6 +122,11 @@ class Cmd {
         DataInput dt = new DataInput();
         dt.forKfoldValidationInstance();
         Instances instances = dt.getInstances();
+
+        INSTANCEORDER_SHUFFLE_BTN = true;
+        instances.setRandSeed(1);
+        instances.autoShuffleInstanceOrder();
+
         return new Evaluation(instances);
     }
 
